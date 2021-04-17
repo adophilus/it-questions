@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="utf-8">
+    <title>Home | Student</title>
+    <!-- <link rel="stylesheet" href="/static/CSS/bootstrap/bootstrap.css"> -->
+    <link rel="stylesheet" href="/static/CSS/freebie-interactive/freebie-interactive.css">
+    <link rel="stylesheet" href="/static/CSS/classroom.css">
+</head>
+
+<body>
+    <div class="main-container">
+        <!-- NAVIGATION BAR -->
+        <header class="block">
+            <ul class="header-menu horizontal-list">
+                <li>
+                    <a class="header-menu-tab active" href="javascript:void(0)"><span class="icon fontawesome-home scnd-font-color"></span>Home</a>
+                </li>
+            </ul>
+            <div class="profile-menu">
+                <p>Me <a href="javascript:void(0)"><span class="entypo-down-open scnd-font-color"></span></a></p>
+                <div class="profile-picture small-profile-picture">
+                    <img draggable="false" width="40px" alt="Profile picture" src="/static/media/user-profile-unisesx-big-white.png">
+                </div>
+            </div>
+        </header>
+        <!-- LEFT-CONTAINER -->
+        <div class="left-container container">
+            {% include "sidebar.html" %}
+        </div>
+        <!-- MIDDLE-CONTAINER -->
+        <div class="middle-container container">
+            {% include "profile-container.html" %}
+            {% if Account.ACCOUNT_TYPE == "teacher" or Account.ACCOUNT_TYPE == "student" %}
+                {% include "student/classroom.html" %}
+            {% endif %}
+            {% if Account.ACCOUNT_TYPE == "student" %}
+                {% include "public_remarks.html" %}
+            {% endif %}
+            {% include "notifications.html" %}
+        </div>
+        <!-- RIGHT-CONTAINER -->
+        <div class="right-container container">
+            <div class="calendar-day block">
+                <div class="arrow-btn-container">
+                    <a class="arrow-btn left" href="javascript:void(0)"><span class="icon fontawesome-angle-left"></span></a>
+                    <h2 class="titular">{{ date_and_time["day"] | upper }}</h2>
+                    <a class="arrow-btn right" href="javascript:void(0)"><span class="icon fontawesome-angle-right"></span></a>
+                </div>
+                <p class="the-day">
+                    {{ date_and_time["date"] }}
+                </p>
+                <a class="add-event button" href="javascript:void(0)">VIEW EVENT</a>
+            </div>
+            <div class="calendar-month block">
+                <div class="arrow-btn-container">
+                    <a class="arrow-btn left" href="javascript:void(0)"><span class="icon fontawesome-angle-left"></span></a>
+                    <h2 class="titular">{{ date_and_time["month"] | upper }} {{ date_and_time["year"] }}</h2>
+                    <a class="arrow-btn right" href="javascript:void(0)"><span class="icon fontawesome-angle-right"></span></a>
+                </div>
+                <table class="calendar">
+                    <thead class="days-week">
+                        <tr>
+                            <th>S</th>
+                            <th>M</th>
+                            <th>T</th>
+                            <th>W</th>
+                            <th>TH</th>
+                            <th>F</th>
+                            <th>S</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><a class="scnd-font-color" href="javascript:void(0)"></a></td>
+                            <td><a class="scnd-font-color" href="javascript:void(0)"></a></td>
+                            <td><a class="scnd-font-color" href="javascript:void(0)"></a></td>
+                            <td><a class="scnd-font-color" href="javascript:void(0)"></a></td>
+                            <td><a class="scnd-font-color" href="javascript:void(0)"></a></td>
+                            <td><a class="scnd-font-color" href="javascript:void(0)"></a></td>
+                            <td><a class="scnd-font-color" href="javascript:void(0)">1</a></td>
+                        </tr>
+                        <tr>
+                            <td><a class="scnd-font-color" href="javascript:void(0)">2</a></td>
+                            <td><a class="scnd-font-color" href="javascript:void(0)">3</a></td>
+                            <td><a class="scnd-font-color" href="javascript:void(0)">4</a></td>
+                            <td><a class="scnd-font-color" href="javascript:void(0)">5</a></td>
+                            <td><a class="scnd-font-color" href="javascript:void(0)">6</a></td>
+                            <td><a class="scnd-font-color" href="javascript:void(0)">7</a></td>
+                            <td><a class="scnd-font-color" href="javascript:void(0)">8</a></td>
+                        </tr>
+                        <tr>
+                            <td><a class="scnd-font-color" href="javascript:void(0)">9</a></td>
+                            <td><a class="scnd-font-color" href="javascript:void(0)">10</a></td>
+                            <td><a class="scnd-font-color" href="javascript:void(0)">11</a></td>
+                            <td><a class="scnd-font-color" href="javascript:void(0)">12</a></td>
+                            <td><a class="scnd-font-color" href="javascript:void(0)">13</a></td>
+                            <td><a class="scnd-font-color" href="javascript:void(0)">14</a></td>
+                            <td><a class="scnd-font-color" href="javascript:void(0)">15</a></td>
+                        </tr>
+                        <tr>
+                            <td><a class="scnd-font-color" href="javascript:void(0)">16</a></td>
+                            <td><a class="scnd-font-color" href="javascript:void(0)">17</a></td>
+                            <td><a class="scnd-font-color" href="javascript:void(0)">18</a></td>
+                            <td><a class="scnd-font-color" href="javascript:void(0)">19</a></td>
+                            <td><a class="scnd-font-color" href="javascript:void(0)">20</a></td>
+                            <td><a class="scnd-font-color" href="javascript:void(0)">21</a></td>
+                            <td><a class="scnd-font-color" href="javascript:void(0)">22</a></td>
+                        </tr>
+                        <tr>
+                            <td><a class="scnd-font-color" href="javascript:void(0)">23</a></td>
+                            <td><a class="scnd-font-color" href="javascript:void(0)">24</a></td>
+                            <td><a class="scnd-font-color" href="javascript:void(0)">25</a></td>
+                            <td><a class="today" href="javascript:void(0)">26</a></td>
+                            <td><a href="javascript:void(0)">27</a></td>
+                            <td><a href="javascript:void(0)">28</a></td>
+                            <td><a href="javascript:void(0)">29</a></td>
+                        </tr>
+                        <tr>
+                            <td><a href="javascript:void(0)">30</a></td>
+                            <td><a href="javascript:void(0)"></a></td>
+                            <td><a href="javascript:void(0)"></a></td>
+                            <td><a href="javascript:void(0)"></a></td>
+                            <td><a href="javascript:void(0)"></a></td>
+                            <td><a href="javascript:void(0)"></a></td>
+                            <td><a href="javascript:void(0)"></a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script type="text/JavaScript">
+        window.displaying = {};
+        window.displaying["public_remarks"] = false;
+        window.displaying["user_profile"] = true;
+        window.displaying["classroom"] = true;
+    </script>
+    <script type="text/javascript" src="/static/JavaScript/jquery.js"></script>
+    <script type="text/javascript" src="/static/JavaScript/jquery-ui.js"></script>
+    <script type="text/javascript" src="/static/JavaScript/profile.js"></script>
+    <!-- <script type="text/javascript" src="/static/JavaScript/student/home.js"></script> -->
+    <script type="text/javascript" src="/static/JavaScript/home.js"></script>
+    <script type="text/javascript" src="/static/JavaScript/classroom.js"></script>
+</body>
+
+</html>

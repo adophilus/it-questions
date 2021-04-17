@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<identification-numbers>
+	<identification-number type="account" level="5" />
+	<identification-number type="question" level="4" />
+	<identification-number type="school-event" level="3" />
+	<identification-number type="school-broadcast" level="" />
+	<identification-number type="chatroom-message" level="6" />
+</identification-numbers>

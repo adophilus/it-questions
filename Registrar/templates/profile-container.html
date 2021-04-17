@@ -1,0 +1,44 @@
+<!-- PROFILE (MIDDLE-CONTAINER) -->
+<div class="profile block">
+    <a class="add-button-alt" style="visibility: hidden" href="#28">
+        <span class="icon entypo-pencil scnd-font-color"></span>
+    </a>
+    <div class="profile-picture big-profile-picture clear">
+        <img draggable="false" width="150px" alt="Profile picture" src="/static/media/user-profile-unisesx-big-white.png" >
+    </div>
+    <h1 class="user-name">
+        {{ Account.FIRST_NAME | capitalize}} {{ Account.LAST_NAME | capitalize }}
+    </h1>
+    <p>
+        &nbsp;
+    </p>
+    <!--<div class="profile-description">
+        <p class="scnd-font-color">{{ account_description }}</p>
+    </div>-->
+    <!-- <ul class="profile-options horizontal-list">
+        <li id="public_remarks_toggler">
+            <p title="Public Remarks">
+                <a onclick="JavaScript:return;" class="comments">
+                    <span class="icon fontawesome-comment-alt scnd-font-color"></span>
+                    {{ number_of_unread_public_remarks }}
+                </a>
+            </p>
+        </li>
+        <li>
+            <p title="Public Remarks">
+                <a class="views" href="#41">
+                    <span class="icon fontawesome-eye-open scnd-font-color"></span>
+                    841
+                </a>
+            </p>
+        </li>
+        <li>
+            <p title="Public Remarks">
+                <a class="likes" href="#42">
+                    <span class="icon fontawesome-heart-empty scnd-font-color"></span>
+                    49
+                </a>
+            </p>
+        </li>
+    </ul> -->
+</div>

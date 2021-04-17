@@ -1,0 +1,39 @@
+.classroom {
+	display: none;
+}
+
+.classroom .titular {
+	background: #35aadc;
+}
+
+#chat_form .chats {
+	overflow: auto;
+}
+
+#chat_form .chat {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+#chat_form .chat .chat-details .chat-message-date {
+	float: right;
+}
+
+#chat_form .send-chat {
+	width: 100%;
+	position: relative;
+}
+
+#chat_form #send_chat {
+	display: inline;
+	margin: 0px;
+	padding: 0px;
+	width: fit-content;
+	height: fit-content;
+	cursor: pointer;
+}
+
+#chat_form #chat_entry.text-input {
+	display: inline;
+	margin-bottom: 0px;
+}

@@ -1,0 +1,224 @@
+{
+	"debugging": true,
+	"is_configured": true,
+	"secret_key": null,
+	"ENCRYPTION_KEY": "bmzUYT20jqyQg8379p-ECPAtRKCCXmNf3QR-lMjjcYA=",
+	"ENCRYPTION_SECRET": null,
+	"host": "0.0.0.0",
+	"id_length": {
+		"account": 5,
+		"question": 4,
+		"school-event": 3,
+		"classroom": 4,
+		"chatroom-message": 6
+	},
+	"week": {
+		"count": 12,
+		"division": 2,
+		"week_of_division": [6]
+	},
+	"port": 4096,
+	"auto_update": {
+		"allow": true,
+		"frequency": 604800
+	},
+	"backups": {
+		"allow": true,
+		"frequency": 604800
+	},
+	"question": {
+		"default_image_path": "/static/media/question-default.png"
+	},
+	"timezone": "+1",
+	"account": {
+		"types": {
+			"administrator": {
+				"database_fields": {
+					"id": "",
+					"FIRST_NAME": "",
+					"LAST_NAME": "",
+					"OTHER_NAMES": "",
+					"USERNAME": "",
+					"PASSWORD": "",
+					"EMAIL": "",
+					"PHONE_MUMBER": "",
+					"BIRTHDAY": "",
+					"ADMIN_RANK": "",
+					"ACCOUNT_TYPE": "",
+					"ACCOUNT_STATUS": ""
+				},
+				"name": "administrator"
+			},
+			"parent": {
+				"database_fields": {
+					"id": "",
+					"FIRST_NAME": "",
+					"LAST_NAME": "",
+					"OTHER_NAMES": "",
+					"USERNAME": "",
+					"PASSWORD": "",
+					"EMAIL": "",
+					"PHONE_MUMBER": "",
+					"BIRTHDAY": "",
+					"WARDS": "",
+					"ACCOUNT_TYPE": "",
+					"ACCOUNT_STATUS": ""
+				},
+				"name": "parent"
+			},
+			"teacher": {
+				"database_fields": {
+					"id": "",
+					"FIRST_NAME": "",
+					"LAST_NAME": "",
+					"OTHER_NAMES": "",
+					"USERNAME": "",
+					"PASSWORD": "",
+					"EMAIL": "",
+					"PHONE_MUMBER": "",
+					"BIRTHDAY": "",
+					"ACCOUNT_TYPE": "",
+					"ACCOUNT_STATUS": ""
+				},
+				"name": "teacher"
+			},
+			"student": {
+				"database_fields": {
+					"id": "",
+					"FIRST_NAME": "",
+					"LAST_NAME": "",
+					"OTHER_NAMES": "",
+					"USERNAME": "",
+					"PASSWORD": "",
+					"EMAIL": "",
+					"PHONE_MUMBER": "",
+					"BIRTHDAY": "",
+					"DEPARTMENT": [],
+					"CLASS_ID": "",
+					"ACCOUNT_TYPE": "",
+					"ACCOUNT_STATUS": ""
+				},
+				"name": "student"
+			}
+		},
+		"statuses": {
+			"ACTIVE": {
+				"status": "ACTIVE",
+				"color": "green",
+				"grant_access": true
+			},
+			"AWAITING_VERIFICATION": {
+				"status": "AWAITING_VERIFICATION",
+				"color": "blue",
+				"grant_access": false
+			},
+			"SUSPENDED": {
+				"status": "SUSPENDED",
+				"color": "orange",
+				"grant_access": false
+			},
+			"EXPELLED": {
+				"status": "EXPELLED",
+				"color": "red",
+				"grant_access": false
+			},
+			"PASSED_OUT": {
+				"status": "PASSED_OUT",
+				"color": "grey",
+				"grant_access": true
+			},
+			"DELETED": {
+				"status": "DELETED",
+				"color": "black",
+				"grant_access": false
+			}
+		}
+	},
+	"classroom": {
+		"statuses": {
+			"AWAITING_CLEARANCE": {
+				"status": "AWAITING_CLEARANCE",
+				"color": "brown",
+				"grant_access": false
+			},
+			"BLOCKED": {
+				"status": "BLOCKED",
+				"color": "red",
+				"grant_access": false
+			},
+			"ACTIVE": {
+				"status": "ACTIVE",
+				"color": "green",
+				"grant_access": true
+			}
+		}
+	},
+	"guardian_ward": {
+		"statuses": {
+			"AWAITING_CLEARANCE": {
+				"status": "AWAITING_CLEARANCE",
+				"color": "brown",
+				"grant_access": false
+			},
+			"CLEARED": {
+				"status": "CLEARED",
+				"color": "green",
+				"grant_access": true
+			}
+		}
+	},
+	"security": {
+		"ALLOW_REMOTE_ACCOUNT_CREATION": true,
+		"ALLOW_REMOTE_ACCOUNT_VALIDATION": true,
+		"ALLOW_STUDENT_REMOVE_GUARDIAN": true,
+		"ALLOW_STUDENT_ADD_GUARDIAN": true
+	},
+	"messages": {
+		"LOGIN_REQUIRED": "Please login to proceed!",
+		"REMOTE_ACCOUNT_CREATION_NOT_ALLOWED": "Sorry, creation of accounts has been disabled by the admin!",
+		"ACCESS_DENIED_PAGE": "Sorry, you are not allowed to access this page!",
+		"ERROR_OCCURRED": "Sorry, an error occurred!",
+		"SUCCESSFUL_ACCOUNT_CREATION": "Your account has been created successfully!",
+		"UNSUCCESSFUL_ACCOUNT_CREATION": "Account creation failed!",
+		"SUCCESSFUL_ACCOUNT_DELETION": "Your account has been deleted successfully!",
+		"UNSUCCESSFUL_ACCOUNT_DELETION": "Your account was not deleted",
+		"SUCCESSFUL_SIGNIN": "Sign in successful!",
+		"UNSUCCESSFUL_SIGNIN": "Sign in un-successful!",
+		"SUCCESSFUL_SIGNOUT": "Sign out successful",
+		"EXISTENT_EMAIL": "This email address is already in use!",
+		"EXISTENT_ACCOUNT": "This account already exists!",
+		"INEXISTENT_CLASS": "Class in-existent!",
+		"INEXISTENT_ACCOUNT": "Account in-existent!",
+		"INEXISTENT_ACCOUNT_SEARCH": "The account you searched for is in-existent!",
+		"INVALID_ACCOUNT": "Invalid account!",
+		"INVALID_ACCOUNT_TYPE": "Invalid account type!",
+		"INVALID_CREDENTIALS": "Invalid username or password!",
+		"INVALID_USERNAME": "Invalid username!",
+		"INVALID_PASSWORD": "Invalid password!",
+		"INVALID_BIRTHDAY": "Invalid birthday!",
+		"INVALID_NAME": "Please check your names!",
+		"INVALID_WARD_NAME": "Please check your ward's names!",
+		"INEXISTENT_QUESTION": "The question does not exist!",
+		"QUESTION_FETCH_FAILED": "Couldn't fetch questions!",
+		"INEXISTENT_CLASSROOM": "The classroom does not exist!",
+		"INEXISTENT_CHATROOM": "The chatroom does not exist!",
+		"EMPTY_CHATROOM_CHAT": "Chat message cannot be empyt!",
+		"UNAUTHORIZED_CHATROOM_ACCESS": "You are not authorized to view this url!",
+		"PASSWORD_CHANGE_SUCCESSFUL": "Your password has been changed successfully!",
+		"CANNOT_REPEAT_OLD_PASSWORD": "Please supply a new password!",
+		"CHANGES_NOT_SAVED": "The changes you made were not saved!",
+		"ACCOUNT_SETTINGS_UPDATED": "Your account settings has been updated successfully!",
+		"QUESTION_SAVE_FAILED": "The question couldn't be saved!",
+		"QUESTION_SAVE_SUCCESSFUL": "The question has been saved be saved!",
+		"UNAUTHORIZED_ACCESS": "You are not authorized to view this url!",
+		"SUCCESSFUL_QUESTION_DELETION": "The question was deleted successfully!",
+		"ACCOUNT_DETAILS_RETRIEVAL_FAILED": "The details for the account could not be retrieved!",
+		"ACCOUNT_DETAILS_STORAGE_FAILED": "The details for the account could not be saved!",
+		"UNSUCCESSFUL_QUESTION_DELETION": "Some errors occurred while deleting the question!",
+		"INVALID_PARENT": "The ID specified does not belong to a parent!",
+		"WARD_ADD_SUCCESSFUL": "The ward has been added under the parent!",
+		"WARD_ALREADY_UNDER_PARENT": "The ward specified is already under the parent!",
+		"CLASS_CREATED": "Class has been created!",
+		"CLASS_DELETED": "Class has been deleted successfully!"
+	}
+}

@@ -1,0 +1,17 @@
+{
+    "id": "private-123456",
+    "title": "Private Question",
+    "creator": [
+        "viktor",
+        "uE3yF4iswGBLkauWhUuIFnyY6"
+    ],
+    "owner": [
+        "viktor",
+        "uE3yF4iswGBLkauWhUuIFnyY6"
+    ],
+    "image_path": "/static/media/question-default.png",
+    "date_created": "10-30-2020",
+    "number_of_questions": 5,
+    "total_marks": 1,
+    "last_modified": "2021-01-31"
+}

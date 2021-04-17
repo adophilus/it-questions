@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Registrar Configuration</title>
+	<link href="/static/CSS/bootstrap/bootstrap.css" type="text/css" rel="stylesheet">
+	<link href="/static/CSS/index.css" type="text/css" rel="stylesheet">
+	<link href="/static/CSS/input.css" type="text/css" rel="stylesheet">
+</head>
+
+<body>
+
+	<div class="container">
+		{% include "navbar.html" %}
+		
+		<form id="configurationForm">
+			<p class="h3" id="schoolSection">School</p>
+			<hr width="100%">
+			<div class="form-group">
+				<label for="schoolName">
+					School Name
+				</label>
+				<input type="text" id="schoolName" class="form-control">
+			</div>
+			<div class="row">
+				<div class="form-group col-xl-2 col-md-3 col-sm-6">
+					<label for="yearEstablished">
+						Year Established
+					</label>
+					<input type="number" id="yearEstablished" class="form-control">
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="schoolDivision">
+					School Division
+				</label>
+				<select class="form-control">
+					{% for division in school_divisions %}
+					{% endfor %}
+					<!-- <option>None</option>
+					<option>Junior & Secondary</option>
+					<option>Junior, Secondary & Tertiary</option>
+					<option>Primary, Secondary & Tertiary</option> -->
+				</select>
+			</div>
+			<div class="form-group">
+				<label for="schoolType">
+					School Type
+				</label>
+				<select class="form-control">
+					<option>None</option>
+					<option>Co-education</option>
+					<option>Single sex</option>
+				</select>
+			</div>
+			<div class="form-group">
+				<label for="promotionalPercentage">
+					Promotional Percentage
+				</label>
+				<input type="number" min="0" max="100" class="form-control" value="50">
+			</div>
+			<p>&nbsp;</p>
+			<p class="h3" id="schoolSection">Accounts</p>
+			<hr width="100%">
+			<div class="form-group">
+				<input type="checkbox" id="remoteAccountCreation">
+				<label for="remoteAccountCreation">
+					Allow remote account creation?
+				</label>
+			</div>
+			<p>&nbsp;</p>
+			<p class="h3" id="schoolSection">Management</p>
+			<hr width="100%">
+			<div class="form-group">
+				<label for="studentTitle">
+					Student Title (s)
+				</label>
+				<input type="text" class="form-control" value="{{ student_titles | join(",")}}">
+			</div>
+			<p>&nbsp;</p>
+			<p class="h4" id="schoolSection">Grading Sytem</p>
+			<hr width="100%">
+			<div class="form-group">
+				<div id="gradeSpace">
+					{% for grade in grading_system %}
+						<div class="row" grade style="margin-top: 5px; margin-bottom: 5px">
+							<div class="col col col-xl-1 col-lg-1 col-md-1 col-sm-1">
+								{% if grade[0] %}
+									<input type="checkbox" checked value="{{ grade[1] }}">
+								{% else %}
+									<input type="checkbox" value="{{ grade[1] }}">
+								{% endif %}
+							</div>
+							<div style="margin-left: -20px; margin-right: -10px" class="col col-xl-1 col-lg-1 col-md-2 col-sm-2">
+								<input type="text" class="form-control" value="{{ grade[1] }}">
+							</div>
+							<div style="margin-left: -20px; margin-right: -10px" class="col col-xl-2 col-lg-2 col-md-2 col-sm-2">
+								<input type="number" class="form-control" value="{{ grade[2] }}">
+							</div>
+							<div style="margin-left: -20px; margin-right: -10px" class="col col-xl-2 col-lg-2 col-md-2 col-sm-2">
+								<input type="number" class="form-control" value="{{ grade[3] }}">
+							</div>
+							<div style="margin-left: -20px; margin-right: -10px" class="col col-xl-2 col-lg-2 col-md-2 col-sm-2">
+								<input type="text" class="form-control" value="{{ grade[4] }}">
+							</div>
+							<div style="margin-left: -20px; margin-right: -10px" class="col col-xl-2 col-lg-2 col-md-2 col-sm-2">
+								<input type="text" class="form-control" value="{{ grade[5] }}">
+							</div>
+							<div style="margin-left: -20px; margin-right: -10px" class="col col-xl-3 col-lg-3 col-md-3 col-sm-2">
+								<input type="text" class="form-control" value="{{ grade[6] }}">
+							</div>
+							<button class="btn" delete-grade>
+								&times;
+							</button>
+						</div>
+					{% endfor %}
+				</div>
+				<div style="padding-top: 10px" class="form-group">
+					<input type="button" id="addGrade" class="btn btn-primary" value="Add Grade">
+				</div>
+			</div>
+			<p>&nbsp;</p>
+			<p class="h4" id="schoolSection">Departments</p>
+			<hr width="100%">
+			<div class="form-group">
+				<div id="schoolDepartmentsSpace">
+					{% for department in school_departments %}
+						<div class="row" department style="margin-top: 5px; margin-bottom: 5px">
+							<div class="col col col-xl-1 col-lg-1 col-md-1 col-sm-1">
+								{% if department[0] %}
+									<input type="checkbox" checked value="{{ department[1] }}">
+								{% else %}
+									<input type="checkbox" value="{{ department[1] }}">
+								{% endif %}
+							</div>
+							<div style="margin-left: -20px; margin-right: -10px" class="col col-xl-3 col-lg-3 col-md-3 col-sm-3">
+								<input type="text" class="form-control" value="{{ department[1] }}">
+							</div>
+							<div style="margin-left: -20px; margin-right: -10px" class="col col-xl-4 col-lg-4 col-md-4 col-sm-4">
+								<input type="text" class="form-control" value="{{ department[2] }}">
+							</div>
+							<div style="margin-left: -20px; margin-right: -10px" class="col col-xl-3 col-lg-3 col-md-3 col-sm-3">
+								<input type="text" class="form-control" value="{{ department[3] }}">
+							</div>
+							<button class="btn" delete-department>
+								&times;
+							</button>
+						</div>
+					{% endfor %}
+				</div>
+				<div style="padding-top: 10px" class="form-group">
+					<input type="button" id="addDepartment" class="btn btn-primary" value="Add Department">
+				</div>
+			</div>
+			<!--p class="h3" id="adminSection">Administrator</p>
+			<div class="row">
+				<div class="form-group col-xl-6 col-md-6 col-sm-12">
+					<label for="adminUsername">
+						Username
+					</label>
+					<input type="text" id="adminUsername" class="form-control">
+				</div>
+				<div class="form-group col-xl-6 col-md-6 col-sm-12">
+					<label for="adminPassword">
+						Password
+					</label>
+					<input type="text" id="adminPassword" class="form-control">
+				</div>
+			</div-->
+		</form>
+	</div>
+
+	<script type="text/javascript" src="/static/JavaScript/jquery.js"></script>
+	<script type="text/javascript" src="/static/JavaScript/jquery-ui.js"></script>
+	<script type="text/javascript" src="/static/JavaScript/bootstrap/bootstrap.js"></script>
+	<script type="text/javascript" src="/static/JavaScript/config.js"></script>
+</body>
+</html>

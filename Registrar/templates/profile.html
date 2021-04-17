@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+	<head>
+		<meta charset="utf-8">
+		<title>Profile | {{ Account.ACCOUNT_TYPE | title or "In-Existent" }}</title>
+		<!-- <link rel="stylesheet" href="/static/CSS/bootstrap/bootstrap.css"> -->
+		<link rel="stylesheet" href="/static/CSS/freebie-interactive/freebie-interactive.css">
+	</head>
+	<body>
+		<div class="main-container">
+			{% include "navbar.html" %}
+			<!-- LEFT CONTAINER -->
+			<div class="left-container container">
+				<!-- SIDE BAR -->
+				{% include "sidebar.html" %}
+			</div>
+			<!-- MIDDLE-CONTAINER -->
+			<div class="middle-container container">
+				{% if Account == True %}
+					{% 'include "profile-container.html"' %}
+					{% include "public_remarks.html" %}
+				{% else %}
+					{% include "profile-inexistent.html" %}
+				{% endif %}
+			</div>
+		</div>
+
+		<script type="text/javascript" src="/static/JavaScript/jquery.js"></script>
+		<script type="text/javascript" src="/static/JavaScript/login.js"></script>
+		<script type="text/javascript" src="/static/JavaScript/profile.js"></script>
+	</body>
+
+</html>

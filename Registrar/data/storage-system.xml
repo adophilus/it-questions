@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<storage-system>
+	<account>
+		<administrator>
+			<file name="details" ext=".json" />
+			<file name="settings" ext=".json" />
+			<file name="notifications" ext=".csv" />
+		</administrator>
+		<teacher>
+			<file name="details" ext=".json" />
+			<file name="settings" ext=".json" />
+			<file name="notifications" ext=".csv" />
+		</teacher>
+		<parent>
+			<file name="details" ext=".json" />
+			<file name="settings" ext=".json" />
+			<file name="notifications" ext=".csv" />
+		</parent>
+		<student>
+			<file name="details" ext=".json" />
+			<file name="settings" ext=".json" />
+			<file name="notifications" ext=".csv" />
+			<file name="public_remarks" ext=".csv" />
+		</student>
+	</account>
+	<school-subjects>
+		<folder type="school-subject" name="<school-subject-id>">
+			<folder name="attendance">
+				<file name="<class-id>" ext=".csv" />
+			</folder>
+		</folder>
+	</school-subjects>
+</storage-system>

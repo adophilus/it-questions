@@ -1,0 +1,31 @@
+{
+	"NAME": "default",
+	"YEAR_ESTABLISHED": 0,
+	"DIVISIONS": null,
+	"TYPE": null,
+	"TERM": {
+		"TERM_STARTS": 0,
+		"TERM_ENDS": 7257600
+	},
+	"DEPARTMENTS": [
+		{
+			"name": "Science",
+			"description": "A school department for science-oriented students",
+			"variable_name": "department_science"
+		},
+		{
+			"name": "Arts",
+			"description": "A school department for arts-oriented students",
+			"variable_name": "department_arts"
+		},
+		{
+			"name": "Commerce",
+			"description": "A school department for commerce-oriented students",
+			"variable_name": "department_commerce"
+		}
+	],
+	"DIVISIONS": [
+
+	],
+	"STUDENT_TITLES": []
+}

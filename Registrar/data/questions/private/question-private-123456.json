@@ -1,0 +1,107 @@
+{
+    "1": {
+        "question": "Who is the governor of Lagos state?",
+        "options": {
+            "correct": [
+                "2"
+            ],
+            "marks": 0,
+            "1": {
+                "type": "radio",
+                "value": "Uchenna Ofoma",
+                "mark": 0
+            },
+            "2": {
+                "type": "radio",
+                "value": "Babajide Sanwo Olu",
+                "mark": 0
+            }
+        }
+    },
+    "2": {
+        "question": "Which of these is/are correct?",
+        "options": {
+            "correct": [
+                "1",
+                "2",
+                "3"
+            ],
+            "marks": 3,
+            "1": {
+                "type": "check",
+                "value": "Nigeria is a federation",
+                "mark": 1
+            },
+            "2": {
+                "type": "check",
+                "value": "Nigeria engages in bilateral trade only",
+                "mark": 1
+            },
+            "3": {
+                "type": "check",
+                "value": "Nigeria engages in multilateral trade",
+                "mark": 1
+            },
+            "4": {
+                "type": "check",
+                "value": "All of the above",
+                "mark": 1
+            }
+        }
+    },
+    "3": {
+        "question": "What is political apathy?",
+        "options": {
+            "correct": [
+                "1"
+            ],
+            "marks": 1,
+            "1": {
+                "type": "check",
+                "value": "A feeling of unwillingness to participate in political activities concerning one's nation",
+                "mark": 1
+            },
+            "2": {
+                "type": "check",
+                "value": "A feeling of unwillingness to participate in political activities concerning one's nation",
+                "mark": 1
+            }
+        }
+    },
+    "4": {
+        "question": "Nigeria is a federation",
+        "options": {
+            "correct": [
+                "1"
+            ],
+            "marks": 1,
+            "1": {
+                "type": "switch",
+                "value": "TRUE|FALSE",
+                "mark": 1,
+                "match": "TRUE"
+            }
+        }
+    },
+    "5": {
+        "question": "what is unity?",
+        "options": {
+            "correct": [
+                "2"
+            ],
+            "marks": 0,
+            "1": {
+                "type": "radio",
+                "value": "The term \"unity\" has a vague definition",
+                "mark": 0
+            },
+            "2": {
+                "type": "text",
+                "value": "definition",
+                "mark": 0,
+                "ignore_case": true,
+                "match": "together, united"
+            }
+        }
+    }
+}

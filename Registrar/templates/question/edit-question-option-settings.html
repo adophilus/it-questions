@@ -1,0 +1,48 @@
+<div class="block edit-question-option-settings">
+	<h2 class="titular">
+		OPTION SETTTINGS
+	</h2>
+	<div class="body">
+		<p class="input-container radio-option-settings text-option-settings check-option-settings">
+			<input type="text" id="option_settings_value_entry" placeholder="Option value">
+		</p>
+		<p class="input-container switch-option-settings">
+			<input type="text" class="switch-option-entry" id="switch_option_settings_on_value_entry" placeholder="on">
+			<input type="text" class="switch-option-entry" id="switch_option_settings_off_value_entry" placeholder="off">
+		</p>
+		<p class="input-container switch-option-settings">
+			<select id="switch_option_match">
+				<option id="switch_option_match_none" disabled hidden>Select a match</option>
+				<option id="switch_option_on"></option>
+				<option id="switch_option_off"></option>
+			</select>
+		</p>
+		<!-- <div class="text-option-settings"> -->
+		<p class="input-container text-option-settings">
+			<input type="text" id="option_settings_keywords" placeholder="keywords (kw1 | kw2 | kw3 | ...)">
+		</p>
+		<p class="input-container text-option-settings">
+			<label user-select="none" for="option_settings_is_case_sensitive" style="display: inline-block; vertical-align: middle;">
+				Case sensitive?
+			</label>
+			<span style="display: inline-block; float: right;">
+				<input class="sp switch" id="option_settings_is_case_sensitive" type="checkbox">
+			</span>
+		</p>
+		<!-- </div> -->
+		<p class="input-container">
+			<label user-select="none" for="option_settings_correct_option" style="display: inline-block; vertical-align: middle;">
+				Correct option?
+			</label>
+			<span style="display: inline-block; float: right;">
+				<input class="sp switch" id="option_settings_correct_option" type="checkbox">
+			</span>
+		</p>
+		<p class="input-container">
+			<a class="sign-in button" href="javascript:void(0)">
+				<span style="display: inline-block; vertical-align: middle;" class="icon fontawesome-remove"></span>
+				<span style="display: inline-block; vertical-align: middle;">Delete Question</span>
+			</a>
+		</p>
+	</div>
+</div>

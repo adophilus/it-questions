@@ -1,0 +1,17 @@
+.events {
+	/*display: none;*/
+}
+
+.events .titular {
+	background: #35aadc;
+}
+
+.events .school-event-none {
+	display: none;
+}
+
+.events .school-events .school-event-none .title {
+	font-size: 20px;
+	font-weight: bolder;
+	text-align: center;
+}

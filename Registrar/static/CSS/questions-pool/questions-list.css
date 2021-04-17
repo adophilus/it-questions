@@ -1,0 +1,123 @@
+.questions-list {
+	display: flex;
+	flex-direction: column;
+}
+
+.questions-list .questions-container {
+	display: flex;
+}
+
+.questions-list .questions-container .question-item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	cursor: pointer;
+}
+
+.questions-list .questions-container .question-item .question-image {
+	user-select: none;
+	clip-path: circle(40% at center center);
+}
+
+.questions-list .questions-container .question-item .question-title {
+	user-select: none;
+	margin-right: 10px;
+}
+
+.questions-list .question-loader {
+	display: none;
+	text-align: center;
+}
+
+.modal-question-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.modal-question-container .question-image {
+	clip-path: circle(40% at center center);
+}
+
+.modal-question-container .question-title {
+	font-weight: bold;
+	font-size: 150%;
+}
+
+.modal-question-container .question-details {
+	width: 60%;
+	margin-top: 10px;
+	display: none;
+}
+
+.modal-question-container .question-details span {
+	color: black;
+}
+
+.modal-question-container .question-details span:last-child {
+	float: right;
+}
+
+.modal-question-container .question-footer {
+	display: flex;
+	margin-top: 10px;
+	justify-content: space-between;
+}
+
+.modal-question-container .question-footer button {
+	cursor: pointer;
+	background-color: white;
+	border: 2px solid;
+	padding: 5px 5px;
+    border-radius: 5px;
+	font-weight: bold;
+	letter-spacing: 1px;
+	transition: 0.2s ease-in-out;
+	margin: 5px;
+}
+
+.modal-question-container .question-footer button:hover {
+	color: white;
+	transform: translateY(-10px);
+	box-shadow: 0px 5px 10px 0px #0d0d0d;
+}
+
+.modal-question-container .question-footer button span:first-child {
+	margin-right: 5px;
+}
+
+.modal-question-container .question-footer .download-btn {
+	color: #3468af;
+	border-color: #3468af;
+}
+
+.modal-question-container .question-footer .download-btn:hover {
+	background-color: #3468af;
+}
+
+/* .modal-question-container .question-footer .download-btn .downloadIcon{ */
+
+.modal-question-container .question-footer .pull-btn {
+	color: orange;
+	border-color: orange;
+}
+
+.modal-question-container .question-footer .pull-btn:hover {
+	background-color: orange;
+}
+
+.modal-question-container .question-footer .details-btn {
+	color: blue;
+	border-color: blue;
+}
+
+.modal-question-container .question-footer .details-btn.active {
+	color: white;
+	transform: translateY(-10px);
+	box-shadow: 0px 5px 10px 0px #0d0d0d;
+	background-color: blue;
+}
+
+.modal-question-container .question-footer .details-btn:hover {
+	background-color: blue;
+}

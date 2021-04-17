@@ -1,0 +1,81 @@
+{
+	"ids": {
+		"admin": "",
+		"teacher": "",
+		"parent": "",
+		"student": ""
+	},
+	"login": {
+		"admin": {
+			"#form-username": "admin",
+			"#form-password": "password123"
+		},
+		"teacher": {
+			"#form-username": "teacher",
+			"#form-password": "password123"
+		},
+		"parent": {
+			"#form-username": "parent",
+			"#form-password": "password123"
+		},
+		"student": {
+			"#form-username": "student",
+			"#form-password": "password123"
+		}
+	},
+	"register": {
+		"admin": {
+			"#form_first_name": "admin",
+			"#form_last_name": "admin",
+			"#form_other_names": "",
+			"#form_birthday": "12/12/1999",
+			"#form_email": "admin@mail.com",
+
+			"#form_username": "admin",
+			"#form_password": "password123",
+			"#form_account_type": "admin"
+		},
+		"teacher": {
+			"#form_first_name": "teacher",
+			"#form_last_name": "teacher",
+			"#form_other_names": "",
+			"#form_birthday": "12/12/1999",
+			"#form_email": "teacher@mail.com",
+
+			"#form_username": "teacher",
+			"#form_password": "password123",
+			"#form_account_type": "teacher",
+
+			"#form_subjects_teaching": "Mathematics"
+		},
+		"parent": {
+			"#form_first_name": "parent",
+			"#form_last_name": "parent",
+			"#form_other_names": "",
+			"#form_birthday": "12/12/1999",
+			"#form_email": "parent@mail.com",
+
+			"#form_username": "parent",
+			"#form_password": "password123",
+			"#form_account_type": "parent",
+
+			"#form_ward_id": ""
+		},
+		"student": {
+			"#form_first_name": "student",
+			"#form_last_name": "student",
+			"#form_other_names": "",
+			"#form_birthday": "12/12/1999",
+			"#form_email": "student@mail.com",
+
+			"#form_username": "student",
+			"#form_password": "password123",
+			"#form_account_type": "student",
+
+			"#form_classroom": "SS3",
+			"#form_department": "science",
+			"#form_subjects_offered": "Mathematics",
+			"#form_extracurricular_activities": "Swimming"
+		}
+	}
+}

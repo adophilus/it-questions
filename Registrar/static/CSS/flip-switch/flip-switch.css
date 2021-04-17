@@ -1,0 +1,11 @@
+.flip-switch-container {
+
+}
+	.flip-switch-container .flip-switch-label {
+		display: inline-block;
+	}
+
+	.flip-switch-container .flip-switch {
+		display: inline-block;
+		float: right;
+	}

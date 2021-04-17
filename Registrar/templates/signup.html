@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Signup | IT Questions Registrar</title>
+		<!-- <link rel="stylesheet" href="/static/CSS/bootstrap/bootstrap.css"> -->
+		<link rel="stylesheet" href="/static/CSS/freebie-interactive/freebie-interactive.css">
+		<link rel="stylesheet" href="/static/CSS/jquery-ui.css">
+		<link rel="stylesheet" href="/static/CSS/signup.css">
+		<link rel="stylesheet" href="/static/CSS/datepicker.css">
+	</head>
+	<body>
+		<div class="main-container">
+			<div class="left-container container">
+				<div id="sign-up-form" class="menu-box block">
+					<h2 class="titular">PERSONAL</h2>
+					<div style="height: 30px"></div>
+					<div class="body">
+						<div class="input-container">
+							<input type="text" id="form_first_name" placeholder="First name" class="text-input" value="">
+							<div class="input-icon envelope-icon-acount">
+								<span class="scnd-font-color"></span>
+							</div>
+						</div>
+						<div class="input-container">
+							<input type="text" id="form_last_name" placeholder="Last name" class="text-input" value="">
+							<div class="input-icon">
+								<span class="scnd-font-color"></span>
+							</div>
+						</div>
+						<div id="student_teacher_personal_details_block">
+							<div class="input-container">
+								<input type="text" id="form_other_names" placeholder="Other names" class="text-input" value="">
+								<div class="input-icon">
+									<span class="scnd-font-color"></span>
+								</div>
+							</div>
+					   </div>
+						<div class="input-container">
+							<input type="text" id="form_birthday" style="cursor: default;" placeholder="Birthday (DD/MM/YYYY)" class="text-input" value="">
+							<div class="input-icon">
+								<span class="scnd-font-color fontawesome-calendar"></span>
+							</div>
+						</div>
+					   <div class="input-container">
+							<input type="email" id="form_email" style="cursor: default;" placeholder="E-mail address" class="text-input" required="required" value="">
+							<div class="input-icon">
+								<span class="scnd-font-color fontawesome-envelope-alt "></span>
+							</div>
+						</div>
+						<div class="input-container">
+							<input type="text" id="form_phone_number" style="cursor: default;" placeholder="Phone number" class="text-input" value="">
+							<div class="input-icon">
+								<span class="scnd-font-color fontawesome-phone"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="middle-container container">
+				<div class="menu-box block" style="padding-bottom: 1px;">
+					<h2 class="titular">ACCOUNT</h2>
+					<div style="height: 30px"></div>
+					<div class="body">
+						<div class="input-container">
+							<input type="text" id="form_username" placeholder="Username" class="username text-input">
+							<div class="input-icon envelope-icon-acount">
+								<span class="fontawesome-user scnd-font-color"></span>
+							</div>
+						</div>
+						<div class="input-container">
+							<input type="password" id="form_password" placeholder="Password" class="password text-input">
+							<div class="input-icon password-icon">
+								<span class="fontawesome-lock scnd-font-color"></span>
+							</div>
+						</div>
+						<div class="input-container">
+							<select id="form_account_type" class="account-type text-input">
+								<option value="student">Student</option>
+								<option value="parent">Parent</option>
+								<option value="teacher">Teacher</option>
+							</select>
+							</select>
+						</div>
+						{% if 1 == 0 %}
+							<div style="display: none;" class="input-container">
+								<textarea type="text" id="form_account_description" placeholder="Description" class="text-input">My account description</textarea>
+								<div class="input-icon password-icon">
+									<span class="entypo-doc-text scnd-font-color"></span>
+								</div>
+							</div>
+						{% endif %}
+						<div class="input-container">
+							<a style="margin-left: 0px; width: 260px" id="form_submit_button" class="sign-in button">SIGN UP</a>
+						</div>
+						<p style="text-align: center" class="scnd-font-color">
+		                	Already have an account?
+		                	<a href="/login">
+		                		Login
+		                	</a>
+		                </p>
+					</div>
+				</div>
+			</div>
+			<div class="right-container container">
+				<div id="sign-up-form" class="menu-box block">
+					<h2 class="titular">
+						<span id="student_teacher_titular">SCHOOL</span>
+						<span id="parent_titular">WARD</span>
+					</h2>
+					<div style="height: 30px"></div>
+					<div class="body">
+						<div id="parent_student_details_block">
+							<div class="input-container">
+								<input type="text" id="form_ward_id" placeholder="First name" class="text-input" value="">
+							</div>
+							<!-- <div class="input-container">
+								<input type="text" id="form_ward_first_name" placeholder="First name" class="text-input" value="">
+							</div>
+							<div class="input-container">
+								<input type="text" id="form_ward_last_name" placeholder="Last name" class="text-input" value="">
+							</div>
+							<div class="input-container">
+								<input type="text" id="form_ward_other_names" placeholder="Other names" class="text-input" value="">
+							</div>
+							<div class="input-container">
+								<input type="text" id="form_ward_classroom" placeholder="Class" class="text-input" value="">
+								<div class="input-icon">
+									<span class="scnd-font-color entypo-home"></span>
+								</div>
+							</div> -->
+						</div>
+						<div class="student_school_details_block">
+							<div class="input-container">
+								<input type="text" id="form_classroom" placeholder="Class" class="text-input" value="">
+								<div class="input-icon">
+									<span class="scnd-font-color entypo-home"></span>
+								</div>
+							</div>
+							<div class="input-container">
+								<input type="text" id="form_department" placeholder="Department" class="text-input" value="">
+								<div class="input-icon">
+									<span class="scnd-font-color"></span>
+								</div>
+							</div>
+							<div id="student_school_details_block">
+								<div class="input-container">
+									<input type="text" id="form_subjects_offered" placeholder="Subjects offered" class="text-input" value="">
+									<div class="input-icon">
+										<span class="scnd-font-color"></span>
+									</div>
+								</div>
+							</div>
+							<div class="input-container">
+								<input type="text" id="form_extracurricular_activities" placeholder="Extra-curricular activities" class="text-input" value="">
+								<div class="input-icon">
+									<span class="scnd-font-color"></span>
+								</div>
+							</div>
+						</div>
+						<div style="display: none" id="teacher_school_details_block">
+							<div class="input-container">
+								<input type="text" id="form_subjects_teaching" placeholder="Subjects teaching" class="text-input">
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script type="text/javascript">window.displaying = {}</script>
+		<script type="text/javascript" src="/static/JavaScript/jquery.js"></script>
+		<script type="text/javascript" src="/static/JavaScript/jquery-ui.js"></script>
+		<script type="text/javascript" src="/static/JavaScript/signup.js"></script>
+		<script type="text/javascript" src="/static/JavaScript/datepicker.js"></script>
+		<script type="text/javascript" src="/static/JavaScript/InputChecker.js"></script>
+	</body>
+</html>

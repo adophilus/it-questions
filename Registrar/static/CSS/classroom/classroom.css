@@ -1,0 +1,43 @@
+.classrooms-list .title {
+	font-size: 23px;
+	font-weight: bolder;
+}
+
+.classrooms-list .body .list {
+	display: flex;
+    align-items: center;
+}
+
+.classrooms-list .body .list .profile {
+    height: 50px;
+    width: 50px;
+    user-select: none;
+}
+
+.classrooms-list .active-classroom, .classrooms-list .arrow-btn-container .arrow-btn {
+	display: none;
+}
+
+/*.classroom .active-classroom {
+	display: block;
+}*/
+
+.classroom .arrow-btn-container .icon {
+	border: 0px;
+}
+
+.classroom .body {
+	display: none;
+}
+
+.classroom .active-classroom .messages .list {
+	padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.classroom .active-classroom .messages .message-details {
+	padding-left: 30px;
+	padding-right: 30px;
+	display: flex;
+	flex-direction: row-reverse;
+}

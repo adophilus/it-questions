@@ -1,0 +1,56 @@
+{
+	"1": {
+		"question": "Who is the present Governor of Lagos state?",
+		"options": {
+			"1": {
+				"type": "radio",
+				"value": "Babajide Sanwo-Olu",
+				"mark": 1
+			},
+			"2": {
+				"type": "radio",
+				"value": "Babatunde Raji Fashola",
+				"mark": 1
+			},
+			"3": {
+				"type": "radio",
+				"value": "Some random Lagosian",
+				"mark": 1
+			},
+			"4": {
+				"type": "radio",
+				"value": "No one in particular",
+				"mark": 1
+			},
+			"correct": ["1"]
+		}
+	},
+	"2": {
+		"question": "What system of political system does The Republic of Nigeria operate?",
+		"options": {
+			"1": {
+				"type": "radio",
+				"value": "Republic",
+				"mark": 1
+			},
+			"2": {
+				"type": "radio",
+				"value": "Military",
+				"mark": 1
+			},
+			"3": {
+				"type": "radio",
+				"value": "Autocracy",
+				"mark": 1
+			},
+			"4": {
+				"type": "text",
+				"value": "None of the above",
+				"ignore_case": true,
+				"match": "democracy",
+				"mark": 3
+			},
+			"correct": ["1", "4"]
+		}
+	}
+}

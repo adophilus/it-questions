@@ -1,0 +1,11 @@
+{
+	"id": "public-1234567",
+	"title": "Public Question",
+	"creator": [ "viktor", "uE3yF4iswGBLkauWhUuIFnyY6" ],
+	"owner": [ "viktor", "uE3yF4iswGBLkauWhUuIFnyY6" ],
+	"image_path": "/static/media/question-default.png",
+	"date_created": "10-30-2020",
+	"number_of_questions": 2,
+	"total_marks": 5,
+	"last_modified": "30-01-2021"
+}
