@@ -50,7 +50,6 @@ globals.methods.refreshConfig()
 globals.db = SQLAlchemy(app)
 
 from models import classroom
-from models import chatroom # should be removed
 from models import administrator
 from models import parent
 from models import teacher
@@ -65,7 +64,6 @@ globals.running_processes = CSVParser(os.path.join("data", "Registrar", "running
 
 # database models
 globals.Classroom = classroom.Classroom
-globals.Chatroom = chatroom.Chatroom # should be removed
 globals.Administrator = administrator.Administrator
 globals.Parent = parent.Parent
 globals.Teacher = teacher.Teacher
@@ -74,12 +72,11 @@ globals.SchoolEvent = school_event.SchoolEvent
 globals.SchoolSubject = school_subject.SchoolSubject
 globals.Question = question.Question
 
-globals.methods.loadChatrooms()
-
 # import varous blueprints
 from blueprints.MainBlueprint import main
 from blueprints.HandlerBlueprint import handler
 from blueprints.HandlerQuestionBlueprint import handlerQuestion
+from blueprints.HandlerClassroomBlueprint import handlerClassroom
 from blueprints.QuestionsPool import questionsPool
 from blueprints.AdminBlueprint import admin
 from blueprints.ParentBlueprint import parent
@@ -93,6 +90,7 @@ from blueprints.DevelopmentBlueprint import development
 app.register_blueprint(main)
 app.register_blueprint(handler, url_prefix = "/handler")
 app.register_blueprint(handlerQuestion, url_prefix = "/handler/question")
+app.register_blueprint(handlerClassroom, url_prefix = "/handler/classroom")
 app.register_blueprint(questionsPool, url_prefix = "/questions-pool")
 app.register_blueprint(admin, url_prefix = "/administrator")
 app.register_blueprint(parent, url_prefix = "/parent")

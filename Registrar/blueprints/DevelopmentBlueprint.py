@@ -37,7 +37,7 @@ def getAccountById (id):
 
 @development.route("/create-classroom/<classroom_name>")
 def createClassroom (classroom_name):
-	globals.methods.createClassroom(classroom_name, commit = True)
+	globals.methods.createClassroom(classroom_name)
 	return globals.General.sendTrue(globals.config.getMessage("CLASS_CREATED"))
 
 @development.route("/delete-classroom/<classroom_id>")

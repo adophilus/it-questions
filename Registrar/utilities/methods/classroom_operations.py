@@ -11,23 +11,37 @@ def generateClassroomId (unique = False):
 			if not (classroom):
 				return id
 
-def createClassroom (classroom_name, commit = False):
+def createClassroom (classroom_name, classroom_members = {}, classroom_image = None):
 	classroom_id = generateClassroomId(True)
+
+	classroomMessagesTable = globals.db.Table(f"classroom_{classroom_id}", globals.db.metadata,
+		globals.db.Column("id", globals.db.Integer, autoincrement = True),
+		globals.db.Column("TYPE", globals.db.String(32), default = globals.config["classroom"]["messages"]["types"]["message"]["hash"]),
+		globals.db.Column("MESSAGE", globals.db.String(65000), nullable = False),
+		globals.db.Column("DATE_SENT", globals.db.DateTime)
+	)
+	globals.db.metadata.create_all(globals.db.engine)
+
 	classroom =  globals.Classroom(
 		id = classroom_id,
 		NAME = classroom_name,
-		MEMBERS = globals.General.unjsonize({})
+		MEMBERS = globals.General.unjsonize(classroom_members),
+		CLASSROOM = f"classroom_{classroom_id}"
 	)
+
+	if (classroom_image):
+		classrom.IMAGE_PATH = classroom_image
+
 	globals.db.session.add(classroom)
-	if (commit):
-		globals.db.session.commit()
+	globals.db.session.commit()
+
 	return classroom
 
 def deleteClassroom (classroom_id, commit = False):
 	classroom = globals.methods.getClassroomById(classroom_id)
 	if (not classroom):
 		return False
-	
+
 	globals.db.session.delete(classroom)
 
 	if (commit):
@@ -55,13 +69,11 @@ def addUserToClassroom (user, classroom, commit = False):
 		classroom.id: classroom_profile[user.id]
 	}
 
-def removeUserAccountFromClassroom (account, classroom, commit = False):
+def removeUserAccountFromClassroom (account, classroom_id, commit = False):
 	user_id = account.id
 
 	if not (globals.methods.User(account = account).isStudent() or globals.methods.User(account = account).isTeacher()):
 		return False
-
-	classroom_id = account_details["classroom"]["id"]
 
 	classroom = getClassroomById(classroom_id)
 

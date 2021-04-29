@@ -27,15 +27,15 @@ def removeUserAccount (user_id):
 
 	try:
 		# removeUserAccountFromChatrooms(account, account_details)
-		# globals.methods.removeUserAccountFromClassroom(account, account_details)
+		for classroom in account_details["classroom"]:
+			globals.methods.removeUserAccountFromClassroom(account, classroom["id"])
 		globals.methods.removeUserAccountFromDB(account)
-	except Exception as e: #sqlalchemy.exc.OperationalError:
+	except Exception as e:
 		print(e)
 		return globals.General.unjsonize({"data": globals.config.getMessage("UNSUCCESSFUL_ACCOUNT_DELETION"), "status": False})
 
 	removeUserAccountDirectory(user_id, account_type)
-
-	# save the database session
+	removeUserAccountFromClassroom()
 	globals.db.session.commit()
 
 	logout_user()
@@ -148,7 +148,7 @@ def createUserAccount (first_name, last_name, other_names, birthday, email, phon
 		account_details.update({
 			"is_homeroom_teacher": False,
 			"questions": [],
-			"subjects_teaching": subjects_teaching
+			"subjects_teaching": subjects_teaching,
 			"classroom": {}
 		})
 	elif (account_type == "administrator"):

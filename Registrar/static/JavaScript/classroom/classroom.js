@@ -1,14 +1,38 @@
 function getClassroomMessages () {
-	
+
+}
+
+function sendClassroomMessage (classroom_id, message) {
+	$.ajax({
+		url: `/handler/classroom/${classroom_id}/send-message`,
+		type: "POST",
+		data: {
+			message: message
+		},
+		success: function (data) {
+			data = JSON.parse(data);
+			if (data.status) {
+				console.log(data.data);
+				window.window.classroomMessageEntry.val("");
+			}
+			else {
+				alert(data.error);
+			}
+		}
+	});
 }
 
 function setActiveClassroom (event) {
 	// var elem = $(event.target);
 	var classroomsListElement = document.querySelector(".classrooms-list");
-	
+
 	if (classroomsListElement) {
 		classroomsListElement.classList.add("classroom");
 		classroomsListElement.classList.remove("classrooms-list");
+	}
+	
+	window.activeClassroom = {
+		"id": event.target.getAttribute("classroom-id")
 	}
 }
 
@@ -26,8 +50,9 @@ function displayClassroomsList (classrooms_list) {
 	if (!classrooms_list) {
 		return false;
 	}
+
+	window.classroomsListContainer.empty();
 	if (classrooms_list.length === 0) {
-		window.classroomsListContainer.empty();
 		var containerElement = document.createElement("div");
 		var containerTextElement = document.createElement("p");
 
@@ -36,7 +61,7 @@ function displayClassroomsList (classrooms_list) {
 		containerTextElement.classList.add("scnd-font-color");
 
 		containerTextElement.innerHTML = "No classrooms available!";
-		
+
 		containerElement.appendChild(containerTextElement);
 		window.classroomsListContainer.append(containerElement);
 		return true;
@@ -52,6 +77,7 @@ function displayClassroomsList (classrooms_list) {
 		classroomListTitleElement.classList.add("title");
 
 		classroomListContainerElement.setAttribute("title", `ID: ${classroomDetails.id}`);
+		classroomListContainerElement.setAttribute("classroom-id", classroomDetails.id);
 		classroomListImageElement.setAttribute("src", classroomDetails.IMAGE_PATH);
 		classroomListImageElement.setAttribute("draggable", "false");
 		classroomListTitleElement.innerHTML = classroomDetails.NAME;
@@ -83,7 +109,20 @@ function getClassroomsList (callback) {
 }
 
 $(document).ready(function () {
+	window.activeClassroom = new Object();
 	window.classroomsListContainer = $(".classrooms-list .body");
-	document.querySelector("#display_classrooms_list_btn").onclick = unsetActiveClassroom;
+	window.classroomMessageEntry = $("#classroom_message_entry");
+	
+	$("#display_classrooms_list_btn").click(function (e) { unsetActiveClassroom(e) });
+	$("#message_send_btn").click(function () {
+		var message = window.classroomMessageEntry.val().replace(/\s+$/, "");
+		if (!message) {
+			alert("Empty message!")
+			return false;
+		}
+		else {
+			sendClassroomMessage(window.activeClassroom.id, message);
+		}
+	});
 	getClassroomsList(displayClassroomsList);
 });

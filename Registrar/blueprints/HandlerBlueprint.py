@@ -137,12 +137,6 @@ def changeUserPassword ():
 
     return globals.General.sendFalse(globals.config.getMessage("ACCOUNT_SETTINGS_UPDATED"))
 
-@handler.route("/list-of-classrooms", methods=["GET", "POST"])
-def getListOfClassrooms ():
-    classes = globals.Classroom.query.all()
-    classes = [classroom.NAME for classroom in classes]
-    return globals.General.unjsonize(list(classes))
-
 @handler.route("/list-of-subjects")
 def getListOfSubjects ():
     subjects = [subject.SUBJECT_NAME for subject in globals.methods.getSchoolSubjectsList()]
