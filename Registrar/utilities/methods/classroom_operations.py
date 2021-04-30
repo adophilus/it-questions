@@ -1,16 +1,6 @@
 from flask import globals
 from flask_login import current_user
 
-def generateClassroomId (unique = False):
-	while True:
-		id = globals.IDgenerator.generate(level = globals.config["id_length"]["classroom"])
-
-		if (unique):
-			classroom = globals.methods.getClassroomById(id)
-
-			if not (classroom):
-				return id
-
 def createClassroom (classroom_name, classroom_members = {}, classroom_image = None):
 	classroom_id = generateClassroomId(True)
 

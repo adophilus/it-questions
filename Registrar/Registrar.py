@@ -9,11 +9,9 @@ from flask import redirect
 from flask import url_for
 from flask import globals
 from flask import session
+
 from flask_sqlalchemy import SQLAlchemy
-from glob import glob
 import os
-import webbrowser
-import sqlite3
 
 from utilities.csvparser import CSVParser
 from utilities.config import Config
@@ -133,10 +131,5 @@ globals.months = [
     "december"
 ]
 
-def openBrowser (port):
-    # webbrowser.open(f"http://{globals.config['host']}:{port}")
-    return False
-
 if __name__ == "__main__":
-    setTimeout(openBrowser, 2, {"port": globals.config["port"]})
     app.run(host = globals.config["host"], port = globals.config["port"], debug = globals.config["debugging"])

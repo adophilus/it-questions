@@ -10,8 +10,8 @@ from .account_get import *
 from .account_pages import *
 from .account_put import *
 from .account_operations import *
-from .chatroom_get import *
-from .chatroom_message_get import *
+# from .chatroom_get import *
+# from .chatroom_message_get import *
 from .classroom_get import *
 from .classroom_operations import *
 from .classroom_pages import *

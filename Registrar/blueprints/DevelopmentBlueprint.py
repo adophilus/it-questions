@@ -35,6 +35,13 @@ def getAccountById (id):
 		return globals.General.sendTrue(account_details)
 	return globals.General.sendFalse(globals.config.getMessage("INEXISTENT_ACCOUNT"))
 
+@development.route("/check-classroom/<classroom_id>")
+def checkClassroom (classroom_id):
+	classroom = globals.methods.getClassroomById(classroom_id)
+	if (not classroom):
+		return globals.General.sendFalse(globals.config.getMessage("INEXISTENT_CLASS"))
+	return globals.General.sendTrue({"id": classroom.id, "name": classroom.NAME})
+
 @development.route("/create-classroom/<classroom_name>")
 def createClassroom (classroom_name):
 	globals.methods.createClassroom(classroom_name)
@@ -45,3 +52,7 @@ def deleteClassroom (classroom_id):
 	if (globals.methods.deleteClassroom(classroom_id, commit = True)):
 		return globals.General.sendTrue(globals.config.getMessage("CLASS_DELETED"))
 	return globals.General.sendTrue(globals.config.getMessage("INEXISTENT_CLASS"))
+
+@development.route("/classrooms-list")
+def getClassroomsList ():
+	return globals.General.sendTrue([{"id": classroom.id, "name": classroom.NAME} for classroom in globals.Classroom.query.all()])
