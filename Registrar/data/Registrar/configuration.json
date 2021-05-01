@@ -8,9 +8,10 @@
 	"id_length": {
 		"account": 5,
 		"question": 4,
-		"school-event": 3,
+		"contact_area": 4,
+		"school_event": 3,
 		"classroom": 4,
-		"chatroom-message": 6
+		"chatroom_message": 6
 	},
 	"id_per_level": {
 		"classroom": 5
@@ -32,11 +33,15 @@
 	"question": {
 		"default_image_path": "/static/media/question-default.png"
 	},
+	"database": {
+		"schema": "sqlite",
+		"path": "data/Registrar/accounts.db"
+	},
 	"timezone": "+1",
 	"account": {
 		"types": {
 			"administrator": {
-				"database_fields": {
+				"database_field": {
 					"id": "",
 					"FIRST_NAME": "",
 					"LAST_NAME": "",
@@ -53,7 +58,7 @@
 				"name": "administrator"
 			},
 			"parent": {
-				"database_fields": {
+				"database_field": {
 					"id": "",
 					"FIRST_NAME": "",
 					"LAST_NAME": "",
@@ -70,7 +75,7 @@
 				"name": "parent"
 			},
 			"teacher": {
-				"database_fields": {
+				"database_field": {
 					"id": "",
 					"FIRST_NAME": "",
 					"LAST_NAME": "",
@@ -86,7 +91,7 @@
 				"name": "teacher"
 			},
 			"student": {
-				"database_fields": {
+				"database_field": {
 					"id": "",
 					"FIRST_NAME": "",
 					"LAST_NAME": "",
@@ -104,7 +109,7 @@
 				"name": "student"
 			}
 		},
-		"statuses": {
+		"status": {
 			"ACTIVE": {
 				"status": "ACTIVE",
 				"color": "green",
@@ -138,7 +143,7 @@
 		}
 	},
 	"classroom": {
-		"statuses": {
+		"status": {
 			"AWAITING_CLEARANCE": {
 				"status": "AWAITING_CLEARANCE",
 				"color": "brown",
@@ -155,14 +160,21 @@
 				"grant_access": true
 			}
 		},
-		"messages": {
-			"types": {
+		"message": {
+			"type": {
 				"message": {
 					"hash": "e5df9d1b444f11e902a5e4b8355c2c4d"
 				},
 				"presentation": {
 					"hash": "707a6f6c2ac1ed20b69834fdfde7898c"
 				}
+			}
+		}
+	},
+	"room": {
+		"type": {
+			"classroom": {
+				"hash": "ce25f44a7ca8651128b58684e7cd98fa"
 			}
 		}
 	},
