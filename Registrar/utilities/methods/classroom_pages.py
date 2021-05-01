@@ -16,6 +16,6 @@ def renderClassroomPage ():
 		no_of_unseen_results = 0,
 		Client = globals.methods.Client,
 		account_details = account_details,
-		getClassroomById = globals.methods.getClassroomById,
+		getClassroomById = globals.model.Classroom.getById,
 		# no_of_classrooms = len(account_details)
 		classroom = account_details["classroom"]) #globals.methods.getClassrooms())

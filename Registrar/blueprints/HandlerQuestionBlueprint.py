@@ -3,7 +3,7 @@ from flask import globals
 from flask import request
 from flask_login import LoginManager, login_user, login_required, current_user, logout_user
 
-from utilities.General import *
+from ..utilities.General import *
 
 handlerQuestion = Blueprint("handlerQuestion", __name__)
 

@@ -18,7 +18,7 @@ def getQuestionQuestions (question_id, question_type):
 		return None
 
 def _getQuestionById (id):
-	question = globals.Question.query.filter_by(id = id)
+	question = globals.model.Question.query.filter_by(id = id)
 
 	if (question.first()):
 		return question
@@ -29,7 +29,7 @@ def getQuestionById (id):
 		return question.first()
 
 def getAllPublicQuestions ():
-	return globals.Question.query.filter_by(QUESTION_TYPE = "public").all()
+	return globals.model.Question.query.filter_by(QUESTION_TYPE = "public").all()
 
 def renderQuestionsPoolPage ():
 	return render_template("questions-pool/list.html", Client = globals.methods.Client, str = str)

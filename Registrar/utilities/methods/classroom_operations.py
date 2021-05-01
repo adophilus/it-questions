@@ -6,13 +6,13 @@ def createClassroom (classroom_name, classroom_members = {}, classroom_image = N
 
 	classroomMessagesTable = globals.db.Table(f"classroom_{classroom_id}", globals.db.metadata,
 		globals.db.Column("id", globals.db.Integer, autoincrement = True),
-		globals.db.Column("TYPE", globals.db.String(32), default = globals.config["classroom"]["messages"]["types"]["message"]["hash"]),
+		globals.db.Column("TYPE", globals.db.String(32), default = globals.config["classroom"]["messages"]["type"]["message"]["hash"]),
 		globals.db.Column("MESSAGE", globals.db.String(65000), nullable = False),
 		globals.db.Column("DATE_SENT", globals.db.DateTime)
 	)
 	globals.db.metadata.create_all(globals.db.engine)
 
-	classroom =  globals.Classroom(
+	classroom =  globals.model.Classroom(
 		id = classroom_id,
 		NAME = classroom_name,
 		MEMBERS = globals.General.unjsonize(classroom_members),
@@ -28,7 +28,7 @@ def createClassroom (classroom_name, classroom_members = {}, classroom_image = N
 	return classroom
 
 def deleteClassroom (classroom_id, commit = False):
-	classroom = globals.methods.getClassroomById(classroom_id)
+	classroom = globals.model.Classroom.getById(classroom_id)
 	if (not classroom):
 		return False
 

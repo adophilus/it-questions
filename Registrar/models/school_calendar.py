@@ -1,5 +1,6 @@
 from flask import globals
 from flask_login import UserMixin
+from flask_sqlalchemy import Model
 
 class SchoolCalendar (UserMixin, globals.db.Model):
     DAY = globals.db.Column(globals.db.Float, primary_key = True)

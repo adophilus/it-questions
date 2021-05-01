@@ -18,25 +18,25 @@ class Client ():
         if not (current_user.is_active):
             return False
 
-        return (current_user.ACCOUNT_TYPE == globals.ADMINISTRATOR["name"])
+        return (current_user.ACCOUNT_TYPE == globals.model.Administrator["name"])
 
     def isParent ():
         if not (current_user.is_active):
             return False
 
-        return (current_user.ACCOUNT_TYPE == globals.PARENT["name"])
+        return (current_user.ACCOUNT_TYPE == globals.model.Parent["name"])
 
     def isTeacher ():
         if not (current_user.is_active):
             return False
 
-        return (current_user.ACCOUNT_TYPE == globals.TEACHER["name"])
+        return (current_user.ACCOUNT_TYPE == globals.model.Teacher["name"])
 
     def isStudent ():
         if not (current_user.is_active):
             return False
 
-        return (current_user.ACCOUNT_TYPE == globals.STUDENT["name"])
+        return (current_user.ACCOUNT_TYPE == globals.model.Student["name"])
 
     def isVisitor ():
         if not (Client.isAdmin() or Client.isParent() or Client.isTeacher() or Client.isStudent()):

@@ -6,7 +6,9 @@ from flask import request
 from flask import session
 from flask_login import LoginManager, login_user, login_required, current_user, logout_user
 
-from utilities.General import *
+from ..Registrar import app
+from ..utilities.General import *
+
 import os
 import re
 import time
@@ -17,19 +19,19 @@ handler = Blueprint("handler", __name__)
 # login manager
 globals.loginManager = LoginManager()
 globals.loginManager.login_view = "main.mainLoginPage"
-globals.loginManager.init_app(globals.app)
+globals.loginManager.init_app(app)
 
 @globals.loginManager.user_loader
 def load_user (user_id):
     user = globals.methods.getAccountById(user_id)
     if user.ACCOUNT_TYPE == "administrator":
-        user = globals.Administrator.query.get(user.id)
+        user = globals.model.Administrator.query.get(user.id)
     elif user.ACCOUNT_TYPE == "parent":
-        user = globals.Parent.query.get(user.id)
+        user = globals.model.Parent.query.get(user.id)
     elif user.ACCOUNT_TYPE == "teacher":
-        user = globals.Teacher.query.get(user.id)
+        user = globals.model.Teacher.query.get(user.id)
     else:
-        user = globals.Student.query.get(user.id)
+        user = globals.model.Student.query.get(user.id)
     return user
 
 @handler.route("/login", methods = ["POST"])
@@ -145,7 +147,7 @@ def getListOfSubjects ():
 @handler.route("/school/events/get/<after_event_id>", methods = ["GET"])
 # @login_required
 def getSchoolEvents (after_event_id):
-    school_events = [ {"ID": school_event.id, "EVENT": school_event.EVENT, "DATE": globals.methods.dateToString(school_event.DAY)["ymd"], "VENUE": school_event.VENUE} for school_event in globals.SchoolEvent.query.filter().all() ]
+    school_events = [ {"ID": school_event.id, "EVENT": school_event.EVENT, "DATE": globals.methods.dateToString(school_event.DAY)["ymd"], "VENUE": school_event.VENUE} for school_event in globals.model.SchoolEvent.query.filter().all() ]
 
     if (after_event_id == "null"):
         return globals.General.unjsonize(school_events)

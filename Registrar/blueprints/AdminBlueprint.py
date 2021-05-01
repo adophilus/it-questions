@@ -17,4 +17,4 @@ def adminIndexPage ():
 @admin.route("/<id>")
 @login_required
 def lookupAdministratorByIdPage (id):
-	return globals.methods.renderAccountPageOf(id, globals.ADMINISTRATOR["name"])
+	return globals.methods.renderAccountPageOf(id, globals.model.Administrator["name"])

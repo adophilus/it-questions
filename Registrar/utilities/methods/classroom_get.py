@@ -2,7 +2,7 @@ from flask import globals
 import os
 
 def _getClassroomByName (class_name):
-    classroom = globals.Classroom.query.filter_by(NAME = class_name)
+    classroom = globals.model.Classroom.query.filter_by(NAME = class_name)
 
     if (classroom.first()):
         return classroom
@@ -20,7 +20,7 @@ def getClassroomDetails (classroom_id):
 		return None
 
 def _getClassroomById (id):
-    classroom = globals.Classroom.query.filter_by(id = id)
+    classroom = globals.model.Classroom.query.filter_by(id = id)
 
     if (classroom.first()):
         return classroom
@@ -33,7 +33,7 @@ def getClassroomById (id):
 def getClassroomDict (classroom):
     if (not classroom):
         return classroom
-    
+
     return {
         "id": classroom.id,
         "NAME": classroom.NAME,

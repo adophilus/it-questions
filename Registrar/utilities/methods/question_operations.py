@@ -41,7 +41,7 @@ def createQuestion (question_title, question_type = "private"):
 		}
 	}
 
-	question = globals.Question(
+	question = globals.model.Question(
 		id = question_details["id"],
 		QUESTION_TITLE = question_details["title"],
 		QUESTION_TYPE = question_type,

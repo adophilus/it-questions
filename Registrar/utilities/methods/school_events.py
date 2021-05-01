@@ -5,7 +5,7 @@ def addSchoolEvent (event_title, description, venue):
 	present = globals.methods.getPresent()
 	date = datetime.date(present.year, present.month, present.day)
 
-	event = globals.SchoolEvent(
+	event = globals.model.SchoolEvent(
 		id = globals.methods.generateSchoolEventId(),
 		DATE = date,
 		EVENT = event_title,

@@ -1,5 +1,6 @@
 from flask import globals
 from flask_login import UserMixin
+from flask_sqlalchemy import Model
 
 class SchoolEvent (UserMixin, globals.db.Model):
     id = globals.db.Column(globals.db.Text, primary_key = True)

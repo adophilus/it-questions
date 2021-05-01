@@ -3,43 +3,43 @@ from flask_login import current_user
 import os
 
 def _getAccountById (id):
-    user = globals.Administrator.query.filter_by(id = id)
+    user = globals.model.Administrator.query.filter_by(id = id)
 
     if (user.first()):
         return user
 
-    user = globals.Parent.query.filter_by(id = id)
+    user = globals.model.Parent.query.filter_by(id = id)
 
     if (user.first()):
         return user
 
-    user = globals.Teacher.query.filter_by(id = id)
+    user = globals.model.Teacher.query.filter_by(id = id)
 
     if (user.first()):
         return user
 
-    user = globals.Student.query.filter_by(id = id)
+    user = globals.model.Student.query.filter_by(id = id)
 
     if (user.first()):
         return user
 
 def _getAccountByEmail (email):
-    user = globals.Administrator.query.filter_by(EMAIL = email)
+    user = globals.model.Administrator.query.filter_by(EMAIL = email)
 
     if (user.first()):
         return user
 
-    user = globals.Parent.query.filter_by(EMAIL = email)
+    user = globals.model.Parent.query.filter_by(EMAIL = email)
 
     if (user.first()):
         return user
 
-    user = globals.Teacher.query.filter_by(EMAIL = email)
+    user = globals.model.Teacher.query.filter_by(EMAIL = email)
 
     if (user.first()):
         return user
 
-    user = globals.Student.query.filter_by(EMAIL = email)
+    user = globals.model.Student.query.filter_by(EMAIL = email)
 
     if (user.first()):
         return user
@@ -55,22 +55,22 @@ def getAccountById (id):
         return account.first()
 
 def _getAccountByUsername (username):
-    user = globals.Administrator.query.filter_by(USERNAME = username)
+    user = globals.model.Administrator.query.filter_by(USERNAME = username)
 
     if (user.first()):
         return user
 
-    user = globals.Parent.query.filter_by(USERNAME = username)
+    user = globals.model.Parent.query.filter_by(USERNAME = username)
 
     if (user.first()):
         return user
 
-    user = globals.Teacher.query.filter_by(USERNAME = username)
+    user = globals.model.Teacher.query.filter_by(USERNAME = username)
 
     if (user.first()):
         return user
 
-    user = globals.Student.query.filter_by(USERNAME = username)
+    user = globals.model.Student.query.filter_by(USERNAME = username)
 
     if (user.first()):
         return user
@@ -78,10 +78,10 @@ def _getAccountByUsername (username):
 def getAccountDetails (account_id, account = None):
     if not (account):
         account = getAccountById(account_id)
-    
+
     if not (account):
         return False
-    
+
     account_id = account.id
     try:
         account_details = globals.General.loadJson(_getAccountDetailsPath(account.ACCOUNT_TYPE, account_id))
@@ -119,7 +119,7 @@ def getAccountBySession ():
     return getAccountById(current_user.id)
 
 def getSchoolSubjectsList ():
-    school_subjects = globals.SchoolSubjects.query.all()
+    school_subjects = globals.model.SchoolSubjects.query.all()
     return school_subjects
 
 

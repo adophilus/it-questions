@@ -37,7 +37,7 @@ def getAccountById (id):
 
 @development.route("/check-classroom/<classroom_id>")
 def checkClassroom (classroom_id):
-	classroom = globals.methods.getClassroomById(classroom_id)
+	classroom = globals.model.Classroom.getById(classroom_id)
 	if (not classroom):
 		return globals.General.sendFalse(globals.config.getMessage("INEXISTENT_CLASS"))
 	return globals.General.sendTrue({"id": classroom.id, "name": classroom.NAME})
@@ -55,4 +55,4 @@ def deleteClassroom (classroom_id):
 
 @development.route("/classrooms-list")
 def getClassroomsList ():
-	return globals.General.sendTrue([{"id": classroom.id, "name": classroom.NAME} for classroom in globals.Classroom.query.all()])
+	return globals.General.sendTrue([{"id": classroom.id, "name": classroom.NAME} for classroom in globals.model.Classroom.query.all()])

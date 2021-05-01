@@ -18,4 +18,4 @@ def parentIndexPage ():
 @parent.route("/<id>")
 @login_required
 def lookupParentByIdPage (id):
-	return globals.methods.renderAccountPageOf(id, globals.PARENT["name"])
+	return globals.methods.renderAccountPageOf(id, globals.model.Parent["name"])

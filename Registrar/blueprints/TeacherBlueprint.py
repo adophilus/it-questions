@@ -6,7 +6,6 @@ from flask_login import current_user, login_required
 
 teacher = Blueprint("teacher", __name__)
 
-
 @teacher.route("/")
 @login_required
 def teacherIndexPage ():
@@ -18,4 +17,4 @@ def teacherIndexPage ():
 @teacher.route("/<id>")
 @login_required
 def lookupTeacherByIdPage (id):
-    return globals.methods.renderAccountPageOf(id, globals.TEACHER["name"])
+    return globals.methods.renderAccountPageOf(id, globals.model.Teacher["name"])

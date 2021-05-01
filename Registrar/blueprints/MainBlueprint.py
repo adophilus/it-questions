@@ -5,7 +5,7 @@ from flask import redirect
 from flask import session
 from flask import url_for
 import os
-from utilities.General import *
+from ..utilities.General import *
 
 main = Blueprint("main", __name__)
 

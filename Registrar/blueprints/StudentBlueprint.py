@@ -7,11 +7,11 @@ from flask import render_template
 from flask import session
 from flask import url_for
 from flask_login import login_required, current_user, logout_user
-from utilities.General import *
-from blueprints.MainBlueprint import mainLoginPage
+from ..utilities.General import *
+from .MainBlueprint import mainLoginPage
 import os
-student = Blueprint("student", __name__)
 
+student = Blueprint("student", __name__)
 
 def checkStudent ():
 	if current_user.ACCOUNT_TYPE != globals.config["account"]["types"]["student"]["name"]:
@@ -24,7 +24,7 @@ def studentIndexPage ():
 		return globals.methods.redirectUserToHomePage()
 
 	return globals.methods.renderUserAccountHomePage()
-	
+
 @student.route("/logout")
 @login_required
 def studentLogoutPage ():
@@ -36,7 +36,7 @@ def studentLogoutPage ():
 @student.route("/<id>")
 @login_required
 def lookupStudentByIdPage (id):
-	return globals.methods.renderAccountPageOf(id, globals.STUDENT["name"])
+	return globals.methods.renderAccountPageOf(id, globals.model.Student["name"])
 
 	# return render_template(
 	#     "profile.html",
@@ -53,9 +53,9 @@ def lookupStudentByIdPage (id):
 	#     "result": []
 	# }
 
-	# if (id in globals.students.selectColumn("ID")):
+	# if (id in globals.model.Students.selectColumn("ID")):
 	#     # I used "students" here rather than "student". Although IDs are unique and no two students (or any two acccounts) can have the same ID, I felt its safer to just loop though all the students matching a particular ID.
-	#     students = globals.students.select({
+	#     students = globals.model.Students.select({
 	#         "where": {
 	#             "ID": id
 	#         }
@@ -88,8 +88,8 @@ def lookupStudentByFirstNamePage (firstName):
 		"result": []
 	}
 
-	if (firstName in globals.students.selectColumn("FIRST_NAME")):
-		students = globals.students.select({
+	if (firstName in globals.model.Students.selectColumn("FIRST_NAME")):
+		students = globals.model.Students.select({
 			"where": {
 				"FIRST_NAME": firstName
 			}

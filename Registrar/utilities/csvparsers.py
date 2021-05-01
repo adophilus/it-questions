@@ -1,4 +1,4 @@
-from utilities.General import *
+from .General import *
 
 def parseGradingSystem (field, value, row, index):
     if field == "ACTIVE":
@@ -54,7 +54,7 @@ def parseSchoolSubjects (field, value, row, index):
     if field == "TEACHERS" or field == "STUDENTS":
         row[index] = jsonize(swapQuotes(value))
         return row
-        
+
 def unparseSchoolSubjects (field, value, row, index):
     if field == "TEACHERS" or field == "STUDENTS":
         row[index] = unjsonize(value)
@@ -64,7 +64,7 @@ def parseResults (field, value, row, index):
     if field == "SCORE" or field == "OVERALL" or field == "PERCENTAGE":
         row[index] = int(value)
     return row
-        
+
 def unparseResults (field, value, row, index):
     if field == "SCORE" or field == "OVERALL" or field == "PERCENTAGE":
         row[index] = str(value)
@@ -74,7 +74,7 @@ def parseRunningProcesses (field, value, row, index):
     if field == "PID":
         row[index] = int(value)
     return row
-        
+
 def unparseRunningProcesses (field, value, row, index):
     if field == "PID":
         row[index] = str(value)

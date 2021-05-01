@@ -6,8 +6,8 @@ def updateAccountsDB (user, **update):
 
 def addNewUserToDB (username, password, account_details, commit = False):
 
-	if (account_details["account_type"] == globals.PARENT["name"]):
-		userAccount = globals.Parent(
+	if (account_details["account_type"] == globals.model.Parent["name"]):
+		userAccount = globals.model.Parent(
 			id = account_details["identity"],
 			FIRST_NAME = account_details["first_name"],
 			LAST_NAME = account_details["last_name"],
@@ -22,8 +22,8 @@ def addNewUserToDB (username, password, account_details, commit = False):
 			ACCOUNT_STATUS = account_details["status"]
 		)
 		globals.db.session.add(userAccount)
-	elif (account_details["account_type"] == globals.TEACHER["name"]):
-		userAccount = globals.Teacher(
+	elif (account_details["account_type"] == globals.model.Teacher["name"]):
+		userAccount = globals.model.Teacher(
 			id = account_details["identity"],
 			FIRST_NAME = account_details["first_name"],
 			LAST_NAME = account_details["last_name"],
@@ -37,8 +37,8 @@ def addNewUserToDB (username, password, account_details, commit = False):
 			ACCOUNT_STATUS = account_details["status"]
 		)
 		globals.db.session.add(userAccount)
-	elif (account_details["account_type"] == globals.STUDENT["name"]):
-		userAccount = globals.Student(
+	elif (account_details["account_type"] == globals.model.Student["name"]):
+		userAccount = globals.model.Student(
 			id = account_details["identity"],
 			FIRST_NAME = account_details["first_name"],
 			LAST_NAME = account_details["last_name"],

@@ -5,7 +5,7 @@ from flask import render_template
 from flask import redirect
 from flask import session
 from flask import url_for
-from utilities.General import *
+from ..utilities.General import *
 global checkClient
 
 registrar = Blueprint("registrar", __name__)
@@ -21,7 +21,7 @@ def registrarConfigurationPage ():
     return render_template(
 		"config.html",
 		title = "IT Questions Registrar",
-		student_titles = globals.student_titles,
+		student_titles = globals.model.Student_titles,
 		grading_system = globals.grading_system.selectAll()["rows"],
 		school_departments = globals.school_departments.selectAll()["rows"]
 	)

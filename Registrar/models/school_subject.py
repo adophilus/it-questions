@@ -1,5 +1,6 @@
 from flask import globals
 from flask_login import UserMixin
+from flask_sqlalchemy import Model
 
 class SchoolSubject (UserMixin, globals.db.Model):
     VARIABLE_NAME = globals.db.Column(globals.db.Text, primary_key = True)
