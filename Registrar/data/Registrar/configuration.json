@@ -159,7 +159,16 @@
 				"color": "green",
 				"grant_access": true
 			}
-		},
+		}
+	},
+	"room": {
+		"type": {
+			"classroom": {
+				"hash": "ce25f44a7ca8651128b58684e7cd98fa"
+			}
+		}
+	},
+	"contact_area": {
 		"message": {
 			"type": {
 				"message": {
@@ -168,13 +177,6 @@
 				"presentation": {
 					"hash": "707a6f6c2ac1ed20b69834fdfde7898c"
 				}
-			}
-		}
-	},
-	"room": {
-		"type": {
-			"classroom": {
-				"hash": "ce25f44a7ca8651128b58684e7cd98fa"
 			}
 		}
 	},

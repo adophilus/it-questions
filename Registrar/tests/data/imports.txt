@@ -1,3 +1,2 @@
 __name__ = "Registrar"
 from . import tests
-tests.createClassroom()

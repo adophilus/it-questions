@@ -1,2 +1,2 @@
 @echo off
-cat tests\data\test_commands.txt | flask shell
+cat tests\data\imports.txt tests\data\%1.txt %2 | flask shell
