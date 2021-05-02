@@ -4,6 +4,6 @@ from .student import Student
 from .teacher import Teacher
 
 from .question import Question
-from .room import Room, Classroom, ClassroomContactArea
+from .room import Room, RoomContactArea
 from .school_event import SchoolEvent
 from .school_subject import SchoolSubject

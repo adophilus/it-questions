@@ -1,9 +1,13 @@
 from flask import globals
 
+from ...controllers import Classroom
+
 def createClassroom ():
-	classroom = globals.model.Classroom(classroom_name = "SS3")
+	classroom = Classroom(classroom_name = "SS3")
 	classroom.create()
 
 def checkClassroomMessages ():
-	classroom = globals.model.Classroom(classroom_id = "wNjKAp7LPPgaJFmrmN9Z")
-	print(classroom.CONTACT_AREA.getMessages())
+	classroom = Classroom(classroom_id = "wNjKAp7LPPgaJFmrmN9Z")
+	print(type(classroom.CONTACT_AREA.getMessages()))
+	print(type(classroom.CONTACT_AREA.getMessages()[0]))
+	print(type(classroom.CONTACT_AREA.getMessages()[0].id))
