@@ -7,7 +7,8 @@ from flask import session
 from flask_login import LoginManager, login_user, login_required, current_user, logout_user
 
 from ..Registrar import app
-from ..utilities.General import *
+from ..contollers.config import config
+from ..contollers.methods import sendFalse, jsonize
 
 import os
 import re
@@ -23,31 +24,50 @@ globals.loginManager.init_app(app)
 
 @globals.loginManager.user_loader
 def load_user (user_id):
-    user = globals.methods.getAccountById(user_id)
-    if user.ACCOUNT_TYPE == "administrator":
-        user = globals.model.Administrator.query.get(user.id)
-    elif user.ACCOUNT_TYPE == "parent":
-        user = globals.model.Parent.query.get(user.id)
-    elif user.ACCOUNT_TYPE == "teacher":
-        user = globals.model.Teacher.query.get(user.id)
-    else:
-        user = globals.model.Student.query.get(user.id)
-    return user
+    # user = globals.methods.Account(user_id)
+    # if user.ACCOUNT_TYPE == "administrator":
+    #     user = globals.model.Administrator.query.get(user.id)
+    # elif user.ACCOUNT_TYPE == "parent":
+    #     user = globals.model.Parent.query.get(user.id)
+    # elif user.ACCOUNT_TYPE == "teacher":
+    #     user = globals.model.Teacher.query.get(user.id)
+    # else:
+    #     user = globals.model.Student.query.get(user.id)
+    # return user
+    account = Account(user_id)
+    return account.account
 
-@handler.route("/login", methods = ["POST"])
+@handler.route("/login", methods = [ "POST" ])
 def handleLogin ():
-    return globals.methods.loginUser(request.form.get("username"), request.form.get("password"))
+    username = request.form.get("username")
+    password = request.form.get("password")
 
-@handler.route("/logout", methods = ["POST", "GET"])
+    account = Account(username = username)
+
+    if (account):
+		if (not (account.hasUsername(username) and  account.hasPassword(password)):
+			return sendFalse(config.getMessage("INVALID_CREDENTIALS"))
+
+        if not (account.isAllowedEntry()):
+            return sendFalse(config.getMessage("ACCESS_DENIED_PAGE"))
+
+        if (login_user(account)):
+            return jsonize({"status": True, "ACCOUNT_TYPE": account.ACCOUNT_TYPE, "data": config.getMessage("SUCCESSFUL_SIGNIN")})
+        else:
+            return sendFalse(config.getMessage("UNSUCCESSFUL_SIGNIN"))
+
+    return sendFalse(config.getMessage("INEXISTENT_ACCOUNT"))
+
+@handler.route("/logout", methods = [ "POST", "GET" ])
 @login_required
 def handleLogout ():
     logout_user()
-    return unjsonize({"status": True, "data": globals.config.getMessage("SUCCESSFUL_SIGNOUT")})
+    return sendTrue(config.getMessage("SUCCESSFUL_SIGNOUT"))
 
-@handler.route("/signup", methods = ["POST"])
+@handler.route("/signup", methods = [ "POST" ])
 def handleSignUp ():
-    if (not globals.config["security"]["ALLOW_REMOTE_ACCOUNT_CREATION"]):
-        return globals.General.sendFalse(globals.config.getMessage("REMOTE_ACCOUNT_CREATION_NOT_ALLOWED"))
+    if (not config["security"]["ALLOW_REMOTE_ACCOUNT_CREATION"]):
+        return sendFalse(config.getMessage("REMOTE_ACCOUNT_CREATION_NOT_ALLOWED"))
 
     # Everyone's fields
     first_name = request.form.get("first_name")
@@ -109,43 +129,31 @@ def handleSignUp ():
 # def getCalendarArray ():
 #     return globals.General.unjsonize(globals.methods.getCalendarArray())
 
-@handler.route("/account/change/password", methods = ["POST"])
+@handler.route("/account/change/password", methods = [ "POST" ])
 @login_required
 def changeUserPassword ():
-    user_id = globals.methods.Client.getUserId()
-    confirm_password = request.form.get("confirm_password")
-    changes = {
-        "password": request.form.get("password")
-    }
+    account = Account(Client.getUserId())
+    old_password = request.form.get("confirm_password")
+    new_password =  request.form.get("password")
 
-    if not (globals.methods.Client.hasPassword(confirm_password)):
-        errmsg = globals.config.getMessage("CHANGES_NOT_SAVED")
-        return globals.General.sendFalse(errmsg)
+    if (not (account)):
+        return sendFalse(config.getMessage("INEXISTENT_ACCOUNT"))
 
-    if not (globals.methods.Validate.password(confirm_password)):
-        return globals.General.sendFalse(globals.config.getMessage("INVALID_PASSWORD"))
+    if (not (account.hasPassword(old_password)):
+        return sendFalse(config.getMessage("CHANGES_NOT_SAVED"))
 
-    if not (globals.methods.Verify.credentials(globals.methods.Client.getUsername(), confirm_password)):
-        return globals.General.sendFalse(globals.config.getMessage("INCORRECT_PASSWORD"))
+    if (not (globals.methods.Validate.password(new_password)):
+        return sendFalse(config.getMessage("INVALID_PASSWORD"))
 
-    user = globals.methods.getAccountById(user_id)
-    if not (user):
-        return globals.General.sendFalse(globals.config.getMessage("INEXISTENT_ACCOUNT"))
+    if (not (account.hasUsername(globals.methods.Client.getUsername()) and account.hasPassword(confirm_password))):
+        return globals.General.sendFalse(config.getMessage("INCORRECT_PASSWORD"))
 
-    if (changes["password"]):
-        has_changed_password = globals.methods.changePassword(user, confirm_password, changes["password"])
-        if (has_changed_password != 0):
-            return has_changed_password
+    if (not account.changePassword(old_password, new_passwowrd)):
+        return sendFalse(config.getMessage("ERROR_OCCURRED"))
 
-    return globals.General.sendFalse(globals.config.getMessage("ACCOUNT_SETTINGS_UPDATED"))
-
-@handler.route("/list-of-subjects")
-def getListOfSubjects ():
-    subjects = [subject.SUBJECT_NAME for subject in globals.methods.getSchoolSubjectsList()]
-    return globals.General.unjsonize(list(subjects))
+    return globals.General.sendFalse(config.getMessage("ACCOUNT_SETTINGS_UPDATED"))
 
 @handler.route("/school/events/get/<after_event_id>", methods = ["GET"])
-# @login_required
 def getSchoolEvents (after_event_id):
     school_events = [ {"ID": school_event.id, "EVENT": school_event.EVENT, "DATE": globals.methods.dateToString(school_event.DAY)["ymd"], "VENUE": school_event.VENUE} for school_event in globals.model.SchoolEvent.query.filter().all() ]
 
@@ -163,140 +171,10 @@ def getSchoolEvents (after_event_id):
 
     return globals.General.unjsonize(return_events)
 
-@login_required
-@handler.route("/chatroom/get", methods = ["GET"])
-def getMyChatrooms ():
-    if (globals.methods.Client.isAdmin()):
-        return "check HandlerBlueprint getMyChatrooms"
-
-    chatrooms = globals.methods.getAccountDetails(current_user.id).get("chatrooms")
-
-    for chatroom_id in chatrooms:
-        chatroom = globals.methods.getChatroomById(chatroom_id)
-        if not (current_user.id in chatroom.MEMBERS):
-            chatrooms.remove(chatroom_id)
-        else:
-            chatrooms.remove(chatroom_id)
-            chatrooms.append({
-                "name": chatroom.NAME,
-                "id": chatroom.id
-            })
-
-    return globals.General.unjsonize(chatrooms)
-
-@login_required
-@handler.route("/chatroom/chat/add/<chatroom_id>", methods = ["POST"])
-def addChatroomChat (chatroom_id):
-    chatroom = globals.methods.getChatroomById(chatroom_id)
-
-    if not (globals.methods.Client.isAdmin() or globals.methods.Client.isTeacher()):
-        if not (current_user.id in globals.General.jsonize(chatroom.MEMBERS)):
-            errmsg = globals.config.getMessage("UNAUTHORIZED_CHATROOM_ACCESS")
-            return unjsonize({"data": errmsg, "error": errmsg, "status": False})
-
-    if (not chatroom):
-        errmsg = globals.config.getMessage("INEXISTENT_CHATROOM")
-        return unjsonize({"data": errmsg, "error": errmsg, "status": False})
-
-    chatfile_path = globals.chatrooms[chatroom_id]["chats-file"]
-
-    if not (chatfile_path):
-        errmsg = globals.config.getMessage("INEXISTENT_CHATROOM")
-        return unjsonize({"data": errmsg, "error": errmsg, "status": False})
-
-    chat_message = request.form.get("chat_message")
-    present = globals.methods.getPresent()
-
-    if (not chat_message):
-        errmsg = globals.config["message"]["EMPTY_CHATROOM_CHAT"]
-        return unjsonize({"data": errmsg, "error": errmsg, "status": False})
-
-    present = globals.methods.getPresent()
-
-    float_time = time.time()
-    date = globals.methods.getPresentYMD()
-    _time = f"{present.hour}:{present.minute}"
-    sender = globals.methods.Client.getUsername()
-
-    parser = globals.chatrooms[chatroom_id]["chats"]
-    chat = {
-        "FLOAT_TIME": float_time,
-        "DATE": date,
-        "TIME": _time,
-        "MESSAGE": chat_message,
-        "SENDER": sender
-    }
-    parser.insert(chat)
-    parser.save()
-
-    return unjsonize({"data": chat, "status": True})
-
-@login_required
-@handler.route("/chatroom/chat/get/<chatroom_id>/<after_chat_float_time>", methods = ["GET"])
-def getChatroomChats (chatroom_id, after_chat_float_time):
-    chatroom = globals.methods.getChatroomById(chatroom_id)
-
-    if not (globals.methods.Client.isAdmin() or globals.methods.Client.isTeacher()):
-        if not (current_user.id in globals.General.jsonize(chatroom.MEMBERS)):
-            errmsg = globals.config.getMessage("UNAUTHORIZED_CHATROOM_ACCESS")
-            return unjsonize({"data": errmsg, "error": errmsg, "status": False})
-
-    if (not chatroom):
-        errmsg = globals.config.getMessage("INEXISTENT_CHATROOM")
-        return unjsonize({"data": errmsg, "error": errmsg, "status": False})
-
-    chatfile_path = globals.chatrooms[chatroom_id]["chats-file"]
-
-    if not (chatfile_path):
-        errmsg = globals.config.getMessage("INEXISTENT_CHATROOM")
-        return unjsonize({"data": errmsg, "error": errmsg, "status": False})
-
-    parser = globals.chatrooms[chatroom_id]["chats"]
-    chats = []
-    for row in parser.selectAll()["rows"]:
-        if (len(row) == 0):
-            continue
-
-        float_time = row[0]
-        date = row[1]
-        _time = row[2]
-        message = row[3]
-        sender = row[4]
-
-        chats.append({
-            "FLOAT_TIME": float_time,
-            "DATE": date,
-            "TIME": _time,
-            "MESSAGE": message,
-            "SENDER": sender
-        })
-
-    if (after_chat_float_time == "null"):
-        return unjsonize({
-            "data": chats,
-            "status": True
-        })
-
-    after_chat_float_time = float(after_chat_float_time)
-
-    globals.General.putContentIn("ouput.txt", str(after_chat_float_time))
-
-    return_chats = []
-    start = False
-    for chat in chats:
-        if (start):
-            return_chats.append(chat)
-
-        if (chat["FLOAT_TIME"] >= after_chat_float_time):
-            start = True
-
-    return unjsonize({"data": return_chats, "status": True})
-@handler.route("/account/is-logged-in")
-def checkUserLogin ():
-    return str(not globals.methods.Client.isVisitor())
-
 @handler.route("/remove-account")
 @handler.route("/delete-account")
 @login_required
 def deleteUserAccount ():
-    return globals.methods.removeUserAccount(current_user.id)
+    if (not account(current_user.id).delete(current_user.id).delete()):
+        return sendFalse(config.getMessage("ERROR_OCCURRED"))
+    return sendTrue(config.getMessage("SUCCESSFUL_ACCOUNT_DELETION"))

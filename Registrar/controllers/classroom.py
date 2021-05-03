@@ -2,6 +2,7 @@ from datetime import datetime
 from flask import globals
 
 from . import config, method
+from ..controllers import config
 from ..models import Room, RoomContactArea
 
 class ClassroomInvalidFieldException (Exception):
@@ -39,7 +40,7 @@ class Classroom ():
 		else:
 			self.id = Classroom.__generateId__()
 			self.NAME = classroom_name
-			self.CONTACT_AREA = ClassroomContactArea(classroom_id = ClassroomContactArea.__generateId__())
+			self.CONTACT_AREA = ClassroomContactArea(classroom_id = self.id)
 			classroom = Room(id = self.id, NAME = self.NAME)
 			if (classroom_members):
 				self.addMember(*classroom_members)
@@ -70,6 +71,10 @@ class Classroom ():
 	@classmethod
 	def getById (cls, classroom_id):
 		return Room.query.filter_by(id = classroom_id).first()
+
+	@classmethod
+	def getByName (cls, name):
+		return Room.query.filter_by(NAME = name).first()
 
 	@classmethod
 	def getStatus (cls, status_name):
@@ -110,9 +115,9 @@ class Classroom ():
 
 	def create (self):
 		if (not self.__exists__):
-			self.CONTACT_AREA.create()
 			globals.db.session.add(self.classroom)
 			globals.db.session.commit()
+			self.CONTACT_AREA.create()
 			self.__exists__ = True
 
 	def delete (self):
@@ -125,16 +130,30 @@ class Classroom ():
 	def getMessages (self):
 		return self.CONTACT_AREA.getMessages()
 
+	def addMessage (self, sender_id, message, message_type = config["contact_area"]["message"]["type"]["message"]["hash"]):
+		return self.CONTACT_AREA.addMessage(sender_id, message, message_type)
+
+class ClassroomMessage ():
+	def __init__ (self, queryResult):
+		self.id = queryResult.id
+		self.TYPE = queryResult.TYPE
+		self.MESSAGE = queryResult.MESSAGE
+		self.SENDER = queryResult.SENDER
+		self.DATE_SENT = queryResult.DATE_SENT
+
+	def __dict__ (self):
+		return f"classroom_{self.id}"
+
 class ClassroomContactArea ():
 	__exists__ = False
 
 	def __init__ (self, classroom_id, table_prefix = "room_"):
 		self.classroom_id = classroom_id
 		self.table = globals.db.Table(f"{table_prefix}{self.classroom_id}", globals.db.metadata,
-			globals.db.Column("id", globals.db.Integer, autoincrement = True),
-			globals.db.Column("TYPE", globals.db.String(32), default = globals.config["contact_area"]["message"]["type"]["message"]["hash"]),
-			globals.db.Column("MESSAGE", globals.db.String(65000), nullable = False),
-			globals.db.Column("SENDER", globals.db.String(globals.config["id_length"]["account"]), nullable = False),
+			globals.db.Column("id", globals.db.Integer, autoincrement = True, primary_key = True),
+			globals.db.Column("TYPE", globals.db.String(32), default = config["contact_area"]["message"]["type"]["message"]["hash"]),
+			globals.db.Column("MESSAGE", globals.db.String(65000), default = config["contact_area"]["message"]["type"]["message"]["hash"], nullable = False),
+			globals.db.Column("SENDER", globals.db.String(config["id_length"]["account"]), nullable = False),
 			globals.db.Column("DATE_SENT", globals.db.DateTime, default = datetime.utcnow),
 			extend_existing = True
 		)
@@ -145,11 +164,24 @@ class ClassroomContactArea ():
 		if (not self.__exists__):
 			self.table.create(globals.db.engine, True)
 			globals.db.mapper(RoomContactArea, self.table)
-			self.contactArea = RoomContactArea()
 			self.__exists__ = True
+
+	def drop (self, bind = None, checkfirst = False):
+		self.table.drop(bind, checkfirst)
+		self.__exists__ = False
 
 	def getMessages (self):
 		if (self.__exists__):
-			return globals.db.session.query(self.table).all()
+			return [ClassroomMessage(message) for message in globals.db.session.query(self.table).all()]
 		else:
 			return []
+
+	def addMessage (self, sender_id, message, message_type = config["contact_area"]["message"]["type"]["message"]["hash"]):
+		record = RoomContactArea(
+			TYPE = message_type,
+			MESSAGE = message,
+			SENDER = sender_id
+		)
+
+		globals.db.session.add(record)
+		globals.db.session.commit()

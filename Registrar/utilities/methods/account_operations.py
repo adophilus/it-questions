@@ -18,29 +18,6 @@ def calculateUserAge (birthDate):
 	return age
 
 def removeUserAccount (user_id):
-	account = getAccountById(user_id)
-	if (not account):
-		return globals.General.unjsonize({"data": globals.config.getMessage("INEXISTENT_ACCOUNT"), "status": False})
-
-	account_type = account.ACCOUNT_TYPE
-	account_details = getAccountDetails(user_id)
-
-	try:
-		# removeUserAccountFromChatrooms(account, account_details)
-		for classroom in account_details["classroom"]:
-			globals.methods.removeUserAccountFromClassroom(account, classroom["id"])
-		globals.methods.removeUserAccountFromDB(account)
-	except Exception as e:
-		print(e)
-		return globals.General.unjsonize({"data": globals.config.getMessage("UNSUCCESSFUL_ACCOUNT_DELETION"), "status": False})
-
-	removeUserAccountDirectory(user_id, account_type)
-	removeUserAccountFromClassroom()
-	globals.db.session.commit()
-
-	logout_user()
-
-	return globals.General.unjsonize({"data": globals.config.getMessage("SUCCESSFUL_ACCOUNT_DELETION"), "status": True})
 
 def createUserAccount (first_name, last_name, other_names, birthday, email, phone_number, username, password, account_type, classroom = "", department = "", subjects_offered = [], extracurricular_activities = [], subjects_teaching = [], ward_id = ""): # ward_first_name = "", ward_last_name = "", ward_other_names = "", ward_classroom = ""):
 	first_name = first_name.strip()
@@ -58,31 +35,31 @@ def createUserAccount (first_name, last_name, other_names, birthday, email, phon
 	# ward_classroom = ward_classroom.strip()
 
 	if (not account_type in globals.config["account"]["types"]):
-		return globals.General.unjsonize({"data": globals.config.getMessage("INVALID_ACCOUNT_TYPE"), "status": False})
+		return globals.General.unjsonize({"data": config.getMessage("INVALID_ACCOUNT_TYPE"), "status": False})
 
 	if (not globals.methods.Validate.username(username)):
-		return globals.General.sendFalse(globals.config.getMessage("INVALID_USERNAME"))
+		return globals.General.sendFalse(config.getMessage("INVALID_USERNAME"))
 
 	if (not globals.methods.Validate.password(password)):
-		return globals.General.sendFalse(globals.config.getMessage("INVALID_PASSWORD"))
+		return globals.General.sendFalse(config.getMessage("INVALID_PASSWORD"))
 
 	if (not globals.methods.Validate.email(email)):
-		return globals.General.sendFalse(globals.config.getMessage("INVALID_EMAIL"))
+		return globals.General.sendFalse(config.getMessage("INVALID_EMAIL"))
 
 	if ((account_type == globals.config["account"]["types"]["student"]["name"] and (not getClassroomByName(classroom))) or (account_type == globals.config["account"]["types"]["parent"]["name"] and (not getClassroomByName(ward_classroom)))):
-		return globals.General.sendFalse(globals.config.getMessage("INEXISTENT_CLASS"))
+		return globals.General.sendFalse(config.getMessage("INEXISTENT_CLASS"))
 
 	if (getAccountByUsername(username)):
-		return globals.General.sendFalse(globals.config.getMessage("EXISTENT_ACCOUNT"))
+		return globals.General.sendFalse(config.getMessage("EXISTENT_ACCOUNT"))
 
 	if (getAccountByEmail(email)):
-		return globals.General.sendFalse(globals.config.getMessage("EXISTENT_EMAIL"))
+		return globals.General.sendFalse(config.getMessage("EXISTENT_EMAIL"))
 
 	if not (account_type in globals.config["account"]["types"]):
-		return globals.General.sendFalse(globals.config.getMessage("INVALID_ACCOUNT_TYPE"))
+		return globals.General.sendFalse(config.getMessage("INVALID_ACCOUNT_TYPE"))
 
 	if (len(first_name) == 0 or len(last_name) == 0):
-		return globals.General.sendFalse(globals.config.getMessage("INVALID_NAME"))
+		return globals.General.sendFalse(config.getMessage("INVALID_NAME"))
 
 	# Generate a unique ID for the user
 	id = generateUserId(unique = True)
@@ -97,7 +74,7 @@ def createUserAccount (first_name, last_name, other_names, birthday, email, phon
 		birthday = datetime.strptime(birthday, "%Y-%m-%d")
 		age = calculateUserAge(birthday)
 	except Exception:
-		return globals.General.sendFalse(globals.config.getMessage("INVALID_BIRTHDAY"))
+		return globals.General.sendFalse(config.getMessage("INVALID_BIRTHDAY"))
 
 	account_details = account_settings = {}
 
@@ -118,7 +95,7 @@ def createUserAccount (first_name, last_name, other_names, birthday, email, phon
 	if (account_type == "student"):
 		_classroom = getClassroomByName(classroom)[0]
 		if not (_classroom):
-			return globals.General.sendFalse(globals.config.getMessage("INEXISTENT_CLASS"))
+			return globals.General.sendFalse(config.getMessage("INEXISTENT_CLASS"))
 
 		account_details.update({
 			# define miscellaneous fields for students
@@ -135,12 +112,12 @@ def createUserAccount (first_name, last_name, other_names, birthday, email, phon
 		})
 	elif (account_type == "parent"):
 		# if (len(ward_first_name) == 0 or len(ward_last_name) == 0):
-		# 	return globals.General.sendFalse(globals.config.getMessage("INVALID_WARD_NAME"))
+		# 	return globals.General.sendFalse(config.getMessage("INVALID_WARD_NAME"))
 
 		# _classroom = getClassroomByName(ward_classroom)
 		# if not (_classroom):
-		# 	return globals.General.sendFalse(globals.config.getMessage("INEXISTENT_CLASS"))
-		ward = getAccountById(ward_id)
+		# 	return globals.General.sendFalse(config.getMessage("INEXISTENT_CLASS"))
+		ward = Account(ward_id)
 		if (ward):
 			account_details["ward"] = globals.methods.addWardToGuardian(ward, None, account_details)
 
@@ -162,7 +139,7 @@ def createUserAccount (first_name, last_name, other_names, birthday, email, phon
 
 	userAccount = globals.methods.addNewUserToDB(username, password, account_details)
 	if (not userAccount):
-		return globals.General.sendFalse(globals.config.getMessage("ERROR_OCCURRED"))
+		return globals.General.sendFalse(config.getMessage("ERROR_OCCURRED"))
 
 	if (account_type == "student"):
 		classroom_profile = globals.methods.addUserToClassroom(userAccount, _classroom)
@@ -170,9 +147,9 @@ def createUserAccount (first_name, last_name, other_names, birthday, email, phon
 		print(classroom_profile)
 		print("\n" * 3)
 		if (classroom_profile == None):
-			return globals.General.sendFalse(globals.config.getMessage("ERROR_OCCURRED") + "cprof")
+			return globals.General.sendFalse(config.getMessage("ERROR_OCCURRED") + "cprof")
 		elif (classroom_profile == False):
-			return globals.General.sendFalse(globals.config.getMessage("ERROR_OCCURRED") + "cprofN")
+			return globals.General.sendFalse(config.getMessage("ERROR_OCCURRED") + "cprofN")
 		account_details["classroom"].update(classroom_profile)
 
 		createUserAccountPublicRemarksFile(account_path)
@@ -182,7 +159,7 @@ def createUserAccount (first_name, last_name, other_names, birthday, email, phon
 	createUserAccountNotificationsFile(account_path)
 
 	globals.db.session.commit()
-	return globals.General.sendTrue(globals.config.getMessage("SUCCESSFUL_ACCOUNT_CREATION"))
+	return globals.General.sendTrue(config.getMessage("SUCCESSFUL_ACCOUNT_CREATION"))
 
 def removeUserAccountDirectory (user_id, account_type):
 	account_path = getAccountPath(user_id, account_type)
@@ -205,7 +182,7 @@ def removeUserAccountDirectory (user_id, account_type):
 
 # def removeUserAccountFromChatrooms (account, account_details, commit = False):
 # 	if (account):
-# 		user_id = account.id
+# 		user_id = account.get("id")
 
 # 		chatroom_ids = account_details["chatrooms"]
 
@@ -289,40 +266,16 @@ def createUserAccountNotificationsFile (account_path):
 def createUserAccountPublicRemarksFile (account_path):
 	globals.General.putContentIn(os.path.join(account_path, "public_remarks.csv"), "")
 
-
-
-# def addNewUserToChatroom (user_id, chatroom_id, commit = False):
-# 	croom = globals.methods.getChatroomById(chatroom_id)
-
-# 	if not (croom):
-# 		return False
-
-# 	account_details = getAccountDetails(user_id)
-# 	if not (chatroom_id in account_details["chatrooms"]):
-# 		account_details["chatrooms"].append(chatroom_id)
-# 		putAccountDetails(user_id, account_details)
-
-# 	croom_members = globals.General.jsonize(croom.MEMBERS)
-
-# 	if not (user_id in croom_members):
-# 		croom_members.append(user_id)
-# 		croom.MEMBERS = globals.General.json.dumps(croom_members)
-# 		print(f"Added {user_id} to chatroom ({chatroom_id}")
-# 		if (commit):
-# 			print(f"Saving changes of (adding {user_id} to chatroom ({chatroom_id}))")
-# 			globals.db.session.commit()
-# 		return True
-
 def isCurrentAccount (account_id):
 	if account_id == current_user.id:
 		return True
 
 def changePassword (user, old_password, new_password):
 	if (globals.methods.Client.hasPassword(new_password)):
-		return globals.General.sendFalse(globals.config.getMessage("CANNOT_REPEAT_OLD_PASSWORD"))
+		return globals.General.sendFalse(config.getMessage("CANNOT_REPEAT_OLD_PASSWORD"))
 
 	new_password = globals.methods.encryptPassword(new_password)
 	user.PASSWORD = new_password
 	globals.db.session.commit()
-	# return globals.General.sendTrue(globals.config.getMessage("PASSWORD_CHANGE_SUCCESSFUL"))
+	# return globals.General.sendTrue(config.getMessage("PASSWORD_CHANGE_SUCCESSFUL"))
 	return False

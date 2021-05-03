@@ -6,6 +6,9 @@ from .private_key_generator import PrivateKeyGenerator
 import os
 
 class Config (dict):
+	def getAccountType (self, accountType):
+		return self.get("account")["types"][account_type]
+
 	def getMessage (self, message):
 		return self.get("messages").get(message)
 

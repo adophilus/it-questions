@@ -4,6 +4,8 @@ from flask import redirect
 from flask import url_for
 from flask_login import current_user, login_required
 
+from ..controllers import Account
+
 development = Blueprint("dev", __name__)
 
 @development.route("/get-id")
@@ -21,15 +23,15 @@ def isLoggedIn ():
 
 @development.route("/get-account-by-id/<id>")
 def getAccountById (id):
-	account = globals.methods.getAccountById(id)
+	account = Account(id)
 	if (account):
 		account_details = {
-			"id": account.id,
-			"username": account.USERNAME,
-			"password": account.PASSWORD,
-			"email": account.EMAIL,
-			"phone_number": account.PHONE_NUMBER,
-			"birthday": globals.methods.dateToString(account.BIRTHDAY),
+			"id": account.get("id"),
+			"username": account.get("USERNAME"),
+			"password": account.get("PASSWORD"),
+			"email": account.get("EMAIL"),
+			"phone_number": account.get("PHONE_NUMBER"),
+			"birthday": globals.methods.dateToString(account.get("BIRTHDAY")),
 			"account_status": account.ACCOUNT_STATUS,
 		}
 		return globals.General.sendTrue(account_details)

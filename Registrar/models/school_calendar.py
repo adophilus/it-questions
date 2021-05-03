@@ -7,3 +7,11 @@ class SchoolCalendar (UserMixin, globals.db.Model):
     DAY_TYPE = globals.db.Column(globals.db.Text)
     ACTIVITY = globals.db.Column(globals.db.Text)
     BROADCAST = globals.db.Column(globals.db.Boolean)
+
+    @classmethod
+    def getById (cls, id):
+        return cls.query.filter_by(id = id).first()
+
+    @classmethod
+    def getAll (cls):
+        return cls.query.all()

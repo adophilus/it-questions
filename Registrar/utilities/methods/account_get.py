@@ -2,87 +2,14 @@ from flask import globals
 from flask_login import current_user
 import os
 
-def _getAccountById (id):
-    user = globals.model.Administrator.query.filter_by(id = id)
-
-    if (user.first()):
-        return user
-
-    user = globals.model.Parent.query.filter_by(id = id)
-
-    if (user.first()):
-        return user
-
-    user = globals.model.Teacher.query.filter_by(id = id)
-
-    if (user.first()):
-        return user
-
-    user = globals.model.Student.query.filter_by(id = id)
-
-    if (user.first()):
-        return user
-
-def _getAccountByEmail (email):
-    user = globals.model.Administrator.query.filter_by(EMAIL = email)
-
-    if (user.first()):
-        return user
-
-    user = globals.model.Parent.query.filter_by(EMAIL = email)
-
-    if (user.first()):
-        return user
-
-    user = globals.model.Teacher.query.filter_by(EMAIL = email)
-
-    if (user.first()):
-        return user
-
-    user = globals.model.Student.query.filter_by(EMAIL = email)
-
-    if (user.first()):
-        return user
-
-def getAccountByEmail (email):
-    account = _getAccountByEmail(email)
-    if (account):
-        return account.first()
-
-def getAccountById (id):
-    account = _getAccountById(id)
-    if (account):
-        return account.first()
-
-def _getAccountByUsername (username):
-    user = globals.model.Administrator.query.filter_by(USERNAME = username)
-
-    if (user.first()):
-        return user
-
-    user = globals.model.Parent.query.filter_by(USERNAME = username)
-
-    if (user.first()):
-        return user
-
-    user = globals.model.Teacher.query.filter_by(USERNAME = username)
-
-    if (user.first()):
-        return user
-
-    user = globals.model.Student.query.filter_by(USERNAME = username)
-
-    if (user.first()):
-        return user
-
 def getAccountDetails (account_id, account = None):
     if not (account):
-        account = getAccountById(account_id)
+        account = Account(account_id)
 
     if not (account):
         return False
 
-    account_id = account.id
+    account_id = account.get("id")
     try:
         account_details = globals.General.loadJson(_getAccountDetailsPath(account.ACCOUNT_TYPE, account_id))
         return account_details
@@ -93,12 +20,12 @@ def _getAccountDetailsPath (account_type, account_id):
     return os.path.join("data", f"{account_type}s", account_id, "details.json")
 
 def getAccountDetailsPath (account_id):
-    account = getAccountById(account_id)
+    account = Account(account_id)
     if (account):
         return _getAccountDetailsPath(account.ACCOUNT_TYPE, account_id)
 
 def getAccountSettings (account_id):
-    account = getAccountById(account_id)
+    account = Account(account_id)
     if (account):
         account_settings = globals.General.loadJson(os.path.join("data", f"{account.ACCOUNT_TYPE}s", account_id, "settings.json"))
         return account_settings
@@ -106,9 +33,9 @@ def getAccountSettings (account_id):
 
 
 def getAccountSettingsPath (account_id):
-    account = getAccountById(account_id)
+    account = Account(account_id)
     if (account):
-        return os.path.join("data", account.ACCOUNT_TYPE, account.id, "settings.json")
+        return os.path.join("data", account.ACCOUNT_TYPE, account.get("id"), "settings.json")
 
 def getAccountByUsername (username):
     account = _getAccountByUsername(username)
@@ -116,32 +43,11 @@ def getAccountByUsername (username):
         return account.first()
 
 def getAccountBySession ():
-    return getAccountById(current_user.id)
+    return Account(current_user.id)
 
 def getSchoolSubjectsList ():
     school_subjects = globals.model.SchoolSubjects.query.all()
     return school_subjects
-
-
-def lookupParentById (id):
-    account = getAccountById(id)
-    if (account and account.ACCOUNT_TYPE == "parent"):
-        return account
-
-def lookupTeacherById (id):
-    account = getAccountById(id)
-    if (account and account.ACCOUNT_TYPE == "teacher"):
-        return account
-
-def lookupStudentById (id):
-    account = getAccountById(id)
-    if (account and account.ACCOUNT_TYPE == "student"):
-        return account
-
-def lookupAdministratorById (id):
-    account = getAccountById(id)
-    if (account and account.ACCOUNT_TYPE == "administrator"):
-        return account
 
 def determineAccountStatus ():
     if (globals.config["security"]["ALLOW_REMOTE_ACCOUNT_VALIDATION"] == True):
@@ -155,7 +61,7 @@ def getAccountStatus (account):
 
 def getAccountPath (user_id, account_type, verified = True):
     if not (verified):
-        account = getAccountById(user_id)
+        account = Account(user_id)
         if not (account):
             return None
     return os.path.join("data", f"{account_type}s", user_id)

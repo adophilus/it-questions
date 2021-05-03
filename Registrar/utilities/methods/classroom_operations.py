@@ -60,7 +60,7 @@ def addUserToClassroom (user, classroom, commit = False):
 	}
 
 def removeUserAccountFromClassroom (account, classroom_id, commit = False):
-	user_id = account.id
+	user_id = account.get("id")
 
 	if not (globals.methods.User(account = account).isStudent() or globals.methods.User(account = account).isTeacher()):
 		return False

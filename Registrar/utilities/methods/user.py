@@ -11,7 +11,7 @@ class User ():
 		if (account):
 			self.account = account
 		elif (user_id):
-			self.account = getAccountByid(user_id)
+			self.account = Account(user_id)
 
 	def isReady (self):
 		return self.is_ready
@@ -29,7 +29,7 @@ class User ():
 	def isParent (self):
 		if not (self.isReady()):
 			return False
-   
+
 		if not (self.account.is_active):
 			return False
 
@@ -39,7 +39,7 @@ class User ():
 	def isTeacher (self):
 		if not (self.isReady()):
 			return False
-   
+
 		if not (self.account.is_active):
 			return False
 
@@ -49,7 +49,7 @@ class User ():
 	def isStudent (self):
 		if not (self.isReady()):
 			return False
-   
+
 		if not (self.account.is_active):
 			return False
 

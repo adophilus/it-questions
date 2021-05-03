@@ -14,3 +14,15 @@ class Administrator (UserMixin, globals.db.Model):
     ADMIN_RANK = globals.db.Column(globals.db.Text)
     ACCOUNT_TYPE = globals.db.Column(globals.db.Text)
     ACCOUNT_STATUS = globals.db.Column(globals.db.Text)
+
+    @classmethod
+    def getByEmail (cls, email):
+        return cls.query.filter_by(EMAIL = email).first()
+
+    @classmethod
+    def getById (cls, id):
+        return cls.query.filter_by(id = id).first()
+
+    @classmethod
+    def getByUsername (cls, username):
+        return cls.query.filter_by(USERNAME = username).first()

@@ -61,10 +61,3 @@ def addNewUserToDB (username, password, account_details, commit = False):
 		return userAccount
 	except Exception as e:
 		return False
-
-def removeUserAccountFromDB (account, commit = False):
-	if (account):
-		globals.db.session.delete(account)
-
-		if (commit):
-			globals.db.session.commit()

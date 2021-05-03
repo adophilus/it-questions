@@ -5,7 +5,6 @@ from flask import session
 from flask_login import logout_user, current_user
 
 from .account_auth import *
-from .account_gen import *
 from .account_get import *
 from .account_pages import *
 from .account_put import *

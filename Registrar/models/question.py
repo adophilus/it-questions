@@ -1,8 +1,6 @@
 from flask import globals
-from flask_login import UserMixin
-from flask_sqlalchemy import Model
 
-class Question (UserMixin, globals.db.Model):
+class Question (globals.db.Model):
     id = globals.db.Column(globals.db.Text, primary_key = True)
     QUESTION_TITLE = globals.db.Column(globals.db.Text)
     QUESTION_TYPE = globals.db.Column(globals.db.Text)
@@ -12,3 +10,7 @@ class Question (UserMixin, globals.db.Model):
     OWNER = globals.db.Column(globals.db.Text)
     OWNER_ID = globals.db.Column(globals.db.Text)
     IMAGE_PATH = globals.db.Column(globals.db.Text)
+
+    @classmethod
+    def getById (cls, id):
+        return cls.query.filter_by(id = id).first()

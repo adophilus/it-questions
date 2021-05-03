@@ -6,10 +6,10 @@ def _getAccountDetailsPath (account_type, account_id):
 
 def putAccountDetails (account_id, account_details, account = None):
 	if not (account):
-		account = getAccountById(account_id)
+		account = Account(account_id)
 	if not (account):
 		return False
-	account_id = account.id
+	account_id = account.get("id")
 	try:
 		globals.General.saveJson(_getAccountDetailsPath(account.ACCOUNT_TYPE, account_id), account_details)
 		return True

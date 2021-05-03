@@ -1,6 +1,5 @@
 from flask import globals
 from flask_login import UserMixin
-from flask_sqlalchemy import Model
 
 class Teacher (UserMixin, globals.db.Model):
     id = globals.db.Column(globals.db.Text, primary_key = True)
@@ -14,3 +13,15 @@ class Teacher (UserMixin, globals.db.Model):
     PHONE_NUMBER = globals.db.Column(globals.db.Text)
     ACCOUNT_TYPE = globals.db.Column(globals.db.Text)
     ACCOUNT_STATUS = globals.db.Column(globals.db.Text)
+
+    @classmethod
+    def getByEmail (cls, email):
+        return cls.query.filter_by(EMAIL = email).first()
+
+    @classmethod
+    def getById (cls, id):
+        return cls.query.filter_by(id = id).first()
+
+    @classmethod
+    def getByUsername (cls, username):
+        return cls.query.filter_by(USERNAME = username).first()

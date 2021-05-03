@@ -4,7 +4,10 @@ from flask import render_template
 from flask import redirect
 from flask import session
 from flask import url_for
+
 import os
+
+from ..controllers.config import config
 from ..utilities.General import *
 
 main = Blueprint("main", __name__)
@@ -48,7 +51,7 @@ def mainQuestionsPage ():
 @main.route("/signup")
 @main.route("/register")
 def mainSignupPage ():
-	if (globals.config["security"]["ALLOW_REMOTE_ACCOUNT_CREATION"]):
+	if (config["security"]["ALLOW_REMOTE_ACCOUNT_CREATION"]):
 		return render_template("signup.html")
 	else:
 		return redirect(url_for("main.mainLoginPage"))

@@ -89,7 +89,7 @@ def renderAccountPageOf (id, account_type):
 	if not (is_admin or is_teacher or is_parent):
 		return globals.methods.redirectUserToHomePage()
 
-	account = getAccountById(id)
+	account = Account(id)
 
 	if not account:
 		return renderInexistentAccountPage()

@@ -1,1 +1,1 @@
-from .classroom.classroom import createClassroom, checkClassroomMessages
+from .classroom.classroom import runClassroomTests

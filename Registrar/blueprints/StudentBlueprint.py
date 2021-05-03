@@ -41,7 +41,7 @@ def lookupStudentByIdPage (id):
 	# return render_template(
 	#     "profile.html",
 	#     Account = account,
-	#     account_description = globals.methods.getAccountDetails(account.id).get("description"),
+	#     account_description = globals.methods.getAccountDetails(account.get("id")).get("description"),
 	#     date_and_time = date_and_time
 	# )
 

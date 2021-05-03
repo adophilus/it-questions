@@ -4,7 +4,7 @@ def getWards ():
     return
 
 def addWard (wardId, parentId):
-    ward = globals.methods.getAccountById(wardId)
+    ward = globals.methods.Account(wardId)
     if ((not ward) or ward.ACCOUNT_TYPE != globals.config["account"]["types"]["student"]["name"]):
         errmsg = globals.config.getMessage("INVALID_WARD")
         return globals.General.unjsonize({"error": errmsg, "data": errmsg, "status": False})

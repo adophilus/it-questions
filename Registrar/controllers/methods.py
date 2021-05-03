@@ -1,12 +1,19 @@
+from cryptography.fernet import Fernet
+
+from flask_login import login_user
+
+from re import search, sub, I, escape
+from threading import Thread
+
+from . import Account
+from .config import config
+
 import json
 import time
 import sys
 import requests
 import urllib
 import base64
-from threading import Thread
-from re import search, sub, I, escape
-from cryptography.fernet import Fernet
 
 def unjsonize (json_data, *args, **kwargs):
 	dict_object = json.loads(json_data, *args, **kwargs)
@@ -184,6 +191,3 @@ def sendTrue (data):
 
 def sendFalse (data):
 	return jsonize({"error": data, "status": False})
-
-def getIpAddress ():
-	return ""

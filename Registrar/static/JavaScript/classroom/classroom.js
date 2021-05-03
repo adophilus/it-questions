@@ -1,5 +1,51 @@
-function getClassroomMessages () {
+function getClassroomMessages (classroom_id, callback) {
+	$.ajax({
+		url: `/classroom/${classroom_id}/message/get`,
+		type: "GET",
+		data: {},
+		success: function (data) {
+			if (data.status) {
+				console.log(data.data);
+				callback(data);
+			}
+			else {
+				console.log(data.error);
+			}
+		},
+		error: function (xhr) {
+			console.warn(xhr);
+		}
+	});
+}
 
+function displayClassroomMessages (classroom_id, data, first_call = true) {
+	if (first_call) {
+		getClassroomMessages(classroom_id, function (data) { displayClassroomMessages(clasroom_id, data) });
+		return;
+	}
+
+	if (!data.status) {
+		return;
+	}
+
+	for (let message in data.data) {
+		var classroomMessageContainer = document.createElement("div");
+		var classroomMessageBody = document.createElement("div");
+		var classroomMessageDetails = document.createElement("div");
+		var classroomMessageDetailsDateSent = document.createElement("small");
+
+		classroomMessageBody.innerHTML = message.message;
+		classroomMessageDetailsDateSent.innerHTML = message.details.date_sent;
+
+		classroomMessageContainer.classList.add("list");
+		classroomMessageBody.classList.add("message");
+		classroomMessageDetails.classList.add("message-details");
+		classroomMessageDetailsDateSent.classList.add("date-sent scnd-font-color");
+
+		classroomMessageDetails.appendChild(classroomMessageDetailsDateSent);
+		classroomMessageContainer.appendChild(classroomMessageBody);
+		classroomMessageContainer.appendChild(classroomMessageDetails);
+	}
 }
 
 function sendClassroomMessage (classroom_id, message) {
@@ -30,7 +76,7 @@ function setActiveClassroom (event) {
 		classroomsListElement.classList.add("classroom");
 		classroomsListElement.classList.remove("classrooms-list");
 	}
-	
+
 	window.activeClassroom = {
 		"id": event.target.getAttribute("classroom-id")
 	}
@@ -94,7 +140,7 @@ function displayClassroomsList (classrooms_list) {
 
 function getClassroomsList (callback) {
 	$.ajax({
-		url: "/api/classroom/list",
+		url: "/classroom/list",
 		type: "POST",
 		data: {},
 		success: function (data) {
@@ -112,7 +158,7 @@ $(document).ready(function () {
 	window.activeClassroom = new Object();
 	window.classroomsListContainer = $(".classrooms-list .body");
 	window.classroomMessageEntry = $("#classroom_message_entry");
-	
+
 	$("#display_classrooms_list_btn").click(function (e) { unsetActiveClassroom(e) });
 	$("#message_send_btn").click(function () {
 		var message = window.classroomMessageEntry.val().replace(/\s+$/, "");
