@@ -1,6 +1,7 @@
 from flask import globals
 from flask_login import UserMixin
-from flask_sqlalchemy import Model
+
+from ..controllers.config import config
 
 class Parent (UserMixin, globals.db.Model):
     id = globals.db.Column(globals.db.Text, primary_key = True)
@@ -12,8 +13,8 @@ class Parent (UserMixin, globals.db.Model):
     EMAIL = globals.db.Column(globals.db.Text)
     PHONE_NUMBER = globals.db.Column(globals.db.Text)
     BIRTHDAY = globals.db.Column(globals.db.Date)
-    WARDS = globals.db.Column(globals.db.Text)
-    ACCOUNT_TYPE = globals.db.Column(globals.db.Text)
+    WARDS = globals.db.Column(globals.db.Text, default = "[]")
+    ACCOUNT_TYPE = globals.db.Column(globals.db.Text, default = config.getAccountType("parent")["name"])
     ACCOUNT_STATUS = globals.db.Column(globals.db.Text)
 
     @classmethod

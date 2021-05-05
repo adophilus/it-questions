@@ -49,7 +49,7 @@ def handleLogin ():
 			return sendFalse(config.getMessage("INVALID_CREDENTIALS"))
 
         if not (account.isAllowedEntry()):
-            return sendFalse(config.getMessage("ACCESS_DENIED_PAGE"))
+            return sendFalse(config.getMessage("ACCESS_DENIED"))
 
         if (login_user(account)):
             return jsonize({"status": True, "ACCOUNT_TYPE": account.ACCOUNT_TYPE, "data": config.getMessage("SUCCESSFUL_SIGNIN")})
@@ -96,7 +96,7 @@ def handleSignUp ():
     # ward_other_names = request.form.get("ward_other_names")
     # ward_classroom = request.form.get("ward_classroom")
 
-    return globals.methods.createUserAccount(
+    return createUserAccount(
         # Everyone's fields
         first_name,
         last_name,
@@ -153,23 +153,23 @@ def changeUserPassword ():
 
     return globals.General.sendFalse(config.getMessage("ACCOUNT_SETTINGS_UPDATED"))
 
-@handler.route("/school/events/get/<after_event_id>", methods = ["GET"])
-def getSchoolEvents (after_event_id):
-    school_events = [ {"ID": school_event.id, "EVENT": school_event.EVENT, "DATE": globals.methods.dateToString(school_event.DAY)["ymd"], "VENUE": school_event.VENUE} for school_event in globals.model.SchoolEvent.query.filter().all() ]
+# @handler.route("/school/events/get/<after_event_id>", methods = ["GET"])
+# def getSchoolEvents (after_event_id):
+#     school_events = [ {"ID": school_event.id, "EVENT": school_event.EVENT, "DATE": globals.methods.dateToString(school_event.DAY)["ymd"], "VENUE": school_event.VENUE} for school_event in globals.model.SchoolEvent.query.filter().all() ]
 
-    if (after_event_id == "null"):
-        return globals.General.unjsonize(school_events)
+#     if (after_event_id == "null"):
+#         return globals.General.unjsonize(school_events)
 
-    return_events = []
-    start = False
-    for school_event in school_events:
-        if (start):
-            return_events.append(school_event)
+#     return_events = []
+#     start = False
+#     for school_event in school_events:
+#         if (start):
+#             return_events.append(school_event)
 
-        if (school_event["ID"] == after_event_id):
-            start = True
+#         if (school_event["ID"] == after_event_id):
+#             start = True
 
-    return globals.General.unjsonize(return_events)
+#     return globals.General.unjsonize(return_events)
 
 @handler.route("/remove-account")
 @handler.route("/delete-account")

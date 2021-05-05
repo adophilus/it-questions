@@ -1,6 +1,8 @@
 from flask import globals
 from flask_login import UserMixin
 
+from ..controllers.config import config
+
 class Student (UserMixin, globals.db.Model):
     id = globals.db.Column(globals.db.Text, primary_key = True)
     FIRST_NAME = globals.db.Column(globals.db.Text)
@@ -13,8 +15,8 @@ class Student (UserMixin, globals.db.Model):
     PHONE_NUMBER = globals.db.Column(globals.db.Text)
     BIRTHDAY = globals.db.Column(globals.db.Date)
     DEPARTMENT = globals.db.Column(globals.db.Text)
+    ACCOUNT_TYPE = globals.db.Column(globals.db.Text, default = config.getAccountType("student")["name"])
     ACCOUNT_STATUS = globals.db.Column(globals.db.Text)
-    ACCOUNT_TYPE = globals.db.Column(globals.db.Text)
 
     @classmethod
     def getByEmail (cls, email):

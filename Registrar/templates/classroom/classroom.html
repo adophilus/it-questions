@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Classrooms | {{ Account.ACCOUNT_TYPE | capitalize }}</title>
+    <title>Classrooms | {{ Account.get('ACCOUNT_TYPE') | capitalize }}</title>
     <!-- <link rel="stylesheet" href="/static/CSS/bootstrap/bootstrap.css"> -->
     <link rel="stylesheet" href="/static/CSS/freebie-interactive/freebie-interactive.css">
     <link rel="stylesheet" href="/static/CSS/flaticon/flaticon.css">
@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="/static/CSS/context-menu/context-menu.css">
     <!-- <link rel="stylesheet" href="/static/CSS/chatroom.css"> -->
     <link rel="stylesheet" href="/static/CSS/classroom/classroom.css">
-    {% if Client.isAdmin() or Client.isTeacher() %}
+    {% if Account.isAdmin() or Account.isTeacher() %}
         <link rel="stylesheet" href="/static/CSS/questions.css">
         <link rel="stylesheet" href="/static/CSS/flip-switch/flip-switch.css">
         <link rel="stylesheet" href="/static/CSS/modal-box/modal-box-select.css">
@@ -28,7 +28,7 @@
         <header class="block">
             <ul class="header-menu horizontal-list">
                 <li>
-                    <a class="header-menu-tab active" href="/{{ Account.ACCOUNT_TYPE }}">
+                    <a class="header-menu-tab active" href="/{{ url_for('main.homeView') }}">
                         <span class="icon fontawesome-home scnd-font-color"></span>
                         Home
                     </a>
@@ -84,8 +84,8 @@
     <script type="text/javascript" src="/static/JavaScript/jquery-ui.js"></script>
     <script type="text/javascript">
         window.Account = {
-            "id": "{{ Account.id }}",
-            "type": "{{ Account.ACCOUNT_TYPE }}"
+            "id": "{{ Account.get('id') }}",
+            "type": "{{ Account.get('ACCOUNT_TYPE') }}"
         }
         window.displaying = new Array();
         window.displaying["account_settings"] = false;
@@ -126,7 +126,7 @@
     </script>
     <script type="text/javascript">
         window.client = {
-            "id": "{{ Account.id }}"
+            "id": "{{ Account.get('id') }}"
         }
     </script>
     {% if Client.isAdmin() or Client.isTeacher() %}

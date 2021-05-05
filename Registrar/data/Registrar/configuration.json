@@ -203,7 +203,7 @@
 	"messages": {
 		"LOGIN_REQUIRED": "Please login to proceed!",
 		"REMOTE_ACCOUNT_CREATION_NOT_ALLOWED": "Sorry, creation of accounts has been disabled by the admin!",
-		"ACCESS_DENIED_PAGE": "Sorry, you are not allowed to access this page!",
+		"ACCESS_DENIED": "Sorry, you are not allowed to access this page!",
 		"ERROR_OCCURRED": "Sorry, an error occurred!",
 		"SUCCESSFUL_ACCOUNT_CREATION": "Your account has been created successfully!",
 		"UNSUCCESSFUL_ACCOUNT_CREATION": "Account creation failed!",

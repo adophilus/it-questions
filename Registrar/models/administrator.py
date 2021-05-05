@@ -1,6 +1,8 @@
 from flask import globals
 from flask_login import UserMixin
 
+from ..controllers.config import config
+
 class Administrator (UserMixin, globals.db.Model):
     id = globals.db.Column(globals.db.Text, primary_key = True)
     FIRST_NAME = globals.db.Column(globals.db.Text)
@@ -12,7 +14,7 @@ class Administrator (UserMixin, globals.db.Model):
     BIRTHDAY = globals.db.Column(globals.db.Date)
     PHONE_NUMBER = globals.db.Column(globals.db.Text)
     ADMIN_RANK = globals.db.Column(globals.db.Text)
-    ACCOUNT_TYPE = globals.db.Column(globals.db.Text)
+    ACCOUNT_TYPE = globals.db.Column(globals.db.Text, default = config.getAccountType("administrator")["name"])
     ACCOUNT_STATUS = globals.db.Column(globals.db.Text)
 
     @classmethod

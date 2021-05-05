@@ -1,7 +1,8 @@
 from datetime import datetime
 from flask import globals
 
-from . import config, method
+from . import config
+from .methods import jsonize, unjsonize
 from ..controllers import config
 from ..models import Room, RoomContactArea
 
@@ -57,6 +58,12 @@ class Classroom ():
 				self.IMAGE_PATH = classroom.IMAGE_PATH
 			self.classroom = classroom
 
+	def __dict__ (self):
+		return self.id
+
+	def __str__ (self):
+		return self.id
+
 	@classmethod
 	def __generateId__ (cls, unique = True):
 		while True:
@@ -84,7 +91,7 @@ class Classroom ():
 		status = Classroom.getStatus(status)
 		added_members = []
 		for member in members:
-			classroom_members = globals.controller.method.unjsonize(self.classroom.MEMBERS)
+			classroom_members = unjsonize(self.classroom.MEMBERS)
 			if (not member.id in classroom_members.keys()):
 				classroom_profile = {
 					member.id: {
@@ -95,7 +102,8 @@ class Classroom ():
 				}
 				classroom_members.update(classroom_profile)
 				added_members.append(member.id)
-		self.classroom.MEMBERS = controller.method.jsonize(classroom_members)
+				member.addClassroom(self, classroom_profile)
+		self.classroom.MEMBERS = jsonize(classroom_members)
 		return added_members
 
 	def set (self, field, value):
