@@ -10,12 +10,13 @@ parent = Blueprint("parent", __name__)
 @parent.route("/")
 @login_required
 def parentIndexPage ():
-	if not globals.methods.Client.isParent():
-		return globals.methods.redirectUserToHomePage()
+	account = Account(_object = current_user)
+	if (not account.isParent()):
+		return redirect(f"/{account.get('ACCOUNT_TYPE')}")
 
 	return globals.methods.renderUserAccountHomePage()
 
 @parent.route("/<id>")
 @login_required
 def lookupParentByIdPage (id):
-	return globals.methods.renderAccountPageOf(id, globals.model.Parent["name"])
+	return sendFalse("not implemented yet!")

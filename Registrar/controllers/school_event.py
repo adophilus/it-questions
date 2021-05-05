@@ -28,7 +28,7 @@ class SchoolEvent ():
 	@classmethod
 	def __generateId__ (cls, unique = True):
 		while True:
-			id = self.generator.generate(level = globals.config["id_length"]["school_event"])
+			id = self.generator.generate(level = config["id_length"]["school_event"])
 
 			if (unique):
 				schoolEvent = models.SchoolEvent.getById(id)

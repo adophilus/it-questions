@@ -3,7 +3,7 @@ from flask import globals
 from flask import request
 from flask_login import LoginManager, login_user, login_required, current_user, logout_user
 
-from ..utilities.General import *
+from ..controllers.config import config
 
 handlerQuestion = Blueprint("handlerQuestion", __name__)
 
@@ -11,7 +11,7 @@ handlerQuestion = Blueprint("handlerQuestion", __name__)
 @login_required
 def createQuestion (question_title):
 	if not (globals.methods.Client.isAdmin() or globals.methods.Client.isTeacher()):
-		errormsg = globals.config.getMessage("UNAUTHORIZED_ACCESS")
+		errormsg = config.getMessage("UNAUTHORIZED_ACCESS")
 		return globals.General.sendFalse(errormsg)
 	return globals.methods.createQuestion(question_title)
 
@@ -23,44 +23,32 @@ def getUserQuestionsList ():
 
 	user_details = globals.methods.getAccountDetails(current_user.id)
 	user_questions = user_details.get("questions")
-	return globals.General.unjsonize(user_questions)
+	return sendFalse(user_questions)
 
 @handlerQuestion.route("/details/<question_id>", methods = ["GET"])
 def loadQuestionDetails (question_id):
-	question = globals.methods.getQuestionById(question_id)
+	account = Account(_object = current_user)
+	question = Question(question_id = question_id)
 	if (not question):
-		errmsg = globals.config.getMessage("INEXISTENT_QUESTION")
-		return globals.General.unjsonize({"data": errmsg, "error": errmsg, "status": False})
+		return sendFalse(config.getMessage("INEXISTENT_QUESTION"))
 
-	question_type = question.QUESTION_TYPE
-	question_details = globals.methods.getQuestionDetails(question_id, question_type)
+	if (not question.get("IS_PUBLIC")):
+		if (account.isVisitor()):
+			return sendFalse(config.getMessage("QUESTION_FETCH_FAILED"))
+		if (question.get("CREATOR") != account.get("id")):
+			return sendFalse(config.getMessage("QUESTION_FETCH_FAILED"))
 
-	if (not question_details or question_type != "public"):
-		if (globals.methods.Client.isVisitor()):
-			errmsg = globals.config.getMessage("QUESTION_FETCH_FAILED")
-			return globals.General.unjsonize({"data": errmsg, "error": errmsg, "status": False})
-		if (question.CREATOR_ID != current_user.id):
-			errmsg = globals.config.getMessage("QUESTION_FETCH_FAILED")
-			return globals.General.unjsonize({"data": errmsg, "error": errmsg, "status": False})
-
-	return globals.General.unjsonize({"data": question_details, "status": True})
+	return sendTrue(question.questionDetails)
 
 @handlerQuestion.route("/get/<question_id>/<question_number>", methods = ["GET"])
 @login_required
 def loadQuestionNumber (question_id, question_number):
 	question = globals.methods.getQuestionById(question_id)
 	if (not question):
-		errmsg = globals.config.getMessage("INEXISTENT_QUESTION")
-		return globals.General.unjsonize({"data": errmsg, "error": errmsg, "status": False})
+		return sendFalse(config.getMessage("INEXISTENT_QUESTION"))
 
-	question_type = question.QUESTION_TYPE
-	questions = globals.methods.getQuestionQuestions(question_id, question_type)
-	if (not questions):
-		errmsg = globals.config.getMessage("QUESTION_FETCH_FAILED")
-		return globals.General.unjsonize({"data": errmsg, "error": errmsg, "status": False})
-
-	question = questions[f"{question_number}"]
-	return globals.General.unjsonize({"data": question, "status": True})
+	# question = questions[f"{question_number}"]
+	return sendTrue(question)
 
 
 @handlerQuestion.route("/save/<question_id>/<question_number>", methods = ["POST"])
@@ -69,20 +57,17 @@ def saveQuestionNumber (question_id, question_number):
 	question = globals.methods.getQuestionById(question_id)
 	question_data = globals.General.jsonize(request.form.get("question_data"))
 	if (not question):
-		errmsg = globals.config.getMessage("INEXISTENT_QUESTION")
-		return globals.General.unjsonize({"data": errmsg, "error": errmsg, "status": False})
+		return sendFalse(config.getMessage("INEXISTENT_QUESTION"))
 
 	question_type = question.QUESTION_TYPE
 
 	question_details = globals.methods.getQuestionDetails(question_id, question_type)
 	if (not question_details):
-		errmsg = globals.config.getMessage("QUESTION_FETCH_FAILED")
-		return globals.General.unjsonize({"data": errmsg, "error": errmsg, "status": False})
+		return sendFalse(config.getMessage("QUESTION_FETCH_FAILED"))
 
 	questions = globals.methods.getQuestionQuestions(question_id, question_type)
 	if (not questions):
-		errmsg = globals.config.getMessage("QUESTION_FETCH_FAILED")
-		return globals.General.unjsonize({"data": errmsg, "error": errmsg, "status": False})
+		return sendFalse(config.getMessage("QUESTION_FETCH_FAILED"))
 
 	default_question_data = {
 		"question": "The question goes here",
@@ -137,26 +122,25 @@ def saveQuestionNumber (question_id, question_number):
 	# questions[str(question_number)] = question_data
 
 	if not (globals.methods.putQuestionQuestions(question_id, questions, question)):
-		errmsg = globals.config.getMessage("QUESTION_SAVE_FAILED")
-		return globals.General.unjsonize({"data": errmsg, "error": errmsg, "status": False})
+		return sendFalse(config.getMessage("QUESTION_SAVE_FAILED"))
 
-	question_details["last_modified"] = globals.methods.getPresentYMD()
+	question_details["last_modified"] = getPresentYMD()
 	question_details["number_of_questions"] = len(questions.keys())
 	# print("\n"*3)
 	# print(questions[str(question_number)])
 	# print("\n"*3)
 
 	if not (globals.methods.putQuestionDetails(question_id, question_details, question)):
-		errmsg = globals.config.getMessage("QUESTION_SAVE_FAILED")
-		return globals.General.unjsonize({"data": errmsg, "error": errmsg, "status": False})
+		return sendFalse(config.getMessage("QUESTION_SAVE_FAILED"))
 
-	return globals.General.unjsonize({"data": globals.config.getMessage("QUESTION_SAVE_SUCCESSFUL"), "status": True})
+	return sendFalse({"data": config.getMessage("QUESTION_SAVE_SUCCESSFUL"), "status": True})
 
 @handlerQuestion.route("/download/<question_id>", methods = ["GET"])
 def downloadQuestionWithId (question_id):
+	account = Account(_object = current_user)
 	question = globals.methods.getQuestionById(question_id)
 	if not (question):
-		return globals.config.getMessage("INEXISTENT_QUESTION")
-	if (globals.methods.Client.isVisitor() and question.QUESTION_TYPE != "public"):
-		return globals.config.getMessage("INEXISTENT_QUESTION")
+		return config.getMessage("INEXISTENT_QUESTION")
+	if (account.isVisitor()) and (not question.get("IS_PUBLIC")):
+		return config.getMessage("INEXISTENT_QUESTION")
 	return "Downloading question...."

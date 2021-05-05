@@ -5,18 +5,18 @@ from flask import redirect
 from flask import session
 from flask import url_for
 
-import os
-
 from ..controllers.config import config
-from ..utilities.General import *
+
+import os
 
 main = Blueprint("main", __name__)
 
 @main.route("/")
+@main.route("/home")
 def mainIndexPage ():
     # return "The server has not been configured. Please contact the technical administrator in order to configure it"
 
-	# if not globals.config["is_configured"]:
+	# if not config["is_configured"]:
 	# 	return redirect(url_for("registrar.registrarConfigurationPage"))
 	return render_template("home.html", title = "Home")
 
@@ -44,14 +44,13 @@ def mainContactPage ():
 def mainFaqPage ():
 	return render_template("faq.html")
 
-@main.route("/questions")
-def mainQuestionsPage ():
-	return "{}"
-
 @main.route("/signup")
 @main.route("/register")
 def mainSignupPage ():
 	if (config["security"]["ALLOW_REMOTE_ACCOUNT_CREATION"]):
-		return render_template("signup.html")
+		return render_template("signup.html", url_for = url_for)
 	else:
 		return redirect(url_for("main.mainLoginPage"))
+
+def mainAccountHomePage ():
+	pass

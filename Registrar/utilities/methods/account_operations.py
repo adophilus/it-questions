@@ -13,8 +13,8 @@ def createUserAccount (first_name, last_name, other_names, birthday, email, phon
 	# ward_other_names = ward_other_names.strip()
 	# ward_classroom = ward_classroom.strip()
 
-	if (not account_type in globals.config["account"]["types"]):
-		return globals.General.unjsonize({"data": config.getMessage("INVALID_ACCOUNT_TYPE"), "status": False})
+	if (not account_type in config["account"]["types"]):
+		return jsonize({"data": config.getMessage("INVALID_ACCOUNT_TYPE"), "status": False})
 
 	if (not globals.methods.Validate.username(username)):
 		return globals.General.sendFalse(config.getMessage("INVALID_USERNAME"))
@@ -24,7 +24,6 @@ def createUserAccount (first_name, last_name, other_names, birthday, email, phon
 
 	if (not globals.methods.Validate.email(email)):
 		return globals.General.sendFalse(config.getMessage("INVALID_EMAIL"))
-
 
 	if (len(first_name) == 0 or len(last_name) == 0):
 		return globals.General.sendFalse(config.getMessage("INVALID_NAME"))
@@ -99,7 +98,7 @@ def createUserAccount (first_name, last_name, other_names, birthday, email, phon
 # 			account_path,
 # 			"details.json"
 # 		),
-# 		globals.General.unjsonize(
+# 		jsonize(
 # 			details
 # 		)
 # 	)

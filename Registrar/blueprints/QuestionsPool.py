@@ -3,15 +3,18 @@ from flask import globals
 from flask import redirect
 from flask import url_for
 
+from ..controllers.methods import sendFalse
+
 questionsPool = Blueprint("questions_pool", __name__)
 
 @questionsPool.route("/")
 def questionsPoolIndexPage ():
-	return globals.methods.renderQuestionsPoolPage()
+	# return globals.methods.renderQuestionsPoolPage()
+	return sendFalse("needs revision!")
 
 @questionsPool.route("/list/<question_id>")
 def questionsPoolListPage (question_id):
-	return globals.methods.getQuestionsListAfter(question_id)
+	return sendFalse("not implemented yet!")
 
 @questionsPool.route("/<question_id>")
 def displayQuesitionPage (question_id):

@@ -7,36 +7,36 @@ from flask import render_template
 from flask import session
 from flask import url_for
 from flask_login import login_required, current_user, logout_user
-from ..utilities.General import *
+
+from ..controllers import Account
 from .MainBlueprint import mainLoginPage
+
 import os
 
 student = Blueprint("student", __name__)
 
-def checkStudent ():
-	if current_user.ACCOUNT_TYPE != globals.config["account"]["types"]["student"]["name"]:
-		return globals.methods.redirectUserToHomePage()
-
 @student.route("/")
 @login_required
 def studentIndexPage ():
-	if current_user.ACCOUNT_TYPE != globals.config["account"]["types"]["student"]["name"]:
-		return globals.methods.redirectUserToHomePage()
+	account = Account(_object = current_user)
+	if (not account.isStudent()):
+		return redirect(f"/{account.get('ACCOUNT_TYPE')}")
 
 	return globals.methods.renderUserAccountHomePage()
 
 @student.route("/logout")
 @login_required
 def studentLogoutPage ():
-	if current_user.ACCOUNT_TYPE != globals.config["account"]["types"]["student"]["name"]:
-		return globals.methods.redirectUserToHomePage()
+	account = Account(_object = current_user)
+	if (not account.isStudent()):
+		return redirect(f"/{account.get('ACCOUNT_TYPE')}")
 
 	return redirect(url_for("handler.handleLogout"))
 
 @student.route("/<id>")
 @login_required
 def lookupStudentByIdPage (id):
-	return globals.methods.renderAccountPageOf(id, globals.model.Student["name"])
+	return sendFalse("not implemented yet!")
 
 	# return render_template(
 	#     "profile.html",
@@ -112,15 +112,8 @@ def lookupStudentByFirstNamePage (firstName):
 @student.route("/results")
 @login_required
 def lookupStudentResultPage ():
-	if current_user.ACCOUNT_TYPE != globals.config["account"]["types"]["student"]["name"]:
-		return globals.methods.redirectUserToHomePage()
+	account = Account(_object = current_user)
+	if (not account.isStudent()):
+		return redirect(f"/{account.get('ACCOUNT_TYPE')}")
 
 	return render_template("student/results.html")
-
-@student.route("/remove-account")
-@login_required
-def removeStudentAccount ():
-	if current_user.ACCOUNT_TYPE != globals.config["account"]["types"]["student"]["name"]:
-		return globals.methods.redirectUserToHomePage()
-
-	return globals.methods.removeUserAccount(current_user.id)

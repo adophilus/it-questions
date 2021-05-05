@@ -9,12 +9,13 @@ teacher = Blueprint("teacher", __name__)
 @teacher.route("/")
 @login_required
 def teacherIndexPage ():
-	if current_user.ACCOUNT_TYPE != globals.config["account"]["types"]["teacher"]["name"]:
-		return globals.methods.redirectUserToHomePage()
+	account = Account(_object = current_user)
+	if (not account.isTeacher()):
+		return redirect(f"/{account.get('ACCOUNT_TYPE')}")
 
 	return globals.methods.renderUserAccountHomePage()
 
 @teacher.route("/<id>")
 @login_required
 def lookupTeacherByIdPage (id):
-    return globals.methods.renderAccountPageOf(id, globals.model.Teacher["name"])
+    return sendFalse("not implemented yet!")

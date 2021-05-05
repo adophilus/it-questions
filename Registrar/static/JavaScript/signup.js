@@ -33,17 +33,15 @@ $(document).ready(function (){
 		}
 	});
 
-	fetch("/handler/list-of-classrooms").then(response => {
-		response.text().then(response => {
-			// console.log("Classrooms:");
-			// console.log(response);
+	fetch($("#form_classroom").attr("target-url")).then(response => {
+		response.json().then(response => {
 			$("#form_classroom").autocomplete({
-				source: JSON.parse(response),
+				source: response.data,
 				"minLength": 0,
 			});
 
 			$("#form_ward_classroom").autocomplete({
-				source: JSON.parse(response),
+				source: response.data,
 				"minLength": 0,
 			});
 		});

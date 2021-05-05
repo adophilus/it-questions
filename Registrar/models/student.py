@@ -14,7 +14,7 @@ class Student (UserMixin, globals.db.Model):
     EMAIL = globals.db.Column(globals.db.Text)
     PHONE_NUMBER = globals.db.Column(globals.db.Text)
     BIRTHDAY = globals.db.Column(globals.db.Date)
-    DEPARTMENT = globals.db.Column(globals.db.Text)
+    DEPARTMENT = globals.db.Column(globals.db.Text, nullable = False)
     ACCOUNT_TYPE = globals.db.Column(globals.db.Text, default = config.getAccountType("student")["name"])
     ACCOUNT_STATUS = globals.db.Column(globals.db.Text)
 

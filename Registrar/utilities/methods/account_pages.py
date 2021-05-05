@@ -11,21 +11,6 @@ from .question_get import *
 
 import calendar
 import datetime
-import urllib
-
-def renderInexistentAccountPage ():
-	message = globals.General.unjsonize({
-		"account_search_code": 404,
-		"message": globals.config.getMessage("INEXISTENT_ACCOUNT_SEARCH")
-	})
-
-	cookie_data = {
-		"key": "account_search",
-		"value": urllib.parse.quote(message),
-		"path": f"/{current_user.ACCOUNT_TYPE}"
-	}
-
-	return renderUserAccountHomePage([cookie_data])
 
 def renderUserAccountHomePage (cookies = []):
 	try:
@@ -38,9 +23,9 @@ def renderUserAccountHomePage (cookies = []):
 		}
 
 		account_details = getAccountDetails(current_user.id)
-		if (globals.config["account"]["statuses"][account_details["status"]].get("grant_access")):
+		if (config["account"]["statuses"][account_details["status"]].get("grant_access")):
 			keys = {
-				"Account": current_user,
+				"Account": account,
 				"account_details": account_details,
 				"Client": Client,
 				"date_and_time": date_and_time,
@@ -57,15 +42,6 @@ def renderUserAccountHomePage (cookies = []):
 				keys["questions_list_length"] = len(keys["questions_list"])
 				keys["getQuestionDetails"] = getQuestionDetails
 
-				# print(keys["questions_list"][0]["id"],
-				# 		keys["questions_list"][0]["type"])
-				# print("\n\n\n\n",
-				# 	getQuestionDetails(
-				# 		keys["questions_list"][0]["id"],
-				# 		keys["questions_list"][0]["type"]
-				# 	),
-				# 	"\n\n\n\n")
-
 			elif (Client.isStudent()):
 				keys["no_of_unread_public_remarks"] = 0
 				keys["no_of_unseen_results"] = 0
@@ -81,34 +57,6 @@ def renderUserAccountHomePage (cookies = []):
 	except FileNotFoundError:
 		logout_user()
 		return redirect("main.mainLoginPage")
-
-def renderAccountPageOf (id, account_type):
-	is_admin = Client.isAdmin()
-	is_teacher = Client.isTeacher()
-	is_parent = Client.isParent()
-	if not (is_admin or is_teacher or is_parent):
-		return globals.methods.redirectUserToHomePage()
-
-	account = Account(id)
-
-	if not account:
-		return renderInexistentAccountPage()
-
-	if account.ACCOUNT_TYPE != account_type:
-		return renderInexistentAccountPage()
-
-	if (is_admin):
-		if (globals.methods.Client.isAdmin()):
-			return render_template("administrator/display/account-details.html", Account = account)
-
-	if (is_teacher):
-		return render_template("teacher/display/account-details.html", Account = account)
-
-	if (is_parent):
-		parent_account_details = globals.methods.getAccountDetails(current_user.id)
-		if id not in parent_account_details.get("wards"):
-			return renderInexistentAccountPage()
-		return render_template("parent/display/account-details.html", Account = account)
 
 def getPresent ():
 	return datetime.datetime.now()

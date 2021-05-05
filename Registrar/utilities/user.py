@@ -23,7 +23,7 @@ class User ():
         if not (self.account.is_active):
             return False
 
-        if self.account.ACCOUNT_TYPE == globals.config["account"]["types"]["administrator"]["name"]:
+        if self.account.ACCOUNT_TYPE == config["account"]["types"]["administrator"]["name"]:
             return True
 
     def isParent (self):
@@ -33,7 +33,7 @@ class User ():
         if not (self.account.is_active):
             return False
 
-        if self.account.ACCOUNT_TYPE == globals.config["account"]["types"]["parent"]["name"]:
+        if self.account.ACCOUNT_TYPE == config["account"]["types"]["parent"]["name"]:
             return True
 
     def isTeacher (self):
@@ -43,7 +43,7 @@ class User ():
         if not (self.account.is_active):
             return False
 
-        if self.account.ACCOUNT_TYPE == globals.config["account"]["types"]["teacher"]["name"]:
+        if self.account.ACCOUNT_TYPE == config["account"]["types"]["teacher"]["name"]:
             return True
 
     def isStudent (self):
@@ -53,5 +53,5 @@ class User ():
         if not (self.account.is_active):
             return False
 
-        if self.account.ACCOUNT_TYPE == globals.config["account"]["types"]["student"]["name"]:
+        if self.account.ACCOUNT_TYPE == config["account"]["types"]["student"]["name"]:
             return True

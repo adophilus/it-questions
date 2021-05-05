@@ -6,8 +6,8 @@ from flask import render_template
 from flask import session
 from flask import url_for
 
-from ..controllers import Account, config, Classroom, Client
-from ..controllers.method import sendFalse, sendTrue
+from ..controllers import Account, config, Classroom
+from ..controllers.methods import sendFalse, sendTrue
 
 classroom = Blueprint("classroom", __name__)
 
@@ -28,20 +28,20 @@ def classroomIndexPage ():
 		classrooms = classrooms)
 
 
-@classroom.route("/list", methods = [ "POST" ])
-@login_required
+@classroom.route("/list", methods = [ "GET", "POST" ])
 def getClassroomsList ():
 	return sendFalse("Not implemented yet")
 
 @classroom.route("/<classroom_id>/message/get")
 @login_required
 def getClassroomMessages (classroom_id):
+	account = Account(_object = current_user)
 	classroom = Classroom(classroom_id = classroom_id)
 
 	if (not classroom.__exists__):
 		return sendFalse(config.getMessage("INEXISTENT_CLASSROOM"))
 
-	if (classroom.hasMember(current_user.id) or Client.isStudent()):
-		return sendTrue(classroom.getMessages())
+	if (not classroom.hasMember(account)):
+		return sendFalse(config.getMessage("ACCESS_DENIED"))
 
-	return sendFalse(config.getMessage("ACCESS_DENIED"))
+	return sendTrue(classroom.getMessages())

@@ -7,11 +7,11 @@
 	"host": "0.0.0.0",
 	"id_length": {
 		"account": 5,
-		"question": 4,
+		"question": 7,
 		"contact_area": 4,
 		"school_event": 3,
 		"classroom": 4,
-		"chatroom_message": 6
+		"chatroom_message": 10
 	},
 	"id_per_level": {
 		"classroom": 5
@@ -213,17 +213,19 @@
 		"UNSUCCESSFUL_SIGNIN": "Sign in un-successful!",
 		"SUCCESSFUL_SIGNOUT": "Sign out successful",
 		"EXISTENT_EMAIL": "This email address is already in use!",
+		"EXISTENT_EMAIL_USERNAME": "This email address and/or username is already in use!",
 		"EXISTENT_ACCOUNT": "This account already exists!",
 		"INEXISTENT_CLASS": "Class in-existent!",
 		"INEXISTENT_ACCOUNT": "Account in-existent!",
 		"INEXISTENT_ACCOUNT_SEARCH": "The account you searched for is in-existent!",
 		"INVALID_ACCOUNT": "Invalid account!",
 		"INVALID_ACCOUNT_TYPE": "Invalid account type!",
-		"INVALID_CREDENTIALS": "Invalid username or password!",
-		"INVALID_USERNAME": "Invalid username!",
-		"INVALID_PASSWORD": "Invalid password!",
 		"INVALID_BIRTHDAY": "Invalid birthday!",
+		"INVALID_CREDENTIALS": "Invalid username or password!",
+		"INVALID_EMAIL_USERNAME": "Invalid email and/or username!",
+		"INVALID_EMAIL_USERNAME": "Invalid email and/or username!",
 		"INVALID_NAME": "Please check your names!",
+		"INVALID_PASSWORD": "Invalid password!",
 		"INVALID_WARD_NAME": "Please check your ward's names!",
 		"INEXISTENT_QUESTION": "The question does not exist!",
 		"QUESTION_FETCH_FAILED": "Couldn't fetch questions!",

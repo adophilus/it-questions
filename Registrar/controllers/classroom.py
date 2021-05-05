@@ -1,9 +1,8 @@
 from datetime import datetime
 from flask import globals
 
-from . import config
+from .config import config
 from .methods import jsonize, unjsonize
-from ..controllers import config
 from ..models import Room, RoomContactArea
 
 class ClassroomInvalidFieldException (Exception):
@@ -18,45 +17,37 @@ class ClassroomInvalidFieldException (Exception):
 class Classroom ():
 	__exists__ = False
 
-	def __init__ (self, classroom_id = "", classroom_name = None, contact_area_id = None, classroom_members = None, image_path = None):
+	def __init__ (self, classroom_id = "", classroom_name = None, contact_area = None, classroom_members = None, image_path = None):
 		classroom = Classroom.getById(classroom_id)
+		classroom.TYPE = config["room"]["type"]["classroom"]["hash"]
 		if (classroom):
 			self.__exists__ = True
-			self.id = classroom.id
-			self.NAME = classroom.NAME
-			self.CONTACT_AREA = ClassroomContactArea(classroom_id = classroom.CONTACT_AREA)
-			self.IMAGE_PATH = classroom.IMAGE_PATH
+			self.contactArea = ClassroomContactArea(classroom_id = classroom.CONTACT_AREA)
+			self.members = unjsonize(classroom.MEMBERS)
 			if (classroom_name):
-				self.NAME = classroom_name
-				classroom.NAME = self.NAME
+				classroom.NAME = classroom_name
+			if (contact_area):
+				self.contactArea = contact_area
+				classroom.CONTACT_AREA = contact_area.classroom_id
 			if (classroom_members):
 				self.addMember(*classroom_members)
-			if (contact_area_id):
-				self.CONTACT_AREA = ClassroomContactArea(classroom_id = contact_area_id)
-				classroom.CONTACT_AREA = contact_area_id
 			if (image_path):
 				classroom.IMAGE_PATH = image_path
-				self.IMAGE_PATH = image_path
-			self.classroom = classroom
 		else:
-			self.id = Classroom.__generateId__()
-			self.NAME = classroom_name
-			self.CONTACT_AREA = ClassroomContactArea(classroom_id = self.id)
-			classroom = Room(id = self.id, NAME = self.NAME)
+			id = Classroom.__generateId__()
+			classroom = Room(id = self.id, NAME = classroom_name, IMAGE_PATH = image_path)
+			self.contactArea = ClassroomContactArea(classroom_id = id)
+			classroom.CONTACT_AREA = contact_area.classroom_id
+			self.members = []
+			if (contact_area):
+				self.contactArea = contact_area
+				classroom.CONTACT_AREA = contact_area.classroom_id
 			if (classroom_members):
 				self.addMember(*classroom_members)
-			if (contact_area_id):
-				self.CONTACT_AREA = ClassroomContactArea(classroom_id = contact_area_id)
-				classroom.CONTACT_AREA = contact_area_id
-			else:
-				self.CONTACT_AREA = ClassroomContactArea(classroom_id = self.id)
-				classroom.CONTACT_AREA = self.id
 			if (image_path):
-				self.IMAGE_PATH = image_path
 				classroom.IMAGE_PATH = self.IMAGE_PATH
-			else:
-				self.IMAGE_PATH = classroom.IMAGE_PATH
-			self.classroom = classroom
+
+		self.classroom = classroom
 
 	def __dict__ (self):
 		return self.id
@@ -67,7 +58,7 @@ class Classroom ():
 	@classmethod
 	def __generateId__ (cls, unique = True):
 		while True:
-			id = globals.IDgenerator.generate(level = globals.config["id_length"]["classroom"])
+			id = globals.IDgenerator.generate(level = config["id_length"]["classroom"])
 
 			if (unique):
 				classroom = Classroom.getById(id)
@@ -91,8 +82,7 @@ class Classroom ():
 		status = Classroom.getStatus(status)
 		added_members = []
 		for member in members:
-			classroom_members = unjsonize(self.classroom.MEMBERS)
-			if (not member.id in classroom_members.keys()):
+			if (not member.id in self.members.keys()):
 				classroom_profile = {
 					member.id: {
 						"ACCOUNT_TYPE": member.ACCOUNT_TYPE,
@@ -100,23 +90,49 @@ class Classroom ():
 						"status": status
 					}
 				}
-				classroom_members.update(classroom_profile)
-				added_members.append(member.id)
+				members.update(classroom_profile)
+				added_members.append(member)
 				member.addClassroom(self, classroom_profile)
-		self.classroom.MEMBERS = jsonize(classroom_members)
+		self.classroom.MEMBERS = jsonize(self.members)
+		globals.db.commit()
 		return added_members
+
+	def hasMember (self, member):
+		return member.get("id") in self.members.keys()
+
+	def removeMember (self, *members):
+		removed_members = []
+		for member in members:
+			if (not self.hasMember(member)):
+				continue
+			del self.classroom.members[member.id]
+			removed_members.append(member)
+		globals.db.commit()
+		return removed_members
+
+	def get (self, field):
+		if (field == "NAME"):
+			return self.classroom.NAME
+		elif (field == "TYPE"):
+			return self.classroom.TYPE
+		elif (field == "CONTACT_AREA"):
+			return self.contactArea
+		elif (field == "IMAGE_PATH"):
+			return self.classroom.IMAGE_PATH
+		else:
+			raise ClassroomInvalidFieldException(field)
 
 	def set (self, field, value):
 		if (field == "NAME"):
-			self.NAME = value
+			self.classroom.NAME = value
 		elif (field == "TYPE"):
-			self.TYPE = value
 			self.classroom.TYPE = value
 		elif (field == "CONTACT_AREA"):
-			self.CONTACT_AREA = value.classroom_id
+			if (not isinstance(value, ClassroomContactArea)):
+				raise ClassroomInvalidFieldException(field)
+			self.contactArea = value
 			self.classroom.CONTACT_AREA = value.classroom_id
 		elif (field == "IMAGE_PATH"):
-			self.IMAGE_PATH = value
 			self.classroom.IMAGE_PATH = value
 		else:
 			raise ClassroomInvalidFieldException(field)
@@ -125,21 +141,21 @@ class Classroom ():
 		if (not self.__exists__):
 			globals.db.session.add(self.classroom)
 			globals.db.session.commit()
-			self.CONTACT_AREA.create()
+			self.contactArea.create()
 			self.__exists__ = True
 
 	def delete (self):
 		if (self.__exists__):
-			self.CONTACT_AREA.drop(globals.db.engine, True)
+			self.contactArea.drop(globals.db.engine, True)
 			globals.db.session.delete(self.classroom)
 			globals.db.session.commit()
 			self.__exists__ = False
 
 	def getMessages (self):
-		return self.CONTACT_AREA.getMessages()
+		return self.contactArea.getMessages()
 
 	def addMessage (self, sender_id, message, message_type = config["contact_area"]["message"]["type"]["message"]["hash"]):
-		return self.CONTACT_AREA.addMessage(sender_id, message, message_type)
+		return self.contactArea.addMessage(sender_id, message, message_type)
 
 class ClassroomMessage ():
 	def __init__ (self, queryResult):

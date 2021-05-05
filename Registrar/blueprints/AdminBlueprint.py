@@ -4,6 +4,8 @@ from flask import redirect
 from flask import url_for
 from flask_login import current_user, login_required
 
+from ..controllers.methods import sendFalse
+
 admin = Blueprint("admin", __name__)
 
 @admin.route("/")
@@ -17,4 +19,4 @@ def adminIndexPage ():
 @admin.route("/<id>")
 @login_required
 def lookupAdministratorByIdPage (id):
-	return globals.methods.renderAccountPageOf(id, globals.model.Administrator["name"])
+	return sendFalse("not implemented yet!")

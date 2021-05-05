@@ -5,8 +5,7 @@ from flask_login import login_user
 from re import search, sub, I, escape
 from threading import Thread
 
-from . import Account
-from .config import config
+from . import config
 
 import json
 import time
@@ -14,6 +13,12 @@ import sys
 import requests
 import urllib
 import base64
+
+fernetDefaultKey = 'bmzUYT20jqyQg8379p-ECPAtRKCCXmNf3QR-lMjjcYA='.encode("UTF-8")
+
+class FalseDict (dict):
+	def __bool__ (self):
+		return False
 
 def unjsonize (json_data, *args, **kwargs):
 	dict_object = json.loads(json_data, *args, **kwargs)
@@ -190,4 +195,4 @@ def sendTrue (data):
 	return jsonize({"data": data, "status": True})
 
 def sendFalse (data):
-	return jsonize({"error": data, "status": False})
+	return jsonize(FalseDict({"error": data, "status": False}))

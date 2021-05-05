@@ -3,7 +3,7 @@ from flask import globals
 
 from .config import config
 from .classroom import Classroom
-from .methods import fernetEncrypt, fernetDecrypt
+from .methods import fernetEncrypt, fernetDecrypt, jsonize
 from .private_key_generator import PrivateKeyGenerator
 from .. import models
 
@@ -20,36 +20,39 @@ class Account ():
 	accountSettings = {}
 	accountSettingsPath = None
 
-	def __init__ (self, id = None, username = None, email = None, account_type = config.getAccount("student")["name"], _object = None):
+	def __init__ (self, id = None, username = None, email = None, account_type = config.getAccountType("student")["name"], _object = None, check = False):
 		if (_object):
-			self.__determineAccountType(_object = _object, account_type = account_type)
+			self.__determineAccountType(_object = _object, account_type = account_type, check = check)
 		elif (email):
-			self.__determineAccountType(email = email, account_type = account_type)
+			self.__determineAccountType(email = email, account_type = account_type, check = check)
 		elif (username):
-			self.__determineAccountType(username = username, account_type = account_type)
+			self.__determineAccountType(username = username, account_type = account_type, check = check)
 		else:
-			self.__determineAccountType(id, account_type = account_type)
+			self.__determineAccountType(id, account_type = account_type, check = check)
 
 	def __bool__ (self):
 		return self.__exists__
 
-	def __determineAccountType (self, id = None, username = None, email = None, account_type = config.getAccount("student")["name"], _object = None):
-		if (object):
+	def __str__ (self):
+		return self.get("id")
+
+	def __determineAccountType (self, id = None, username = None, email = None, account_type = config.getAccountType("student")["name"], _object = None, check = False):
+		if (_object):
 			administrator = _object
-		if (email):
+		elif (email):
 			administrator = models.Administrator.getByEmail(email)
-			parent = models.Parent.getByEmail(email)
-			teacher = models.Teacher.getByEmail(email)
+			parent = Parent.getByEmail(email)
+			teacher = Teacher.getByEmail(email)
 			student = Student.getByEmail(email)
 		elif (username):
-			administrator = models.Administrator.getByUsername(username)
-			parent = models.Parent.getByUsername(username)
-			teacher = models.Teacher.getByUsername(username)
+			administrator = Administrator.getByUsername(username)
+			parent = Parent.getByUsername(username)
+			teacher = Teacher.getByUsername(username)
 			student = Student.getByUsername(username)
 		else:
-			administrator = models.Administrator.getById(id)
-			parent = models.Parent.getById(id)
-			teacher = models.Teacher.getById(id)
+			administrator = Administrator.getById(id)
+			parent = Parent.getById(id)
+			teacher = Teacher.getById(id)
 			student = Student.getById(id)
 
 		if (administrator):
@@ -65,23 +68,24 @@ class Account ():
 			self.account = student
 			self.__exists__ = True
 		else:
-			if (account_type == config.getAccount("administrator")["name"]):
-				self.account = models.Administrator(id = self.__generateId__())
-			elif (account_type == config.getAccount("parent")["name"]):
-				self.account = models.Parent(id = self.__generateId__())
-			elif (account_type == config.getAccount("teacher")["name"]):
-				self.account = models.Teacher(id = self.__generateId__())
-			else:
-				self.account = Student(id = self.__generateId__())
+			if (not check):
+				if (account_type == config.getAccountType("administrator")["name"]):
+					self.account = Administrator(id = self.__generateId__())
+				elif (account_type == config.getAccountType("parent")["name"]):
+					self.account = Parent(id = self.__generateId__())
+				elif (account_type == config.getAccountType("teacher")["name"]):
+					self.account = Teacher(id = self.__generateId__())
+				else:
+					self.account = Student(id = self.__generateId__())
 
 	def setAccountPath (self, path = None):
 		if (self.__exists__):
 			if (not path):
-				path = os.path.join("data", f'{self.account.ACCOUNT_TYPE}s')
+				path = os.path.join("data", f'{self.account.ACCOUNT_TYPE}s', self.account.id)
 			self.accountDetailsPath = path.join("details.json")
 			self.accountSettingsPath = path.join("settings.json")
 
-	def __loadAccountDetails (self, from_dict = False):
+	def loadAccountDetails (self, from_dict = False):
 		if (self.__exists__):
 			if (not from_dict):
 				self.accountDetails = loadJson(self.accountDetailsPath)
@@ -95,7 +99,7 @@ class Account ():
 			saveJson(self.accountDetailsPath, details)
 			return True
 
-	def __loadAccountSettings (self, from_dict = False):
+	def loadAccountSettings (self, from_dict = False):
 		if (self.__exists__):
 			if (not from_dict):
 				self.accountSettings = loadJson(self.accountSettingsPath)
@@ -114,7 +118,7 @@ class Account ():
 			id = cls.generator.generate(level = config["id_length"]["account"])
 
 			if (unique):
-				account = cls(id)
+				account = cls(id, check = True)
 
 				if (not account):
 					return id
@@ -129,15 +133,15 @@ class Account ():
 
 	@classmethod
 	def getByEmail (cls, email):
-		return cls(email = email)
+		return cls(email = email, check = True)
 
 	@classmethod
 	def getById (cls, id):
-		return cls(id)
+		return cls(id, check = True)
 
 	@classmethod
 	def getByUsername (cls, username):
-		return cls(username = username)
+		return cls(username = username, check = True)
 
 	@classmethod
 	def isAllowedEntry (cls):
@@ -148,6 +152,7 @@ class Account ():
 
 	def set (self, field, value):
 		self.account[field] = value
+		globals.db.commit()
 
 	def hasUsername (self, username):
 		return self.get("USERNAME") == username
@@ -176,9 +181,11 @@ class Account ():
 
 			self.setAccountPath()
 
+			os.mkdir(os.dirname(self.accountDetailsPath))
+
 			if (not account_details):
 				account_details = {}
-			self.__loadAccountDetails(from_dict = account_details)
+			self.loadAccountDetails(from_dict = account_details)
 			self.saveAccountDetails()
 
 			if (not account_settings):
@@ -190,7 +197,7 @@ class Account ():
 					"secret_question_answer": "",# the answer to the secret question
 					"enable_secret_question": ""# determines whether the secret question will be enaled or not
 				}
-			self.__loadAccountSettings(from_dict = account_settings)
+			self.loadAccountSettings(from_dict = account_settings)
 			self.saveAccountSettings()
 			return True
 
@@ -203,14 +210,11 @@ class Account ():
 			return True
 
 class Administrator (models.Administrator, Account):
-	def __init__ (self, *args, **kwargs):
+	def __init__ (self, **kwargs):
+		models.Administrator.__init__(self, ACCOUNT_TYPE = config.getAccountType("administrator")["name"], **kwargs)
 		self.setAccountPath(os.path.join("data", self.ACCOUNT_TYPE))
-		self.__loadAccountDetails()
-		self.__loadAccountSettings()
-		models.Administrator.__init__(self, *args, **kwargs)
-
-	def __dict__ (self):
-		return self.id
+		self.loadAccountDetails()
+		self.loadAccountSettings()
 
 	def __str__ (self):
 		return self.id
@@ -245,14 +249,11 @@ class Administrator (models.Administrator, Account):
 		self[field] = value
 
 class Parent (models.Parent, Account):
-	def __init__ (self, *args, **kwargs):
+	def __init__ (self, **kwargs):
+		models.Parent.__init__(self, ACCOUNT_TYPE = config.getAccountType("parent")["name"], **kwargs)
 		self.setAccountPath(os.path.join("data", self.ACCOUNT_TYPE))
-		self.__loadAccountDetails()
-		self.__loadAccountSettings()
-		models.Parent.__init__(self, *args, **kwargs)
-
-	def __dict__ (self):
-		return self.id
+		self.loadAccountDetails()
+		self.loadAccountSettings()
 
 	def __str__ (self):
 		return self.id
@@ -307,15 +308,12 @@ class Teacher (models.Teacher, Account):
 	classrooms = []
 	questions = []
 
-	def __init__ (self, *args, **kwargs):
+	def __init__ (self, **kwargs):
+		models.Teacher.__init__(self, ACCOUNT_TYPE = config.getAccountType("teacher")["name"], **kwargs)
 		self.setAccountPath(os.path.join("data", self.ACCOUNT_TYPE))
-		self.__loadAccountDetails()
-		self.__loadAccountSettings()
+		self.loadAccountDetails()
+		self.loadAccountSettings()
 		self.__populateClassrooms()
-		models.Teacher.__init__(self, *args, **kwargs)
-
-	def __dict__ (self):
-		return self.id
 
 	def __str__ (self):
 		return self.id
@@ -377,22 +375,20 @@ class Teacher (models.Teacher, Account):
 class Student (models.Student, Account):
 	classrooms = []
 
-	def __init__ (self, *args, **kwargs):
+	def __init__ (self, **kwargs):
+		models.Student.__init__(self, ACCOUNT_TYPE = config.getAccountType("student")["name"], **kwargs)
 		self.setAccountPath(os.path.join("data", self.ACCOUNT_TYPE))
-		self.__loadAccountDetails()
-		self.__loadAccountSettings()
+		self.loadAccountDetails()
+		self.loadAccountSettings()
 		self.__populateClassrooms()
-		models.Student.__init__(self, *args, **kwargs)
-
-	def __dict__ (self):
-		return self.id
 
 	def __str__ (self):
 		return self.id
 
 	def __populateClassrooms (self):
-		for classroom in self.accountDetails["classroom"]:
-			self.classrooms.append(Classroom(classroom["id"]))
+		if (self.__exists__):
+			for classroom in self.accountDetails["classroom"]:
+				self.classrooms.append(Classroom(classroom["id"]))
 
 	def addClassroom (self, classroom, classroom_profile = None):
 		if (not classroom_profile):
