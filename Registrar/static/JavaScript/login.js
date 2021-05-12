@@ -1,12 +1,12 @@
 function login () {
-    var username = $("#sign-in-form #form-username").val();
+    var username = $("#sign-in-form #form-email-username").val();
     var password = $("#sign-in-form #form-password").val();
     var remember_me = $("#sign-in-form #form-remember_me").val();
     $.ajax({
         "url": "/handler/login",
         "type": "POST",
         "data": {
-            "username": username,
+            "email_username": username,
             "password": password,
             "remember_me": true
         },
@@ -14,12 +14,10 @@ function login () {
             data = JSON.parse(String(data));
             console.log(data);
             if (data.status) {
-                var link = document.createElement("a");
-                link.setAttribute("href", `/${data.ACCOUNT_TYPE}`);
-                link.click();
+                window.location.replace(data.data);
             }
             else {
-                alert(data.data);
+                alert(data.error);
             }
         },
         "error": function (xhr) {

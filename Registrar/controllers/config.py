@@ -13,6 +13,9 @@ class Config (defaultdict):
 		self.path = path
 		defaultdict.__init__(self, lambda: None, loadJson(self.path))
 
+	def getAccountStatus (self, status):
+		return self.get("account")["status"][status]
+
 	def getAccountType (self, account_type):
 		return self.get("account")["types"][account_type]
 
@@ -20,7 +23,7 @@ class Config (defaultdict):
 		return self.get("messages").get(message)
 
 	def getClassroomStatus (self, status):
-		return self.get("classroom")["statuses"].get(classroom_status)
+		return self.get("classroom")["status"].get(status)
 
 	def save (self, path = None):
 		if (not path):

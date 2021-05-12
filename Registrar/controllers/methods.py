@@ -1,7 +1,5 @@
 from cryptography.fernet import Fernet
 
-from flask_login import login_user
-
 from re import search, sub, I, escape
 from threading import Thread
 

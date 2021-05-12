@@ -9,7 +9,7 @@ parent = Blueprint("parent", __name__)
 
 @parent.route("/")
 @login_required
-def parentIndexPage ():
+def homeView ():
 	account = Account(_object = current_user)
 	if (not account.isParent()):
 		return redirect(f"/{account.get('ACCOUNT_TYPE')}")

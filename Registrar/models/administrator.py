@@ -15,7 +15,10 @@ class Administrator (UserMixin, globals.db.Model):
     PHONE_NUMBER = globals.db.Column(globals.db.Text)
     ADMIN_RANK = globals.db.Column(globals.db.Text)
     ACCOUNT_TYPE = globals.db.Column(globals.db.Text, default = config.getAccountType("administrator")["name"])
-    ACCOUNT_STATUS = globals.db.Column(globals.db.Text)
+    ACCOUNT_STATUS = globals.db.Column(globals.db.Text, default = config.getAccountStatus("ACTIVE"))
+
+    def __bool__ (self):
+        return True
 
     @classmethod
     def getByEmail (cls, email):

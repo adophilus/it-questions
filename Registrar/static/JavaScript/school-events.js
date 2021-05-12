@@ -22,18 +22,19 @@ function toggleSchoolEvents (event, operation = "toggle") {
 }
 
 function __getSchoolEvents (callback, after_event_id) {
-    $.ajax({
-        "url": "/handler/school/events/get/" + after_event_id,
-        "data": {},
-        "type": "GET",
-        "success": function (data) {
-            data = JSON.parse(data);
-            callback(data);
-        },
-        "error": function (xhr) {
-            console.warn(xhr);
-        }
-    });
+    // $.ajax({
+    //     "url": "/handler/school/events/get/" + after_event_id,
+    //     "data": {},
+    //     "type": "GET",
+    //     "success": function (data) {
+    //         data = JSON.parse(data);
+    //         callback(data);
+    //     },
+    //     "error": function (xhr) {
+    //         console.warn(xhr);
+    //     }
+    // });
+    console.log("yet to be refactored! " + after_event_id);
 }
 
 function getSchoolEvents () {

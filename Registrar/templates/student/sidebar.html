@@ -1,0 +1,33 @@
+<div class="menu-box block">
+    <h2 class="titular">MENU BOX</h2>
+    <ul class="menu-box-menu">
+        <li id="profile_toggler">
+            <a class="menu-box-tab" href="javascript:void(0)"><span class="icon fontawesome-user scnd-font-color"></span>Profile</a>
+        </li>
+        <li>
+            <a class="menu-box-tab" href="/classroom"><span class="icon entypo-book-open scnd-font-color"></span>Classroom</a>
+        </li>
+        <li id="notifications_toggler">
+            <a class="menu-box-tab" href="javascript:void(0)">
+                <span class="icon entypo-sound scnd-font-color"></span>
+                Notifications
+                {% if no_of_unread_notifications > 0 %}
+                    <div class="menu-box-number">{{ no_of_unread_notifications }}</div>
+                {% endif %}
+            </a>
+        </li>
+        <li id="school_events_toggler">
+            <a class="menu-box-tab" href="javascript:void(0)">
+                <span class="icon entypo-calendar scnd-font-color"></span>
+                Events
+                <div class="menu-box-number-important" number-of-unseen-school-events=""></div>
+            </a>
+        </li>
+        <li>
+            <a id="account_settings_toggler" class="menu-box-tab" href="javascript:void(0)">
+                <span class="icon entypo-cog scnd-font-color"></span>
+                Account Settings
+            </a>
+        </li>
+    </ul>
+</div>

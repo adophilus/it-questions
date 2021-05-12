@@ -3,6 +3,7 @@ from flask import globals
 
 from .config import config
 from .methods import jsonize, unjsonize
+from .private_key_generator import PrivateKeyGenerator
 from ..models import Room, RoomContactArea
 
 class ClassroomInvalidFieldException (Exception):
@@ -16,10 +17,12 @@ class ClassroomInvalidFieldException (Exception):
 
 class Classroom ():
 	__exists__ = False
+	generator = PrivateKeyGenerator()
+	members = {}
 
 	def __init__ (self, classroom_id = "", classroom_name = None, contact_area = None, classroom_members = None, image_path = None):
 		classroom = Classroom.getById(classroom_id)
-		classroom.TYPE = config["room"]["type"]["classroom"]["hash"]
+
 		if (classroom):
 			self.__exists__ = True
 			self.contactArea = ClassroomContactArea(classroom_id = classroom.CONTACT_AREA)
@@ -34,19 +37,19 @@ class Classroom ():
 			if (image_path):
 				classroom.IMAGE_PATH = image_path
 		else:
-			id = Classroom.__generateId__()
-			classroom = Room(id = self.id, NAME = classroom_name, IMAGE_PATH = image_path)
-			self.contactArea = ClassroomContactArea(classroom_id = id)
-			classroom.CONTACT_AREA = contact_area.classroom_id
-			self.members = []
+			classroom = Room(id = Classroom.__generateId__(), NAME = classroom_name, IMAGE_PATH = image_path)
+			self.contactArea = ClassroomContactArea(classroom_id = classroom.id)
+			classroom.CONTACT_AREA = self.contactArea.classroom_id
+			self.members = {}
 			if (contact_area):
 				self.contactArea = contact_area
-				classroom.CONTACT_AREA = contact_area.classroom_id
+				classroom.CONTACT_AREA = contactArea.classroom_id
 			if (classroom_members):
 				self.addMember(*classroom_members)
 			if (image_path):
 				classroom.IMAGE_PATH = self.IMAGE_PATH
 
+		classroom.TYPE = config["room"]["type"]["classroom"]["hash"]
 		self.classroom = classroom
 
 	def __dict__ (self):
@@ -58,7 +61,7 @@ class Classroom ():
 	@classmethod
 	def __generateId__ (cls, unique = True):
 		while True:
-			id = globals.IDgenerator.generate(level = config["id_length"]["classroom"])
+			id = cls.generator.generate(level = config["id_length"]["classroom"])
 
 			if (unique):
 				classroom = Classroom.getById(id)
@@ -78,23 +81,23 @@ class Classroom ():
 	def getStatus (cls, status_name):
 		return config.getClassroomStatus(status_name)
 
-	def addMember (self, *members, status = "AWAITING_CLEARANCE"):
+	def addMember (self, *members, status = "AWAITING_VERIFICATION"):
 		status = Classroom.getStatus(status)
 		added_members = []
 		for member in members:
 			if (not member.id in self.members.keys()):
 				classroom_profile = {
 					member.id: {
-						"ACCOUNT_TYPE": member.ACCOUNT_TYPE,
-						"ACCOUNT_STATUS": member.ACCOUNT_STATUS,
-						"status": status
+						"ACCOUNT_TYPE": member.accountType,
+						"ACCOUNT_STATUS": member.get("ACCOUNT_STATUS"),
+						"status": config.getClassroomStatus(status)
 					}
 				}
-				members.update(classroom_profile)
+				self.members.update(classroom_profile)
 				added_members.append(member)
 				member.addClassroom(self, classroom_profile)
 		self.classroom.MEMBERS = jsonize(self.members)
-		globals.db.commit()
+		globals.db.session.commit()
 		return added_members
 
 	def hasMember (self, member):
@@ -107,10 +110,12 @@ class Classroom ():
 				continue
 			del self.classroom.members[member.id]
 			removed_members.append(member)
-		globals.db.commit()
+		globals.db.session.commit()
 		return removed_members
 
 	def get (self, field):
+		if (field == "id"):
+			return self.classroom.id
 		if (field == "NAME"):
 			return self.classroom.NAME
 		elif (field == "TYPE"):

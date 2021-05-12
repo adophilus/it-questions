@@ -6,11 +6,11 @@ from flask_login import current_user, login_required
 
 from ..controllers.methods import sendFalse
 
-admin = Blueprint("admin", __name__)
+admin = Blueprint("administrator", __name__)
 
 @admin.route("/")
 @login_required
-def adminIndexPage ():
+def homeView ():
 	if not globals.methods.Client.isAdmin():
 		return globals.methods.renderUserAccountHomePage()
 

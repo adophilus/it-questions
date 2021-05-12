@@ -1,6 +1,7 @@
 from flask import Blueprint
 from flask import globals
 from flask import redirect
+from flask import request
 from flask import url_for
 from flask_login import current_user, login_required
 
@@ -20,6 +21,12 @@ def isLoggedIn ():
 		return "true"
 	else:
 		return "false"
+
+@development.route("/delete-account-by-id", methods = [ "POST" ])
+def deleteAccountById ():
+	account = Account(id = request.form.get("id"))
+	account.delete()
+	return str(account)
 
 @development.route("/get-account-by-id/<id>")
 def getAccountById (id):

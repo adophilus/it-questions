@@ -23,7 +23,7 @@ def renderUserAccountHomePage (cookies = []):
 		}
 
 		account_details = getAccountDetails(current_user.id)
-		if (config["account"]["statuses"][account_details["status"]].get("grant_access")):
+		if (config["account"]["status"][account_details["status"]].get("grant_access")):
 			keys = {
 				"Account": account,
 				"account_details": account_details,
@@ -52,14 +52,14 @@ def renderUserAccountHomePage (cookies = []):
 				response.set_cookie(**cookie)
 			return response
 
+		return "in here!"
 		logout_user()
 		return redirect("main.mainLoginPage")
-	except FileNotFoundError:
+	except FileNotFoundError as e:
+		return "error: " + e.message
 		logout_user()
 		return redirect("main.mainLoginPage")
 
-def getPresent ():
-	return datetime.datetime.now()
 
 def getPresentYMD ():
 	present = getPresent()

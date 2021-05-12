@@ -4,18 +4,14 @@ from flask import render_template
 from flask import redirect
 from flask import request
 from flask import session
+from flask import url_for
 from flask_login import LoginManager, login_user, login_required, current_user, logout_user
 
 from ..Registrar import app
 from ..controllers import Account
 from ..controllers.config import config
-from ..controllers.methods import sendFalse, jsonize
-from ..controllers.handler import createQuestion, createUserAccount
-
-import os
-import re
-import time
-import urllib
+from ..controllers.methods import sendFalse, sendTrue
+from ..controllers.api import createQuestion, createUserAccount
 
 handler = Blueprint("handler", __name__)
 
@@ -36,16 +32,15 @@ def load_user (user_id):
 	# else:
 	#     user = globals.model.Student.query.get(user.id)
 	# return user
-	account = Account(user_id)
-	return account.account
+	account = Account(id = user_id)
+	return account.getAccount()
 
 @handler.route("/login", methods = [ "POST" ])
 def handleLogin ():
-	username = request.form.get("username")
+	username = request.form.get("email_username")
 	password = request.form.get("password")
 
 	account = Account(username = username)
-
 	if (account):
 		if ((not account.hasUsername(username)) or (not account.hasPassword(password))):
 			return sendFalse(config.getMessage("INVALID_CREDENTIALS"))
@@ -53,8 +48,8 @@ def handleLogin ():
 		if not (account.isAllowedEntry()):
 			return sendFalse(config.getMessage("ACCESS_DENIED"))
 
-		if (login_user(account)):
-			return jsonize({"status": True, "ACCOUNT_TYPE": account.ACCOUNT_TYPE, "data": config.getMessage("SUCCESSFUL_SIGNIN")})
+		if (login_user(account.getAccount())):
+			return sendTrue(url_for(f"{account.accountType}.homeView"))
 		else:
 			return sendFalse(config.getMessage("UNSUCCESSFUL_SIGNIN"))
 

@@ -156,7 +156,7 @@ $(document).ready(function (){
 					alert(data.data);
 					setTimeout((link) => {
 						link.click();
-					}, 2000, link)
+					}, 1000, link)
 				}
 				else {
 					alert(data.data);

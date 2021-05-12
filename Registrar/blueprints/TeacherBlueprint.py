@@ -8,7 +8,7 @@ teacher = Blueprint("teacher", __name__)
 
 @teacher.route("/")
 @login_required
-def teacherIndexPage ():
+def homeView ():
 	account = Account(_object = current_user)
 	if (not account.isTeacher()):
 		return redirect(f"/{account.get('ACCOUNT_TYPE')}")

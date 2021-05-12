@@ -1,13 +1,14 @@
-from datetime import datetime
+from datetime import date, datetime
 from flask import globals
 
+from . import validate
 from .config import config
 from .classroom import Classroom
 from .methods import fernetEncrypt, fernetDecrypt, jsonize
 from .private_key_generator import PrivateKeyGenerator
 from .. import models
 
-from .methods import loadJson, saveJson
+from .methods import loadJson, saveJson, sendFalse
 
 import os
 import shutil
@@ -19,6 +20,7 @@ class Account ():
 	accountDetailsPath = None
 	accountSettings = {}
 	accountSettingsPath = None
+	accountType = None
 
 	def __init__ (self, id = None, username = None, email = None, account_type = config.getAccountType("student")["name"], _object = None, check = False):
 		if (_object):
@@ -33,6 +35,11 @@ class Account ():
 	def __bool__ (self):
 		return self.__exists__
 
+	def __getitem__ (self, item):
+		if (hasattr(self, item)):
+			return getattr(self, item)
+		raise KeyError(f"{item} does not exist!")
+
 	def __str__ (self):
 		return self.get("id")
 
@@ -40,7 +47,7 @@ class Account ():
 		if (_object):
 			administrator = _object
 		elif (email):
-			administrator = models.Administrator.getByEmail(email)
+			administrator = Administrator.getByEmail(email)
 			parent = Parent.getByEmail(email)
 			teacher = Teacher.getByEmail(email)
 			student = Student.getByEmail(email)
@@ -57,15 +64,19 @@ class Account ():
 
 		if (administrator):
 			self.account = administrator
+			self.accountType = self.account.accountType
 			self.__exists__ = True
 		elif (parent):
 			self.account = parent
+			self.accountType = self.account.accountType
 			self.__exists__ = True
 		elif (teacher):
 			self.account = teacher
+			self.accountType = self.account.accountType
 			self.__exists__ = True
 		elif (student):
 			self.account = student
+			self.accountType = self.account.accountType
 			self.__exists__ = True
 		else:
 			if (not check):
@@ -77,13 +88,20 @@ class Account ():
 					self.account = Teacher(id = self.__generateId__())
 				else:
 					self.account = Student(id = self.__generateId__())
+				self.accountType = self.account.accountType
 
 	def setAccountPath (self, path = None):
 		if (self.__exists__):
-			if (not path):
-				path = os.path.join("data", f'{self.account.ACCOUNT_TYPE}s', self.account.id)
-			self.accountDetailsPath = path.join("details.json")
-			self.accountSettingsPath = path.join("settings.json")
+			if (isinstance(self, Student)):
+				if (not path):
+					path = os.path.join("data", f'{self.ACCOUNT_TYPE}s', self.id)
+					self.accountDetailsPath = os.path.join(path, "details.json")
+					self.accountSettingsPath = os.path.join(path, "settings.json")
+			else:
+				if (not path):
+					path = os.path.join("data", f'{self.account.ACCOUNT_TYPE}s', self.account.id)
+					self.accountDetailsPath = os.path.join(path, "details.json")
+					self.accountSettingsPath = os.path.join(path, "settings.json")
 
 	def loadAccountDetails (self, from_dict = False):
 		if (self.__exists__):
@@ -123,6 +141,9 @@ class Account ():
 				if (not account):
 					return id
 
+	def getAccount (self):
+		return self.account
+
 	@classmethod
 	def encryptPassword (cls, password):
 		return fernetEncrypt(password, key = config["ENCRYPTION_KEY"].encode("UTF-8")).decode("UTF-8")
@@ -143,45 +164,43 @@ class Account ():
 	def getByUsername (cls, username):
 		return cls(username = username, check = True)
 
-	@classmethod
-	def isAllowedEntry (cls):
-		return config["account"]["statuses"][self.get("ACCOUNT_STATUS")].get("grant_access")
+	def isAllowedEntry (self):
+		return config.getAccountStatus(self.get("ACCOUNT_STATUS"))["grant_access"]
 
 	def get (self, field):
-		return self.account[field]
+		return self.account.get(field)
 
 	def set (self, field, value):
-		self.account[field] = value
-		globals.db.commit()
+		return self.account.set(field, value)
 
 	def hasUsername (self, username):
 		return self.get("USERNAME") == username
 
 	def hasPassword (self, password):
-		return self.get("PASSWORD") == self.decryptPassword(password)
+		return self.decryptPassword(self.get("PASSWORD")) == password
 
 	def isAdmin (self):
-		return self.get("ACCOUNT_TYPE") == config.getAccountType("administrator")["name"]
+		return self.accountType == config.getAccountType("administrator")["name"]
 
 	def isParent (self):
-		return self.get("ACCOUNT_TYPE") == config.getAccountType("parent")["name"]
+		return self.accountType == config.getAccountType("parent")["name"]
 
 	def isTeacher (self):
-		return self.get("ACCOUNT_TYPE") == config.getAccountType("teacher")["name"]
+		return self.accountType == config.getAccountType("teacher")["name"]
 
 	def isStudent (self):
-		return self.get("ACCOUNT_TYPE") == config.getAccountType("student")["name"]
+		return self.accountType == config.getAccountType("student")["name"]
 
-	def create (self, account_details = None, account_settings = None):
+	def create (self, account_details, account_settings, first_name = "", last_name = "", other_names = "", birthday = None, email = "", phone_number = "", username = "", password = "", account_type = config.getAccountType("student")["name"], classroom = None, department = "", subjects_offered = [], extracurricular_activities = [], subjects_teaching = [], ward_id = ""):
 		if (not self.__exists__):
 			if ((not account_details) and (not account_settings)):
-				return self.account.create()
+				return self.account.create(first_name, last_name, other_names, birthday, email, phone_number, username, password, account_type, classroom = classroom, department = department, subjects_offered = subjects_offered, extracurricular_activities = extracurricular_activities, subjects_teaching = subjects_teaching, ward_id = ward_id)
 
 			self.__exists__ = True
 
 			self.setAccountPath()
 
-			os.mkdir(os.dirname(self.accountDetailsPath))
+			os.mkdir(os.path.dirname(self.accountDetailsPath))
 
 			if (not account_details):
 				account_details = {}
@@ -199,17 +218,20 @@ class Account ():
 				}
 			self.loadAccountSettings(from_dict = account_settings)
 			self.saveAccountSettings()
+
 			return True
 
 	def delete (self, first_call = True):
 		if (self.__exists__):
-			shutil.rmtree(os.path.join("data", f"{self.account.ACCOUNT_STATUS}s", self.account.id))
+			shutil.rmtree(os.path.join("data", f"{self.accountType}s", self.account.get("id")))
 			if (first_call):
 				self.account.delete(first_call = False)
 			self.__exists__ = False
 			return True
 
 class Administrator (models.Administrator, Account):
+	accountType = config.getAccountType("administrator")["name"]
+
 	def __init__ (self, **kwargs):
 		models.Administrator.__init__(self, ACCOUNT_TYPE = config.getAccountType("administrator")["name"], **kwargs)
 		self.setAccountPath(os.path.join("data", self.ACCOUNT_TYPE))
@@ -219,7 +241,7 @@ class Administrator (models.Administrator, Account):
 	def __str__ (self):
 		return self.id
 
-	def create (self):
+	def create (self, first_name, last_name, other_names, birthday, email, phone_number, username, password, account_type, **kwargs):
 		account_details = {
 			"unread_messages": 0,
 			"unread_notifications": 0
@@ -234,6 +256,23 @@ class Administrator (models.Administrator, Account):
 			"enable_secret_question": ""# determines whether the secret question will be enaled or not
 		}
 
+		account_details.update(self.accountDetails)
+		account_settings.update(self.accountSettings)
+
+		self.set("first_name", first_name)
+		self.set("last_name", last_name)
+		self.set("last_name", last_name)
+		self.set("other_names", other_names)
+		self.set("birthday", birthday)
+		self.set("email", email)
+		self.set("phone_number", phone_number)
+		self.set("username", username)
+		self.set("password", password)
+		self.set("ACCOUNT_STATUS", config.getAccountStatus("ACTIVE")["status"])
+
+		globals.db.session.add(self)
+		globals.db.session.commit()
+
 		return Account.create(self, account_details = account_details, account_settings = account_settings)
 
 	def delete (self, first_call = True):
@@ -242,13 +281,78 @@ class Administrator (models.Administrator, Account):
 		if (first_call):
 			return Account.delete(self, False)
 
+	def stepDownRank (self):
+		if (self.ADMIN_RANK >= 0):
+			self.ADMIN_RANK -= 1
+			return True
+
+	def stepUpRank (self):
+		if (self.ADMIN_RANK < (len(config.getAccountType("administrator")["rank"])) - 1):
+			self.ADMIN_RANK += 1
+			return True
+
+	def setAccountStatus (self, account_status):
+		self.ACCOUNT_STATUS = account_status
+
 	def get (self, field):
-		return self[field]
+		if (str(field).lower() == "id"):
+		    return self.id
+		if (str(field).upper() == "FIRST_NAME"):
+			return self.FIRST_NAME
+		elif (str(field).upper() == "LAST_NAME"):
+			return self.LAST_NAME
+		elif (str(field).upper() == "OTHER_NAMES"):
+			self.OTHER_NAMES
+		elif (str(field).upper() == "BIRTHDAY"):
+			return self.BIRTHDAY
+		elif (str(field).upper() == "USERNAME"):
+			return self.USERNAME
+		elif (str(field).upper() == "PASSWORD"):
+			return self.PASSWORD
+		elif (str(field).upper() == "EMAIL"):
+			email = validate.email(value)
+			if (not email):
+				return sendFalse(config.getMessage("INVALID_EMAIL"))
+			return self.EMAIL
+		elif (str(field).upper() == "PHONE_NUMBER"):
+			return self.PHONE_NUMBER
+		else:
+			raise Exception(f"Invalid field {field}!")
 
 	def set (self, field, value):
-		self[field] = value
+		if (str(field).upper() == "FIRST_NAME"):
+			self.FIRST_NAME = value
+		elif (str(field).upper() == "LAST_NAME"):
+			self.LAST_NAME = value
+		elif (str(field).upper() == "OTHER_NAMES"):
+			self.OTHER_NAMES = value
+		elif (str(field).upper() == "BIRTHDAY"):
+			self.BIRTHDAY = value
+		elif (str(field).upper() == "USERNAME"):
+			username = validate.username(value)
+			if (not username):
+				raise sendFalse(config.getMessage("INVALID_USERNAME"))
+			self.USERNAME = username
+		elif (str(field).upper() == "PASSWORD"):
+			password = validate.password(value)
+			if (not password):
+				raise sendFalse(config.getMessage("INVALID_PASSWORD"))
+			self.PASSWORD = self.encryptPassword(value)
+		elif (str(field).upper() == "EMAIL"):
+			email = validate.email(value)
+			if (not email):
+				return sendFalse(config.getMessage("INVALID_EMAIL"))
+			self.EMAIL = value
+		elif (str(field).upper() == "PHONE_NUMBER"):
+			self.PHONE_NUMBER = value
+		elif (str(field).upper() == "ACCOUNT_STATUS"):
+			self.ACCOUNT_STATUS = value
+		else:
+			raise Exception(f"Invalid field {field}!")
 
 class Parent (models.Parent, Account):
+	accountType = config.getAccountType("parent")["name"]
+
 	def __init__ (self, **kwargs):
 		models.Parent.__init__(self, ACCOUNT_TYPE = config.getAccountType("parent")["name"], **kwargs)
 		self.setAccountPath(os.path.join("data", self.ACCOUNT_TYPE))
@@ -260,10 +364,11 @@ class Parent (models.Parent, Account):
 
 	def addWard (self, ward):
 		if (isinstance(ward, models.Student)):
-			self.wards.append(ward)
-			self.WARDS = jsonize(self.wards)
-			globals.db.session.commit()
-			return True
+			if (ward):
+				self.wards.append(ward)
+				self.WARDS = jsonize(self.wards)
+				globals.db.session.commit()
+				return True
 
 	def hasWard (self, ward):
 		return ward in self.wards
@@ -275,7 +380,7 @@ class Parent (models.Parent, Account):
 			globals.db.session.commit()
 			return True
 
-	def create (self):
+	def create (self, first_name, last_name, other_names, birthday, email, phone_number, username, password, account_type, wards = [], **kwargs):
 		account_details = {
 			"unread_messages": 0,
 			"unread_notifications": 0
@@ -290,6 +395,25 @@ class Parent (models.Parent, Account):
 			"enable_secret_question": ""# determines whether the secret question will be enaled or not
 		}
 
+		account_details.update(self.accountDetails)
+		account_settings.update(self.accountSettings)
+
+		self.set("first_name", first_name)
+		self.set("last_name", last_name)
+		self.set("last_name", last_name)
+		self.set("other_names", other_names)
+		self.set("birthday", birthday)
+		self.set("email", email)
+		self.set("phone_number", phone_number)
+		self.set("username", username)
+		self.set("password", password)
+		self.set("ACCOUNT_STATUS", config.getAccountStatus("ACTIVE")["status"])
+		for ward_id in wards:
+			self.addWard(Student(ward_id, check = True))
+
+		globals.db.session.add(self)
+		globals.db.session.commit()
+
 		return Account.create(self, account_details = account_details, account_settings = account_settings)
 
 	def delete (self, first_call = True):
@@ -298,15 +422,74 @@ class Parent (models.Parent, Account):
 		if (first_call):
 			return Account.delete(self, False)
 
+	def setAccountStatus (self, account_status):
+		self.ACCOUNT_STATUS = account_status
+
 	def get (self, field):
-		return self[field]
+		if (str(field).lower() == "id"):
+		    return self.id
+		if (str(field).upper() == "FIRST_NAME"):
+			return self.FIRST_NAME
+		elif (str(field).upper() == "LAST_NAME"):
+			return self.LAST_NAME
+		elif (str(field).upper() == "OTHER_NAMES"):
+			self.OTHER_NAMES
+		elif (str(field).upper() == "BIRTHDAY"):
+			return self.BIRTHDAY
+		elif (str(field).upper() == "USERNAME"):
+			return self.USERNAME
+		elif (str(field).upper() == "PASSWORD"):
+			return self.PASSWORD
+		elif (str(field).upper() == "EMAIL"):
+			email = validate.email(value)
+			if (not email):
+				return sendFalse(config.getMessage("INVALID_EMAIL"))
+			return self.EMAIL
+		elif (str(field).upper() == "PHONE_NUMBER"):
+			return self.PHONE_NUMBER
+		elif (str(field).upper() == "ACCOUNT_STATUS"):
+			return self.ACCOUNT_STATUS
+		else:
+			raise Exception(f"Invalid field {field}!")
 
 	def set (self, field, value):
-		self[field] = value
+		if (str(field).upper() == "FIRST_NAME"):
+			self.FIRST_NAME = value
+		elif (str(field).upper() == "LAST_NAME"):
+			self.LAST_NAME = value
+		elif (str(field).upper() == "OTHER_NAMES"):
+			self.OTHER_NAMES = value
+		elif (str(field).upper() == "BIRTHDAY"):
+			self.BIRTHDAY = value
+		elif (str(field).upper() == "USERNAME"):
+			username = validate.username(value)
+			if (not username):
+				raise sendFalse(config.getMessage("INVALID_USERNAME"))
+			self.USERNAME = username
+		elif (str(field).upper() == "PASSWORD"):
+			password = validate.password(value)
+			if (not password):
+				raise sendFalse(config.getMessage("INVALID_PASSWORD"))
+			self.PASSWORD = self.encryptPassword(value)
+		elif (str(field).upper() == "EMAIL"):
+			email = validate.email(value)
+			if (not email):
+				return sendFalse(config.getMessage("INVALID_EMAIL"))
+			self.EMAIL = value
+		elif (str(field).upper() == "PHONE_NUMBER"):
+			self.PHONE_NUMBER = value
+		elif (str(field).upper() == "ACCOUNT_STATUS"):
+			self.ACCOUNT_STATUS = value
+		else:
+			raise Exception(f"Invalid field {field}!")
 
 class Teacher (models.Teacher, Account):
 	classrooms = []
 	questions = []
+	accountType = config.getAccountType("teacher")["name"]
+	accountDetails = {
+		"classroom": {}
+	}
 
 	def __init__ (self, **kwargs):
 		models.Teacher.__init__(self, ACCOUNT_TYPE = config.getAccountType("teacher")["name"], **kwargs)
@@ -324,12 +507,12 @@ class Teacher (models.Teacher, Account):
 
 	def addClassroom (self, classroom, classroom_profile = None):
 		if (not classroom_profile):
-			return classroom_profile
+			return False
 
-		if (isinstance(classroom, Classroom)):
-			self.account_details[classroom.id] = classroom_profile
-			self.saveAccountDetails()
-			return True
+		self.accountDetails["classroom"][classroom.get("id")] = classroom_profile
+		self.classrooms.append(classroom)
+		self.saveAccountDetails()
+		return True
 
 	def addQuestion (self, question):
 		if (isinstance(question, Question)):
@@ -339,7 +522,7 @@ class Teacher (models.Teacher, Account):
 		if (isinstance(subject, models.Subject)):
 			self.subjects_teaching.append(subject)
 
-	def create (self):
+	def create (self, first_name, last_name, other_names, birthday, email, phone_number, username, password, account_type, **kwargs):
 		account_details = {
 			"unread_messages": 0,
 			"unread_notifications": 0,
@@ -358,6 +541,24 @@ class Teacher (models.Teacher, Account):
 			"enable_secret_question": ""# determines whether the secret question will be enaled or not
 		}
 
+		account_details.update(self.accountDetails)
+		account_settings.update(self.accountSettings)
+
+		self.set("first_name", first_name)
+		self.set("last_name", last_name)
+		self.set("last_name", last_name)
+		self.set("other_names", other_names)
+		self.set("birthday", birthday)
+		self.set("email", email)
+		self.set("phone_number", phone_number)
+		self.set("username", username)
+		self.set("password", password)
+		self.set("subjects_teaching", self.subjects_teaching)
+		self.set("ACCOUNT_STATUS", config.getAccountStatus("ACTIVE")["status"])
+
+		globals.db.session.add(self)
+		globals.db.session.commit()
+
 		return Account.create(self, account_details = account_details, account_settings = account_settings)
 
 	def delete (self, first_call = True):
@@ -366,14 +567,73 @@ class Teacher (models.Teacher, Account):
 		if (first_call):
 			return Account.delete(self, False)
 
+	def setAccountStatus (self, account_status):
+		self.ACCOUNT_STATUS = account_status
+
 	def get (self, field):
-		return self[field]
+		if (str(field).lower() == "id"):
+		    return self.id
+		if (str(field).upper() == "FIRST_NAME"):
+			return self.FIRST_NAME
+		elif (str(field).upper() == "LAST_NAME"):
+			return self.LAST_NAME
+		elif (str(field).upper() == "OTHER_NAMES"):
+			self.OTHER_NAMES
+		elif (str(field).upper() == "BIRTHDAY"):
+			return self.BIRTHDAY
+		elif (str(field).upper() == "USERNAME"):
+			return self.USERNAME
+		elif (str(field).upper() == "PASSWORD"):
+			return self.PASSWORD
+		elif (str(field).upper() == "EMAIL"):
+			email = validate.email(value)
+			if (not email):
+				return sendFalse(config.getMessage("INVALID_EMAIL"))
+			return self.EMAIL
+		elif (str(field).upper() == "PHONE_NUMBER"):
+			return self.PHONE_NUMBER
+		elif (str(field).upper() == "ACCOUNT_STATUS"):
+			return self.ACCOUNT_STATUS
+		else:
+			raise Exception(f"Invalid field {field}!")
 
 	def set (self, field, value):
-		self[field] = value
+		if (str(field).upper() == "FIRST_NAME"):
+			self.FIRST_NAME = value
+		elif (str(field).upper() == "LAST_NAME"):
+			self.LAST_NAME = value
+		elif (str(field).upper() == "OTHER_NAMES"):
+			self.OTHER_NAMES = value
+		elif (str(field).upper() == "BIRTHDAY"):
+			self.BIRTHDAY = value
+		elif (str(field).upper() == "USERNAME"):
+			username = validate.username(value)
+			if (not username):
+				raise sendFalse(config.getMessage("INVALID_USERNAME"))
+			self.USERNAME = username
+		elif (str(field).upper() == "PASSWORD"):
+			password = validate.password(value)
+			if (not password):
+				raise sendFalse(config.getMessage("INVALID_PASSWORD"))
+			self.PASSWORD = self.encryptPassword(value)
+		elif (str(field).upper() == "EMAIL"):
+			email = validate.email(value)
+			if (not email):
+				return sendFalse(config.getMessage("INVALID_EMAIL"))
+			self.EMAIL = value
+		elif (str(field).upper() == "PHONE_NUMBER"):
+			self.PHONE_NUMBER = value
+		elif (str(field).upper() == "ACCOUNT_STATUS"):
+			self.ACCOUNT_STATUS = value
+		else:
+			raise Exception(f"Invalid field {field}!")
 
 class Student (models.Student, Account):
 	classrooms = []
+	accountType = config.getAccountType("student")["name"]
+	accountDetails = {
+		"classroom": {}
+	}
 
 	def __init__ (self, **kwargs):
 		models.Student.__init__(self, ACCOUNT_TYPE = config.getAccountType("student")["name"], **kwargs)
@@ -392,17 +652,18 @@ class Student (models.Student, Account):
 
 	def addClassroom (self, classroom, classroom_profile = None):
 		if (not classroom_profile):
-			return classroom_profile
+			return False
 
-		if (isinstance(classroom, Classroom)):
-			self.account_details[classroom.id] = classroom_profile
-			self.saveAccountDetails()
-			return True
+		self.accountDetails["classroom"][classroom.get("id")] = classroom_profile
+		self.classrooms.append(classroom)
+		self.saveAccountDetails()
+		return True
 
-	def calculateAge (self):
-		self.AGE = ((datetime.now() - self.BIRTHDAY).days) + 1
+	@classmethod
+	def calculateAge (cls, birthday):
+		return ((datetime.now() - birthday).days) + 1
 
-	def create (self):
+	def create (self, first_name, last_name, other_names, birthday, email, phone_number, username, password, account_type, classroom = None, department = None, subjects_offered = [], extracurricular_activities = [], **kwargs):
 		account_details = {
 			"unread_messages": 0,
 			"unread_notifications": 0,
@@ -426,7 +687,29 @@ class Student (models.Student, Account):
 			"enable_secret_question": ""# determines whether the secret question will be enaled or not
 		}
 
-		self.calculateAge()
+		account_details.update(self.accountDetails)
+		account_settings.update(self.accountSettings)
+
+		classroom = Classroom(classroom)
+
+		self.set("first_name", first_name)
+		self.set("last_name", last_name)
+		self.set("last_name", last_name)
+		self.set("other_names", other_names)
+		self.set("birthday", birthday)
+		self.set("email", email)
+		self.set("phone_number", phone_number)
+		self.set("username", username)
+		self.set("password", password)
+		if (classroom):
+			classroom.addMember(self)
+		self.set("department", department)
+		self.set("ACCOUNT_STATUS", config.getAccountStatus("ACTIVE")["status"])
+		self.AGE = self.calculateAge(birthday)
+
+		globals.db.session.add(self)
+		globals.db.session.commit()
+
 		return Account.create(self, account_details = account_details, account_settings = account_settings)
 
 	def delete (self, first_call = True):
@@ -439,8 +722,70 @@ class Student (models.Student, Account):
 		if (first_call):
 			return Account.delete(self, False)
 
+	def setAccountStatus (self, account_status):
+		self.ACCOUNT_STATUS = account_status
+
 	def get (self, field):
-		return self[field]
+		if (str(field).lower() == "id"):
+		    return self.id
+		if (str(field).upper() == "FIRST_NAME"):
+			return self.FIRST_NAME
+		elif (str(field).upper() == "LAST_NAME"):
+			return self.LAST_NAME
+		elif (str(field).upper() == "OTHER_NAMES"):
+			self.OTHER_NAMES
+		elif (str(field).upper() == "AGE"):
+			return self.AGE
+		elif (str(field).upper() == "BIRTHDAY"):
+			return self.BIRTHDAY
+		elif (str(field).upper() == "USERNAME"):
+			return self.USERNAME
+		elif (str(field).upper() == "PASSWORD"):
+			return self.PASSWORD
+		elif (str(field).upper() == "EMAIL"):
+			email = validate.email(value)
+			if (not email):
+				return sendFalse(config.getMessage("INVALID_EMAIL"))
+			return self.EMAIL
+		elif (str(field).upper() == "PHONE_NUMBER"):
+			return self.PHONE_NUMBER
+		elif (str(field).upper() == "ACCOUNT_STATUS"):
+			return self.ACCOUNT_STATUS
+		elif (str(field).upper() == "DEPARTMENT"):
+			return self.DEPARTMENT
+		else:
+			raise Exception(f"Invalid field {field}!")
 
 	def set (self, field, value):
-		self[field] = value
+		if (str(field).upper() == "FIRST_NAME"):
+			self.FIRST_NAME = value
+		elif (str(field).upper() == "LAST_NAME"):
+			self.LAST_NAME = value
+		elif (str(field).upper() == "OTHER_NAMES"):
+			self.OTHER_NAMES = value
+		elif (str(field).upper() == "BIRTHDAY"):
+			self.AGE = self.calculateAge(value)
+			self.BIRTHDAY = value
+		elif (str(field).upper() == "USERNAME"):
+			username = validate.username(value)
+			if (not username):
+				raise sendFalse(config.getMessage("INVALID_USERNAME"))
+			self.USERNAME = username
+		elif (str(field).upper() == "PASSWORD"):
+			password = validate.password(value)
+			if (not password):
+				raise sendFalse(config.getMessage("INVALID_PASSWORD"))
+			self.PASSWORD = self.encryptPassword(value)
+		elif (str(field).upper() == "EMAIL"):
+			email = validate.email(value)
+			if (not email):
+				return sendFalse(config.getMessage("INVALID_EMAIL"))
+			self.EMAIL = value
+		elif (str(field).upper() == "PHONE_NUMBER"):
+			self.PHONE_NUMBER = value
+		elif (str(field).upper() == "DEPARTMENT"):
+			self.DEPARTMENT = value
+		elif (str(field).upper() == "ACCOUNT_STATUS"):
+			self.ACCOUNT_STATUS = value
+		else:
+			raise Exception(f"Invalid field {field}!")

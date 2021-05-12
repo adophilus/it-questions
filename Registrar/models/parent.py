@@ -15,7 +15,10 @@ class Parent (UserMixin, globals.db.Model):
     BIRTHDAY = globals.db.Column(globals.db.Date)
     WARDS = globals.db.Column(globals.db.Text, default = "[]")
     ACCOUNT_TYPE = globals.db.Column(globals.db.Text, default = config.getAccountType("parent")["name"])
-    ACCOUNT_STATUS = globals.db.Column(globals.db.Text)
+    ACCOUNT_STATUS = globals.db.Column(globals.db.Text, default = config.getAccountStatus("ACTIVE"))
+
+    def __bool__ (self):
+        return True
 
     @classmethod
     def getByEmail (cls, email):

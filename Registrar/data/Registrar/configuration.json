@@ -55,7 +55,8 @@
 					"ACCOUNT_TYPE": "",
 					"ACCOUNT_STATUS": ""
 				},
-				"name": "administrator"
+				"name": "administrator",
+				"rank": ["techincal", "finacial", "partner", "sponsor", "proprietress", "proprietor"]
 			},
 			"parent": {
 				"database_field": {
@@ -214,6 +215,7 @@
 		"SUCCESSFUL_SIGNOUT": "Sign out successful",
 		"EXISTENT_EMAIL": "This email address is already in use!",
 		"EXISTENT_EMAIL_USERNAME": "This email address and/or username is already in use!",
+		"EXISTENT_USERNAME": "This username is already in use!",
 		"EXISTENT_ACCOUNT": "This account already exists!",
 		"INEXISTENT_CLASS": "Class in-existent!",
 		"INEXISTENT_ACCOUNT": "Account in-existent!",
@@ -222,7 +224,8 @@
 		"INVALID_ACCOUNT_TYPE": "Invalid account type!",
 		"INVALID_BIRTHDAY": "Invalid birthday!",
 		"INVALID_CREDENTIALS": "Invalid username or password!",
-		"INVALID_EMAIL_USERNAME": "Invalid email and/or username!",
+		"INVALID_EMAIL": "Invalid email!",
+		"INVALID_USERNAME": "Invalid username!",
 		"INVALID_EMAIL_USERNAME": "Invalid email and/or username!",
 		"INVALID_NAME": "Please check your names!",
 		"INVALID_PASSWORD": "Invalid password!",

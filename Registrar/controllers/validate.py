@@ -1,3 +1,4 @@
+from datetime import datetime
 import re
 
 def email (email):
@@ -17,7 +18,7 @@ def password (password):
 	if not (re.search(r"\d", password)):
 		return False
 
-	return True
+	return password
 
 def username (username):
 	if (len(username) < 5):
@@ -29,4 +30,11 @@ def username (username):
 	if (re.search(r"\\|#|\(|\)|'|\"|;|:|,|/|\?|~|`", username)):
 		return False
 
-	return True
+	return username
+
+def birthday (birthday, format = "%d/%m/%Y"):
+	try:
+		return datetime.strptime(birthday, format)
+	except Exception as e:
+		print(e)
+		return False

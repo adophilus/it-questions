@@ -6,9 +6,10 @@ from flask import redirect
 from flask import render_template
 from flask import session
 from flask import url_for
-from flask_login import login_required, current_user, logout_user
+from flask_login import login_required, current_user
 
 from ..controllers import Account
+from ..controllers import calendar
 from .MainBlueprint import mainLoginPage
 
 import os
@@ -17,12 +18,12 @@ student = Blueprint("student", __name__)
 
 @student.route("/")
 @login_required
-def studentIndexPage ():
+def homeView ():
 	account = Account(_object = current_user)
 	if (not account.isStudent()):
-		return redirect(f"/{account.get('ACCOUNT_TYPE')}")
+		return redirect(url_for(f"{account.accountType}.homeView"))
 
-	return globals.methods.renderUserAccountHomePage()
+	return render_template(f"{account.accountType}/home.html", account = account, url_for = url_for, date_and_time = calendar.getDateTime(), weeks = calendar.getCalendarArray(), no_of_unread_notifications = 0)
 
 @student.route("/logout")
 @login_required
