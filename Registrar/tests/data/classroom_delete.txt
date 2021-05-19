@@ -1,0 +1,3 @@
+from . import deleteClassrooms
+
+deleteClassrooms()

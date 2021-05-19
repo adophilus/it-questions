@@ -8,8 +8,10 @@ from flask import session
 from flask import url_for
 from flask_login import login_required, current_user
 
-from ..controllers import Account
 from ..controllers import calendar
+from ..controllers.account import Account
+from ..controllers.methods import sendTrue
+
 from .MainBlueprint import mainLoginPage
 
 import os
@@ -24,6 +26,12 @@ def homeView ():
 		return redirect(url_for(f"{account.accountType}.homeView"))
 
 	return render_template(f"{account.accountType}/home.html", account = account, url_for = url_for, date_and_time = calendar.getDateTime(), weeks = calendar.getCalendarArray(), no_of_unread_notifications = 0)
+
+@student.route("classroom/list", methods = [ "POST" ])
+@login_required
+def getClassroomsList ():
+	account = Account(_object = current_user)
+	return sendTrue([ classroom.as_dict() for classroom in account.getClassrooms() ])
 
 @student.route("/logout")
 @login_required

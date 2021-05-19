@@ -1,15 +1,17 @@
 function getClassroomMessages (classroom_id, callback) {
+	console.log("getting");
 	$.ajax({
-		url: `/classroom/${classroom_id}/message/get`,
+		url: `/classroom/${classroom_id}/message`,
 		type: "GET",
 		data: {},
 		success: function (data) {
+			data = JSON.parse(data);
+
 			if (data.status) {
-				console.log(data.data);
 				callback(data);
 			}
 			else {
-				console.log(data.error);
+				console.log(data.error + " " + classroom_id);
 			}
 		},
 		error: function (xhr) {
@@ -18,40 +20,45 @@ function getClassroomMessages (classroom_id, callback) {
 	});
 }
 
-function displayClassroomMessages (classroom_id, data, first_call = true) {
+function displayClassroomMessages (data, classroom_id, first_call = false) {
 	if (first_call) {
-		getClassroomMessages(classroom_id, function (data) { displayClassroomMessages(clasroom_id, data) });
+		console.log("making 'first_call' with classroom_id: " + classroom_id);
+		getClassroomMessages(classroom_id, displayClassroomMessages);
 		return;
 	}
 
+	console.log("bypassing 'first_call'");
 	if (!data.status) {
 		return;
 	}
 
-	for (let message in data.data) {
+	for (let message of data.data) {
 		var classroomMessageContainer = document.createElement("div");
-		var classroomMessageBody = document.createElement("div");
+		var classroomMessageBody = document.createElement("p");
 		var classroomMessageDetails = document.createElement("div");
 		var classroomMessageDetailsDateSent = document.createElement("small");
 
 		classroomMessageBody.innerHTML = message.message;
-		classroomMessageDetailsDateSent.innerHTML = message.details.date_sent;
+		classroomMessageDetailsDateSent.innerHTML = message.date_sent;
 
 		classroomMessageContainer.classList.add("list");
 		classroomMessageBody.classList.add("message");
 		classroomMessageDetails.classList.add("message-details");
-		classroomMessageDetailsDateSent.classList.add("date-sent scnd-font-color");
+		classroomMessageDetailsDateSent.classList.add("date-sent");
+		classroomMessageDetailsDateSent.classList.add("scnd-font-color");
 
 		classroomMessageDetails.appendChild(classroomMessageDetailsDateSent);
 		classroomMessageContainer.appendChild(classroomMessageBody);
 		classroomMessageContainer.appendChild(classroomMessageDetails);
+
+		window.activeClassroomMessageContainer.append(classroomMessageContainer);
 	}
 }
 
 function sendClassroomMessage (classroom_id, message) {
 	$.ajax({
-		url: `/handler/classroom/${classroom_id}/send-message`,
-		type: "POST",
+		url: `/classroom/${classroom_id}/message`,
+		type: "PUT",
 		data: {
 			message: message
 		},
@@ -77,12 +84,17 @@ function setActiveClassroom (event) {
 		classroomsListElement.classList.remove("classrooms-list");
 	}
 
+	console.log(event.target.getAttribute("classroom-id"));
+	displayClassroomMessages(null, event.target.getAttribute("classroom-id"), true);
 	window.activeClassroom = {
-		"id": event.target.getAttribute("classroom-id")
+		id: event.target.getAttribute("classroom-id"),
+		// refresher: setInterval(displayClassroomMessages, 2000, null, event.target.getAttribute("classroom-id"), false)
 	}
 }
 
 function unsetActiveClassroom (event) {
+	clearInterval(window.activeClassroom.refresher);
+
 	getClassroomsList(displayClassroomsList);
 	var classroomElement = document.querySelector(".classroom");
 
@@ -92,10 +104,13 @@ function unsetActiveClassroom (event) {
 	}
 }
 
-function displayClassroomsList (classrooms_list) {
-	if (!classrooms_list) {
+function displayClassroomsList (data, err) {
+	if (err) {
+		console.warn(data)
 		return false;
 	}
+
+	var classrooms_list = data;
 
 	window.classroomsListContainer.empty();
 	if (classrooms_list.length === 0) {
@@ -124,9 +139,9 @@ function displayClassroomsList (classrooms_list) {
 
 		classroomListContainerElement.setAttribute("title", `ID: ${classroomDetails.id}`);
 		classroomListContainerElement.setAttribute("classroom-id", classroomDetails.id);
-		classroomListImageElement.setAttribute("src", classroomDetails.IMAGE_PATH);
+		classroomListImageElement.setAttribute("src", classroomDetails.image);
 		classroomListImageElement.setAttribute("draggable", "false");
-		classroomListTitleElement.innerHTML = classroomDetails.NAME;
+		classroomListTitleElement.innerHTML = classroomDetails.name;
 
 		classroomListContainerElement.onclick = setActiveClassroom;
 
@@ -140,22 +155,22 @@ function displayClassroomsList (classrooms_list) {
 
 function getClassroomsList (callback) {
 	$.ajax({
-		url: "/classroom/list",
+		url: `/${window.Account.type}/classroom/list`,
 		type: "POST",
 		data: {},
 		success: function (data) {
-			console.log(data);
 			data =  JSON.parse(data);
 			callback(data.data, null);
 		},
 		error: function (xhr) {
-			callback(xhr);
+			callback(null, xhr);
 		}
 	})
 }
 
 $(document).ready(function () {
 	window.activeClassroom = new Object();
+	window.activeClassroomMessageContainer = $(".active-classroom .messages .list");
 	window.classroomsListContainer = $(".classrooms-list .body");
 	window.classroomMessageEntry = $("#classroom_message_entry");
 
@@ -170,5 +185,6 @@ $(document).ready(function () {
 			sendClassroomMessage(window.activeClassroom.id, message);
 		}
 	});
+
 	getClassroomsList(displayClassroomsList);
 });

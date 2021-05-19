@@ -3,45 +3,59 @@ from flask import globals
 from flask_login import current_user, login_required
 from flask import redirect
 from flask import render_template
+from flask import request
 from flask import session
 from flask import url_for
 
-from ..controllers import Account, config, Classroom
-from ..controllers.methods import sendFalse, sendTrue
+from ..controllers.config import config
+from ..controllers.classroom import Classroom
+from ..controllers.methods import printDebug, sendFalse, sendTrue
 
 classroom = Blueprint("classroom", __name__)
 
 @classroom.route("/")
 @login_required
 def classroomIndexPage ():
-	account = Account(_object = current_user)
-	classrooms = []
+	account = current_user
+	classrooms = account.getClassrooms()
 
-	if (account.isStudent() or account.isTeacher()):
-		classrooms = account.classrooms
-
-	return render_template("classroom/classroom.html",
+	return render_template(f"{account.accountType}/classroom.html",
 		no_of_unread_public_remarks = 0,
 		no_of_unread_notifications = 0,
 		no_of_unseen_results = 0,
-		Account = account,
+		account = account,
 		classrooms = classrooms)
 
 
-@classroom.route("/list", methods = [ "GET", "POST" ])
-def getClassroomsList ():
-	return sendFalse("Not implemented yet")
-
-@classroom.route("/<classroom_id>/message/get")
+@classroom.route("/<classroom_id>/message")
 @login_required
 def getClassroomMessages (classroom_id):
-	account = Account(_object = current_user)
+	account = current_user
 	classroom = Classroom(classroom_id = classroom_id)
 
-	if (not classroom.__exists__):
+	printDebug(f"classroom: {classroom}", "ClassroomBlueprint.getClassroomMessages")
+	printDebug(f"classroom.__bool__(): {bool(classroom)}", "ClassroomBlueprint.getClassroomMessages")
+	printDebug(f"classroom_id: {classroom_id}", "ClassroomBlueprint.getClassroomMessages")
+	if (not classroom):
 		return sendFalse(config.getMessage("INEXISTENT_CLASSROOM"))
 
 	if (not classroom.hasMember(account)):
 		return sendFalse(config.getMessage("ACCESS_DENIED"))
 
-	return sendTrue(classroom.getMessages())
+	return sendTrue([ message.as_dict() for message in classroom.getMessages() ])
+
+@classroom.route("/<classroom_id>/message", methods = [ "PUT" ])
+@login_required
+def putClassroomMessage (classroom_id):
+	account = current_user
+	classroom = Classroom(classroom_id = classroom_id)
+	message = request.form.get("message")
+
+	if (not classroom):
+		return sendFalse(config.getMessage("INEXISTENT_CLASSROOM"))
+
+	if (not classroom.hasMember(account)):
+		return sendFalse(config.getMessage("ACCESS_DENIED"))
+
+	classroom.addMessage(current_user.id, message)
+	return sendTrue(config.getMessage("CLASS_MESSAGE_SENT"))

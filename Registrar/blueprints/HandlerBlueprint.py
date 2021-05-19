@@ -150,7 +150,7 @@ def changeUserPassword ():
 
 	return sendTrue(config.getMessage("ACCOUNT_SETTINGS_UPDATED"))
 
-# @handler.route("/school/events/get/<after_event_id>", methods = ["GET"])
+# @handler.route("/school/events/get/<after_event_id>")
 # def getSchoolEvents (after_event_id):
 #     school_events = [ {"ID": school_event.id, "EVENT": school_event.EVENT, "DATE": globals.methods.dateToString(school_event.DAY)["ymd"], "VENUE": school_event.VENUE} for school_event in globals.model.SchoolEvent.query.filter().all() ]
 

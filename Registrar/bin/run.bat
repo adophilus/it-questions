@@ -3,4 +3,4 @@
 set FLASK_APP=Registrar.py
 set FLASK_ENV=development
 
-flask run
+flask run --eager-loading --reload

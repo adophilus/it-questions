@@ -14,16 +14,16 @@ class Config (defaultdict):
 		defaultdict.__init__(self, lambda: None, loadJson(self.path))
 
 	def getAccountStatus (self, status):
-		return self.get("account")["status"][status]
+		return self["account"]["status"][status]
 
 	def getAccountType (self, account_type):
-		return self.get("account")["types"][account_type]
+		return self["account"]["types"][account_type]
 
 	def getMessage (self, message):
-		return self.get("messages").get(message)
+		return self["messages"].get(message)
 
 	def getClassroomStatus (self, status):
-		return self.get("classroom")["status"].get(status)
+		return self["classroom"]["status"][status]
 
 	def save (self, path = None):
 		if (not path):

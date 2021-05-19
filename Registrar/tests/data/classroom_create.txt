@@ -1,0 +1,8 @@
+from .controllers.classroom import Classroom
+from .controllers.private_key_generator import PrivateKeyGenerator
+
+classroom = Classroom()
+generator = PrivateKeyGenerator()
+
+classroom.set("name", generator.generate())
+classroom.create()

@@ -1,0 +1,3 @@
+from . import addStudent
+
+addStudent("mvwDNo8qFcmlc7tIGlgq8GeOV", "XTbDgBtkXQrIKa825XkR")

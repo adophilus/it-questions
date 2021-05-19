@@ -1,8 +1,9 @@
 from datetime import datetime
 from flask import globals
+from flask_sqlalchemy import sqlalchemy
 
 from .config import config
-from .methods import jsonize, unjsonize
+from .methods import printDebug, jsonize, unjsonize
 from .private_key_generator import PrivateKeyGenerator
 from ..models import Room, RoomContactArea
 
@@ -19,24 +20,39 @@ class Classroom ():
 	__exists__ = False
 	generator = PrivateKeyGenerator()
 	members = {}
+	members_to_add = []
 
-	def __init__ (self, classroom_id = "", classroom_name = None, contact_area = None, classroom_members = None, image_path = None):
-		classroom = Classroom.getById(classroom_id)
+	def __init__ (self, classroom_id = "", classroom_name = None, contact_area = None, classroom_members = None, image_path = None, _object = None, check = False):
+		if (_object):
+			classroom = _object
+		elif (classroom_id):
+			classroom = Room.getById(classroom_id)
+		elif (classroom_name):
+			classroom = Room.getByName(classroom_name)
+		else:
+			classroom = Room.getById(classroom_id)
 
 		if (classroom):
 			self.__exists__ = True
+			printDebug(f"classroom ({classroom_id}) exists", "Classroom")
 			self.contactArea = ClassroomContactArea(classroom_id = classroom.CONTACT_AREA)
 			self.members = unjsonize(classroom.MEMBERS)
 			if (classroom_name):
 				classroom.NAME = classroom_name
 			if (contact_area):
 				self.contactArea = contact_area
+				self.contactArea.create()
 				classroom.CONTACT_AREA = contact_area.classroom_id
 			if (classroom_members):
 				self.addMember(*classroom_members)
 			if (image_path):
 				classroom.IMAGE_PATH = image_path
+			classroom.TYPE = config["room"]["type"]["classroom"]["hash"]
+			self.classroom = classroom
+		elif (check):
+			pass
 		else:
+			# printDebug(f"classroom ({classroom_id}) does not exist", "Classroom")
 			classroom = Room(id = Classroom.__generateId__(), NAME = classroom_name, IMAGE_PATH = image_path)
 			self.contactArea = ClassroomContactArea(classroom_id = classroom.id)
 			classroom.CONTACT_AREA = self.contactArea.classroom_id
@@ -48,15 +64,33 @@ class Classroom ():
 				self.addMember(*classroom_members)
 			if (image_path):
 				classroom.IMAGE_PATH = self.IMAGE_PATH
+			classroom.TYPE = config["room"]["type"]["classroom"]["hash"]
+			self.classroom = classroom
 
-		classroom.TYPE = config["room"]["type"]["classroom"]["hash"]
-		self.classroom = classroom
+		# printDebug(f"classroom {self} has been instantiatiated", "Classroom")
 
 	def __dict__ (self):
 		return self.id
 
+	def __bool__ (self):
+		return self.__exists__
+
 	def __str__ (self):
-		return self.id
+		return self.get("id")
+
+	def __repr__ (self):
+		return "<Classroom id='" + self.get("id") +"'>"
+
+	def __iter__ (self):
+		return [
+			[ "id", self.get("id") ],
+			[ "name", self.get("NAME") ],
+			[ "type", "classroom" ],
+			[ "image", self.get("IMAGE_PATH") ]
+		].__iter__()
+
+	def as_dict (self):
+		return dict(self.__iter__())
 
 	@classmethod
 	def __generateId__ (cls, unique = True):
@@ -64,38 +98,47 @@ class Classroom ():
 			id = cls.generator.generate(level = config["id_length"]["classroom"])
 
 			if (unique):
-				classroom = Classroom.getById(id)
+				classroom = Classroom(classroom_id = id, check = True)
 
 				if not (classroom):
 					return id
 
 	@classmethod
-	def getById (cls, classroom_id):
-		return Room.query.filter_by(id = classroom_id).first()
+	def getAll (cls):
+		return [ Classroom(_object = room) for room in Room.getAll() ]
 
 	@classmethod
-	def getByName (cls, name):
-		return Room.query.filter_by(NAME = name).first()
+	def getById (cls, classroom_id):
+		return cls(classroom_id = classroom_id)
+
+	@classmethod
+	def getByName (cls, classroom_name):
+		return cls(classroom_name = classroom_name)
 
 	@classmethod
 	def getStatus (cls, status_name):
 		return config.getClassroomStatus(status_name)
 
-	def addMember (self, *members, status = "AWAITING_VERIFICATION"):
-		status = Classroom.getStatus(status)
+	def addMember (self, *members, status = "AWAITING_CLEARANCE", nobypass = True):
+		if (not (self.__exists__ or nobypass)):
+			for member in members:
+				self.members_to_add.append([ member, status ])
+			return [ False for _ in range(len(members)) ]
+
+		status = Classroom.getStatus(status)["status"]
 		added_members = []
 		for member in members:
-			if (not member.id in self.members.keys()):
+			if (not member.get("id") in self.members.keys()):
 				classroom_profile = {
-					member.id: {
+					member.get("id"): {
 						"ACCOUNT_TYPE": member.accountType,
 						"ACCOUNT_STATUS": member.get("ACCOUNT_STATUS"),
-						"status": config.getClassroomStatus(status)
+						"status": status
 					}
 				}
 				self.members.update(classroom_profile)
-				added_members.append(member)
 				member.addClassroom(self, classroom_profile)
+				added_members.append(member)
 		self.classroom.MEMBERS = jsonize(self.members)
 		globals.db.session.commit()
 		return added_members
@@ -108,42 +151,46 @@ class Classroom ():
 		for member in members:
 			if (not self.hasMember(member)):
 				continue
-			del self.classroom.members[member.id]
+			del self.classroom.members[member.get("id")]
 			removed_members.append(member)
 		globals.db.session.commit()
 		return removed_members
 
 	def get (self, field):
-		if (field == "id"):
+		if (str(field).lower() == "id"):
 			return self.classroom.id
-		if (field == "NAME"):
+		if (str(field).upper() == "NAME"):
 			return self.classroom.NAME
-		elif (field == "TYPE"):
+		elif (str(field).upper() == "TYPE"):
 			return self.classroom.TYPE
-		elif (field == "CONTACT_AREA"):
+		elif (str(field).upper() == "CONTACT_AREA"):
 			return self.contactArea
-		elif (field == "IMAGE_PATH"):
+		elif (str(field).upper() == "IMAGE_PATH"):
 			return self.classroom.IMAGE_PATH
 		else:
 			raise ClassroomInvalidFieldException(field)
 
 	def set (self, field, value):
-		if (field == "NAME"):
+		if (str(field).upper() == "NAME"):
 			self.classroom.NAME = value
-		elif (field == "TYPE"):
+		elif (str(field).upper() == "TYPE"):
 			self.classroom.TYPE = value
-		elif (field == "CONTACT_AREA"):
+		elif (str(field).upper() == "CONTACT_AREA"):
 			if (not isinstance(value, ClassroomContactArea)):
 				raise ClassroomInvalidFieldException(field)
 			self.contactArea = value
 			self.classroom.CONTACT_AREA = value.classroom_id
-		elif (field == "IMAGE_PATH"):
+		elif (str(field).upper() == "IMAGE_PATH"):
 			self.classroom.IMAGE_PATH = value
 		else:
 			raise ClassroomInvalidFieldException(field)
 
 	def create (self):
 		if (not self.__exists__):
+			if (len(self.members_to_add) > 0):
+				for i in range(len(self.members_to_add)):
+					member = self.members_to_add.pop(0)
+					self.addMember(member[0], status = member[1], nobypass = True)
 			globals.db.session.add(self.classroom)
 			globals.db.session.commit()
 			self.contactArea.create()
@@ -170,15 +217,25 @@ class ClassroomMessage ():
 		self.SENDER = queryResult.SENDER
 		self.DATE_SENT = queryResult.DATE_SENT
 
-	def __dict__ (self):
-		return f"classroom_{self.id}"
+	def __iter__ (self):
+		return [
+			[ "id", self.id ],
+			[ "type", self.TYPE ],
+			[ "message", self.MESSAGE ],
+			[ "sender", self.SENDER ],
+			[ "date_sent", self.DATE_SENT.strftime("%d/%m/%Y %H:%M") ]
+		].__iter__()
+
+	def as_dict (self):
+		return dict(self.__iter__())
 
 class ClassroomContactArea ():
 	__exists__ = False
 
 	def __init__ (self, classroom_id, table_prefix = "room_"):
 		self.classroom_id = classroom_id
-		self.table = globals.db.Table(f"{table_prefix}{self.classroom_id}", globals.db.metadata,
+		self.table_name = f"{table_prefix}{self.classroom_id}"
+		self.table = globals.db.Table(self.table_name, globals.db.metadata,
 			globals.db.Column("id", globals.db.Integer, autoincrement = True, primary_key = True),
 			globals.db.Column("TYPE", globals.db.String(32), default = config["contact_area"]["message"]["type"]["message"]["hash"]),
 			globals.db.Column("MESSAGE", globals.db.String(65000), default = config["contact_area"]["message"]["type"]["message"]["hash"], nullable = False),
@@ -188,22 +245,38 @@ class ClassroomContactArea ():
 		)
 
 		self.__exists__ = self.table.exists(globals.db.engine)
+		# printDebug(f"checking if the table ({self}) already exists ({self.__exists__})", "ClassroomContactArea")
+		if (self):
+			# printDebug(f"table already exists, mapping...", "ClassroomContactArea")
+			self.mapTable()
+
+	def __repr__ (self):
+		return f"<ClassroomContactArea table_name='{self.table_name}' of='{self.classroom_id}'>"
+
+	def __bool__ (self):
+		return self.__exists__
 
 	def create (self):
 		if (not self.__exists__):
 			self.table.create(globals.db.engine, True)
-			globals.db.mapper(RoomContactArea, self.table)
+			self.mapTable()
 			self.__exists__ = True
 
 	def drop (self, bind = None, checkfirst = False):
 		self.table.drop(bind, checkfirst)
 		self.__exists__ = False
 
+	def mapTable (self):
+		# printDEbug(f"mapping table {self}", "ClassroomContactArea.mapTable")
+		try:
+			return globals.db.mapper(RoomContactArea, self.table)
+		except sqlalchemy.exc.ArgumentError:
+			return globals.db.mapper(RoomContactArea, self.table, non_primary = True)
+
 	def getMessages (self):
 		if (self.__exists__):
-			return [ClassroomMessage(message) for message in globals.db.session.query(self.table).all()]
-		else:
-			return []
+			return [ ClassroomMessage(message) for message in globals.db.session.query(self.table).all() ]
+		return []
 
 	def addMessage (self, sender_id, message, message_type = config["contact_area"]["message"]["type"]["message"]["hash"]):
 		record = RoomContactArea(

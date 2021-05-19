@@ -5,22 +5,22 @@ from flask import request
 from flask import url_for
 from flask_login import current_user, login_required
 
-from ..controllers import Account
+from ..controllers.account import Account
+from ..controllers.config import config
+from ..controllers.classroom import Classroom
+from ..controllers.methods import sendFalse, sendTrue
 
 development = Blueprint("dev", __name__)
 
 @development.route("/get-id")
 def getId ():
 	if (current_user.is_active):
-		return globals.General.sendTrue(current_user.id)
-	return globals.General.sendFalse(config.getMessage("LOGIN_REQUIRED"))
+		return sendTrue(current_user.id)
+	return sendFalse(config.getMessage("LOGIN_REQUIRED"))
 
 @development.route("/is-logged-in")
 def isLoggedIn ():
-	if (current_user.is_active):
-		return "true"
-	else:
-		return "false"
+	return str(current_user.is_active).lower()
 
 @development.route("/delete-account-by-id", methods = [ "POST" ])
 def deleteAccountById ():
@@ -62,6 +62,9 @@ def deleteClassroom (classroom_id):
 		return globals.General.sendTrue(config.getMessage("CLASS_DELETED"))
 	return globals.General.sendTrue(config.getMessage("INEXISTENT_CLASS"))
 
-@development.route("/classrooms-list")
-def getClassroomsList ():
-	return globals.General.sendTrue([{"id": classroom.id, "name": classroom.NAME} for classroom in globals.model.Classroom.query.all()])
+@development.route("/classroom/<classroom_id>/message")
+def getClassroomMessages (classroom_id):
+	if (not classroom_id):
+		classroom_id = "XTbDgBtkXQrIKa825XkR"
+	classroom = Classroom(classroom_id = classroom_id)
+	return sendTrue([ message.as_dict() for message in classroom.getMessages() ])

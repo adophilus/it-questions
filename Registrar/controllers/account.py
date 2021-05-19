@@ -1,14 +1,13 @@
 from datetime import date, datetime
 from flask import globals
+from flask_login import current_user
 
 from . import validate
 from .config import config
 from .classroom import Classroom
-from .methods import fernetEncrypt, fernetDecrypt, jsonize
+from .methods import fernetEncrypt, fernetDecrypt, loadJson, printDebug, saveJson, sendFalse
 from .private_key_generator import PrivateKeyGenerator
 from .. import models
-
-from .methods import loadJson, saveJson, sendFalse
 
 import os
 import shutil
@@ -191,6 +190,17 @@ class Account ():
 	def isStudent (self):
 		return self.accountType == config.getAccountType("student")["name"]
 
+	def addClassroom (self, classroom, classroom_profile):
+		if (self.isStudent() or self.isTeacher()):
+			printDebug("adding classroom to account details", "Account.addClassroom")
+			return self.account.addClassroom(classroom, classroom_profile)
+
+	def getClassrooms (self):
+		if (not (self.isStudent() or self.isTeacher())):
+			return []
+		printDebug(type(self), "Account.getClassrooms")
+		return self.account.classrooms
+
 	def create (self, account_details, account_settings, first_name = "", last_name = "", other_names = "", birthday = None, email = "", phone_number = "", username = "", password = "", account_type = config.getAccountType("student")["name"], classroom = None, department = "", subjects_offered = [], extracurricular_activities = [], subjects_teaching = [], ward_id = ""):
 		if (not self.__exists__):
 			if ((not account_details) and (not account_settings)):
@@ -229,14 +239,83 @@ class Account ():
 			self.__exists__ = False
 			return True
 
-class Administrator (models.Administrator, Account):
+
+class AccountMixin ():
+	classrooms = []
+
+	def __init__ (self):
+		self.setAccountPath("data")
+		self.loadAccountDetails()
+		self.loadAccountSettings()
+
+	def addClassroom (self, classroom, classroom_profile):
+		if (self.isStudent() or self.isTeacher()):
+			printDebug("adding classroom to account details", "AccountMixin.addClassroom")
+			self.accountDetails["classroom"][classroom.get("id")] = classroom_profile
+			self.classrooms.append(classroom)
+			self.saveAccountDetails()
+			return True
+
+	def getClassrooms (self):
+		printDebug(type(self), "AccountMixin.getClassrooms")
+		return self.classrooms
+
+	def populateClassrooms (self):
+		# VERY DANGEROUS!!! RAISES MAX RECURSION DEPTH EXCEPTION # print("current_user:",current_user)
+		# ALSO VERY DANGEROUS!!! CALLS 'current_user' MULTIPLE TIMES THEREBY ADDING MULTIPLE CLASSROOMS # print("dir(current_user):",dir(current_user))
+		if (self.is_active):
+			for classroom_id in self.accountDetails["classroom"].keys():
+				created = False
+				for classroom in self.classrooms:
+					if classroom.get("id") == classroom_id:
+						created = True
+						break
+				if (not created):
+					self.classrooms.append(Classroom(classroom_id))
+
+	def setAccountPath (self, path = "data"):
+		if (self.is_active):
+			path = os.path.join(path, f'{self.ACCOUNT_TYPE}s', self.id)
+			self.accountDetailsPath = os.path.join(path, "details.json")
+			self.accountSettingsPath = os.path.join(path, "settings.json")
+
+	def loadAccountDetails (self, from_dict = False):
+		if (self.is_active):
+			if (not from_dict):
+				self.accountDetails = loadJson(self.accountDetailsPath)
+			else:
+				self.accountDetails = from_dict
+
+	def saveAccountDetails (self, details = None):
+		if (self.is_active):
+			if (not details):
+				details = self.accountDetails
+			saveJson(self.accountDetailsPath, details)
+			return True
+
+	def loadAccountSettings (self, from_dict = False):
+		if (self.is_active):
+			if (not from_dict):
+				self.accountSettings = loadJson(self.accountSettingsPath)
+			else:
+				self.accountSettings = from_dict
+
+	def saveAccountSettings (self, settings = None):
+		if (self.is_active):
+			if (not settings):
+				settings = self.accountSettings
+			saveJson(self.accountSettingsPath, settings)
+
+class Administrator (models.Administrator, AccountMixin, Account):
 	accountType = config.getAccountType("administrator")["name"]
 
 	def __init__ (self, **kwargs):
-		models.Administrator.__init__(self, ACCOUNT_TYPE = config.getAccountType("administrator")["name"], **kwargs)
-		self.setAccountPath(os.path.join("data", self.ACCOUNT_TYPE))
-		self.loadAccountDetails()
-		self.loadAccountSettings()
+		kwargs["ACCOUNT_TYPE"] = config.getAccountType("administrator")["name"]
+		models.Administrator.__init__(self, **kwargs)
+		AccountMixin.__init__(self)
+
+	def __bool__ (self):
+		return self.is_active
 
 	def __str__ (self):
 		return self.id
@@ -350,14 +429,16 @@ class Administrator (models.Administrator, Account):
 		else:
 			raise Exception(f"Invalid field {field}!")
 
-class Parent (models.Parent, Account):
+class Parent (models.Parent, AccountMixin, Account):
 	accountType = config.getAccountType("parent")["name"]
 
 	def __init__ (self, **kwargs):
-		models.Parent.__init__(self, ACCOUNT_TYPE = config.getAccountType("parent")["name"], **kwargs)
-		self.setAccountPath(os.path.join("data", self.ACCOUNT_TYPE))
-		self.loadAccountDetails()
-		self.loadAccountSettings()
+		kwargs["ACCOUNT_TYPE"] = config.getAccountType("parent")["name"]
+		models.Parent.__init__(self, **kwargs)
+		AccountMixin.__init__(self)
+
+	def __bool__ (self):
+		return self.is_active
 
 	def __str__ (self):
 		return self.id
@@ -483,7 +564,7 @@ class Parent (models.Parent, Account):
 		else:
 			raise Exception(f"Invalid field {field}!")
 
-class Teacher (models.Teacher, Account):
+class Teacher (models.Teacher, AccountMixin, Account):
 	classrooms = []
 	questions = []
 	accountType = config.getAccountType("teacher")["name"]
@@ -492,18 +573,17 @@ class Teacher (models.Teacher, Account):
 	}
 
 	def __init__ (self, **kwargs):
-		models.Teacher.__init__(self, ACCOUNT_TYPE = config.getAccountType("teacher")["name"], **kwargs)
-		self.setAccountPath(os.path.join("data", self.ACCOUNT_TYPE))
-		self.loadAccountDetails()
-		self.loadAccountSettings()
-		self.__populateClassrooms()
+		kwargs["ACCOUNT_TYPE"] = config.getAccountType("teacher")["name"]
+		models.Teacher.__init__(self, **kwargs)
+		AccountMixin.__init__(self)
+		self.populateClassrooms()
+
+	def __bool__ (self):
+		return self.is_active
 
 	def __str__ (self):
 		return self.id
 
-	def __populateClassrooms (self):
-		for classroom in self.accountDetails["classroom"]:
-			self.classrooms.append(Classroom(classroom["id"]))
 
 	def addClassroom (self, classroom, classroom_profile = None):
 		if (not classroom_profile):
@@ -628,36 +708,23 @@ class Teacher (models.Teacher, Account):
 		else:
 			raise Exception(f"Invalid field {field}!")
 
-class Student (models.Student, Account):
-	classrooms = []
+class Student (models.Student, AccountMixin, Account):
 	accountType = config.getAccountType("student")["name"]
 	accountDetails = {
 		"classroom": {}
 	}
 
 	def __init__ (self, **kwargs):
-		models.Student.__init__(self, ACCOUNT_TYPE = config.getAccountType("student")["name"], **kwargs)
-		self.setAccountPath(os.path.join("data", self.ACCOUNT_TYPE))
-		self.loadAccountDetails()
-		self.loadAccountSettings()
-		self.__populateClassrooms()
+		kwargs["ACCOUNT_TYPE"] = config.getAccountType("student")["name"]
+		models.Student.__init__(self, **kwargs)
+		AccountMixin.__init__(self)
+		self.populateClassrooms()
+
+	def __bool__ (self):
+		return self.is_active
 
 	def __str__ (self):
 		return self.id
-
-	def __populateClassrooms (self):
-		if (self.__exists__):
-			for classroom in self.accountDetails["classroom"]:
-				self.classrooms.append(Classroom(classroom["id"]))
-
-	def addClassroom (self, classroom, classroom_profile = None):
-		if (not classroom_profile):
-			return False
-
-		self.accountDetails["classroom"][classroom.get("id")] = classroom_profile
-		self.classrooms.append(classroom)
-		self.saveAccountDetails()
-		return True
 
 	@classmethod
 	def calculateAge (cls, birthday):

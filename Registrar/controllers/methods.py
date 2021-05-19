@@ -194,3 +194,12 @@ def sendTrue (data):
 
 def sendFalse (data):
 	return jsonize(FalseDict({"error": data, "status": False}))
+
+def printDebug (message, method = None, status = True):
+	sign = "+"
+	if (not status):
+		sign = "-"
+	if (not method):
+		print(f"[{sign}] {message}")
+	else:
+		print(f"[{sign}][{method}] {message}")

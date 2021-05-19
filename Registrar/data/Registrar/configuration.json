@@ -10,6 +10,7 @@
 		"question": 7,
 		"contact_area": 4,
 		"school_event": 3,
+		"room": 5,
 		"classroom": 4,
 		"chatroom_message": 10
 	},
@@ -213,6 +214,9 @@
 		"SUCCESSFUL_SIGNIN": "Sign in successful!",
 		"UNSUCCESSFUL_SIGNIN": "Sign in un-successful!",
 		"SUCCESSFUL_SIGNOUT": "Sign out successful",
+		"INEXISTENT_SCHOOL_EVENT_CREATION": "The school event does not exist!",
+		"UNSUCCESSFUL_SCHOOL_EVENT_CREATION": "School event was not created!",
+		"SUCCESSFUL_SCHOOL_EVENT_CREATION": "School event created!",
 		"EXISTENT_EMAIL": "This email address is already in use!",
 		"EXISTENT_EMAIL_USERNAME": "This email address and/or username is already in use!",
 		"EXISTENT_USERNAME": "This username is already in use!",
@@ -251,7 +255,6 @@
 		"WARD_ADD_SUCCESSFUL": "The ward has been added under the parent!",
 		"WARD_ALREADY_UNDER_PARENT": "The ward specified is already under the parent!",
 		"CLASS_CREATED": "Class has been created!",
-		"CLASS_DELETED": "Class has been deleted successfully!",
 		"CLASS_DELETED": "Class has been deleted successfully!",
 		"CLASS_MESSAGE_SENT": "The message has been sent to the classroom"
 	}

@@ -34,6 +34,7 @@ from .blueprints.TeacherBlueprint import teacher
 from .blueprints.StudentBlueprint import student
 from .blueprints.ClassroomBlueprint import classroom
 from .blueprints.DevelopmentBlueprint import development
+from .blueprints.school import school
 
 app.register_blueprint(main)
 app.register_blueprint(handler, url_prefix = "/handler")
@@ -46,6 +47,7 @@ app.register_blueprint(teacher, url_prefix = "/teacher")
 app.register_blueprint(student, url_prefix = "/student")
 app.register_blueprint(classroom, url_prefix = "/classroom")
 app.register_blueprint(development, url_prefix = "/dev")
+app.register_blueprint(school, url_prefix = "/school")
 
 """
 globals.days = [

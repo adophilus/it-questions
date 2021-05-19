@@ -6,7 +6,7 @@ db = SQLAlchemy(app)
 
 class Model (db.Model):
     __tablename__ = "test"
-    
+
     id = db.Column(db.Integer, autoincrement = True, primary_key = True)
     name = db.Column(db.String(100))
 
