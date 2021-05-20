@@ -1,7 +1,6 @@
-function getClassroomMessages (classroom_id, callback) {
-	console.log("getting");
+function getClassroomMessages (classroom_id, callback, after_message_id) {
 	$.ajax({
-		url: `/classroom/${classroom_id}/message`,
+		url: `/classroom/${classroom_id}/message/${after_message_id}`,
 		type: "GET",
 		data: {},
 		success: function (data) {
@@ -11,7 +10,7 @@ function getClassroomMessages (classroom_id, callback) {
 				callback(data);
 			}
 			else {
-				console.log(data.error + " " + classroom_id);
+				console.log(data.error);
 			}
 		},
 		error: function (xhr) {
@@ -22,12 +21,10 @@ function getClassroomMessages (classroom_id, callback) {
 
 function displayClassroomMessages (data, classroom_id, first_call = false) {
 	if (first_call) {
-		console.log("making 'first_call' with classroom_id: " + classroom_id);
-		getClassroomMessages(classroom_id, displayClassroomMessages);
+		getClassroomMessages(classroom_id, displayClassroomMessages, window.activeClassroomMessageContainer.find(".list").last().attr("message-id"));
 		return;
 	}
 
-	console.log("bypassing 'first_call'");
 	if (!data.status) {
 		return;
 	}
@@ -38,6 +35,7 @@ function displayClassroomMessages (data, classroom_id, first_call = false) {
 		var classroomMessageDetails = document.createElement("div");
 		var classroomMessageDetailsDateSent = document.createElement("small");
 
+		classroomMessageContainer.setAttribute("message-id", message.id);
 		classroomMessageBody.innerHTML = message.message;
 		classroomMessageDetailsDateSent.innerHTML = message.date_sent;
 
@@ -65,7 +63,6 @@ function sendClassroomMessage (classroom_id, message) {
 		success: function (data) {
 			data = JSON.parse(data);
 			if (data.status) {
-				console.log(data.data);
 				window.window.classroomMessageEntry.val("");
 			}
 			else {
@@ -76,19 +73,17 @@ function sendClassroomMessage (classroom_id, message) {
 }
 
 function setActiveClassroom (event) {
-	// var elem = $(event.target);
 	var classroomsListElement = document.querySelector(".classrooms-list");
-
+	var classroom_id = event.currentTarget.getAttribute("classroom-id");
 	if (classroomsListElement) {
 		classroomsListElement.classList.add("classroom");
 		classroomsListElement.classList.remove("classrooms-list");
 	}
 
-	console.log(event.target.getAttribute("classroom-id"));
-	displayClassroomMessages(null, event.target.getAttribute("classroom-id"), true);
+	displayClassroomMessages(null, classroom_id, true);
 	window.activeClassroom = {
-		id: event.target.getAttribute("classroom-id"),
-		// refresher: setInterval(displayClassroomMessages, 2000, null, event.target.getAttribute("classroom-id"), false)
+		id: classroom_id,
+		refresher: setInterval(displayClassroomMessages, 2000, null, classroom_id, true)
 	}
 }
 
@@ -137,14 +132,13 @@ function displayClassroomsList (data, err) {
 		classroomListImageElement.classList.add("profile");
 		classroomListTitleElement.classList.add("title");
 
-		classroomListContainerElement.setAttribute("title", `ID: ${classroomDetails.id}`);
+		// classroomListContainerElement.setAttribute("title", `ID: ${classroomDetails.id}`);
 		classroomListContainerElement.setAttribute("classroom-id", classroomDetails.id);
 		classroomListImageElement.setAttribute("src", classroomDetails.image);
 		classroomListImageElement.setAttribute("draggable", "false");
 		classroomListTitleElement.innerHTML = classroomDetails.name;
 
 		classroomListContainerElement.onclick = setActiveClassroom;
-
 		classroomListContainerElement.appendChild(classroomListImageElement);
 		classroomListContainerElement.appendChild(classroomListTitleElement);
 		window.classroomsListContainer.append(classroomListContainerElement);
@@ -170,7 +164,7 @@ function getClassroomsList (callback) {
 
 $(document).ready(function () {
 	window.activeClassroom = new Object();
-	window.activeClassroomMessageContainer = $(".active-classroom .messages .list");
+	window.activeClassroomMessageContainer = $(".active-classroom .messages");
 	window.classroomsListContainer = $(".classrooms-list .body");
 	window.classroomMessageEntry = $("#classroom_message_entry");
 

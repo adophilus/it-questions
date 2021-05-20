@@ -209,6 +209,16 @@ class Classroom ():
 	def addMessage (self, sender_id, message, message_type = config["contact_area"]["message"]["type"]["message"]["hash"]):
 		return self.contactArea.addMessage(sender_id, message, message_type)
 
+	def deleteMessage (self, message):
+		if (isinstance(message, str)):
+			message = self.contactArea.getMessageById(message)
+		elif (isinstance(message, ClassroomMessage)):
+			pass
+		else:
+			raise Exception(f"Invalid classroom message {message}")
+
+		return self.contactArea.deleteMessage(message)
+
 class ClassroomMessage ():
 	def __init__ (self, queryResult):
 		self.id = queryResult.id
@@ -267,11 +277,23 @@ class ClassroomContactArea ():
 		self.__exists__ = False
 
 	def mapTable (self):
-		# printDEbug(f"mapping table {self}", "ClassroomContactArea.mapTable")
+		# printDebug(f"mapping table {self}", "ClassroomContactArea.mapTable")
 		try:
 			return globals.db.mapper(RoomContactArea, self.table)
 		except sqlalchemy.exc.ArgumentError:
 			return globals.db.mapper(RoomContactArea, self.table, non_primary = True)
+
+	def deleteMessage (self, message):
+		try:
+			globals.db.session.delete(message)
+			globals.db.session.commit()
+			return True
+		except Exception as e:
+			printDebug(e, "ClassroomContactArea.deleteMessage")
+			return False
+
+	def getMessageById (self, message_id):
+		return globals.db.session.query(self.table).filter_by(id = message_id).first()
 
 	def getMessages (self):
 		if (self.__exists__):

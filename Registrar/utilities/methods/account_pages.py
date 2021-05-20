@@ -54,11 +54,11 @@ def renderUserAccountHomePage (cookies = []):
 
 		return "in here!"
 		logout_user()
-		return redirect("main.mainLoginPage")
+		return redirect("account.loginView")
 	except FileNotFoundError as e:
 		return "error: " + e.message
 		logout_user()
-		return redirect("main.mainLoginPage")
+		return redirect("account.loginView")
 
 
 def getPresentYMD ():

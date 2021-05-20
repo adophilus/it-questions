@@ -35,13 +35,21 @@ $(document).ready(function (){
 
 	fetch($("#form_classroom").attr("target-url")).then(response => {
 		response.json().then(response => {
+			var classroomNames = new Array();
+
+			if (response.status) {
+				classroomNames = response.data.map(function (data) {
+					return data.name;
+				});
+			}
+
 			$("#form_classroom").autocomplete({
-				source: response.data,
+				source: classroomNames,
 				"minLength": 0,
 			});
 
 			$("#form_ward_classroom").autocomplete({
-				source: response.data,
+				source: classroomNames,
 				"minLength": 0,
 			});
 		});

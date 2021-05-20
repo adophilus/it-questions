@@ -30,6 +30,12 @@
 	display: none;
 }
 
+.classroom .active-classroom .messages {
+	max-height: 60vh;
+	min-height: 40vh;
+	overflow-y: scroll;
+}
+
 .classroom .active-classroom .messages .list {
 	padding-top: 10px;
     padding-bottom: 10px;
@@ -47,7 +53,7 @@
 	bottom: 0px;
 	left: 0px;
 	width: 100%;
-	align-items: center;	
+	align-items: center;
 }
 
 .classroom-entry .message-attach-btn {

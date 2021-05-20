@@ -3,108 +3,31 @@
 
 <head>
 	<meta charset="utf-8">
-	<title>Classrooms | {{ account.accountType | capitalize }}</title>
-	<!-- <link rel="stylesheet" href="/static/CSS/bootstrap/bootstrap.css"> -->
-	<link rel="stylesheet" href="/static/CSS/freebie-interactive/freebie-interactive.css">
-	<link rel="stylesheet" href="/static/CSS/flaticon/flaticon.css">
-	<link rel="stylesheet" href="/static/CSS/input.css">
-	<link rel="stylesheet" href="/static/CSS/account-settings.css">
-	<link rel="stylesheet" href="/static/CSS/notifications.css">
-	<link rel="stylesheet" href="/static/CSS/profile.css">
-	<link rel="stylesheet" href="/static/CSS/school-events.css">
-	<link rel="stylesheet" href="/static/CSS/context-menu/context-menu.css">
-	<link rel="stylesheet" href="/static/CSS/classroom/classroom.css">
+	<title>{% block title %}Classrooms | {{ account.accountType | capitalize }}{% endblock %}</title>
+	{% block scripts_head %}{% endblock %}
+    {% block styles_head %}{% endblock %}
 </head>
 
 <body>
 	<div class="main-container">
 		<!-- NAVIGATION BAR -->
-		<header class="block">
-			<ul class="header-menu horizontal-list">
-				<li>
-					<a class="header-menu-tab active" href="{{ url_for(account.accountType + '.homeView') }}">
-						<span class="icon fontawesome-home scnd-font-color"></span>
-						Home
-					</a>
-				</li>
-			</ul>
-			<div class="profile-menu">
-				<p>Me <a href="javascript:void(0)"><span class="entypo-down-open scnd-font-color"></span></a></p>
-				<div class="profile-picture small-profile-picture">
-					<img draggable="false" width="40px" alt="Profile picture" src="/static/media/user-profile-unisesx-big-white.png">
-				</div>
-			</div>
-		</header>
+		{% block navbar %}{% endblock navbar %}
 		<!-- LEFT-CONTAINER -->
 		<div class="left-container container">
-			{% include account.accountType + "/sidebar.html" %}
+			{% block sidebar %}{% endblock %}
 		</div>
 		<!-- MIDDLE-RIGHT-CONTAINER -->
 		<div class="middle-right-container">
-			<div class="block classrooms-list">
-				<div class="arrow-btn-container">
-					<a class="arrow-btn left" id="display_classrooms_list_btn" href="javascript:void(0)">
-						<span class="icon fontawesome-angle-left"></span>
-					</a>
-					<h2 class="titular">CLASSROOMS</h2>
-				</div>
-				<div class="body"></div>
-				<div class="active-classroom">
-					<div class="messages">
-						<div class="list">
-							<p class="message">
-								Hello there!
-							</p>
-							<div class="message-details">
-								<small class="date-sent scnd-font-color">
-									14/03/2021 | 22:00
-								</small>
-							</div>
-						</div>
-					</div>
-					<div class="classroom-entry">
-						<span id="message_attachment_btn" class="entypo-attach message-attach-btn"></span>
-						<input type="text" id="classroom_message_entry" class="message-entry">
-						<span id="message_send_btn" class="message-send-btn">
-							<span class="flaticon-paper-plane"></span>
-						</span>
-					</div>
-				</div>
-			</div>
+			{% block middle_content %}
+			{% block classroom %}
+			<div class="block classrooms-list"></div>
+			{% endblock %}
+			{% endblock %}
 		</div>
 	</div>
 
-	<script type="text/javascript" src="/static/JavaScript/jquery.js"></script>
-	<script type="text/javascript" src="/static/JavaScript/jquery-ui.js"></script>
-	<script type="text/javascript">
-		window.Account = {
-			"id": "{{ account.get('id') }}",
-			"type": "{{ account.accountType }}"
-		}
-		window.displaying = new Array();
-		window.displaying["account_settings"] = false;
-		window.displaying["calendar_day"] = true;
-		window.displaying["calendar_month"] = true;
-		window.displaying["notifications"] = false;
-		window.displaying["school_events"] = true;
-		window.displaying["user_profile"] = true;
-		window.chat_messages = new Array();
-		window.customContextMenu = {}
-	</script>
-	<script type="text/javascript" src="/static/JavaScript/script-1.js"></script>
-	<script type="text/javascript" src="/static/JavaScript/events.js"></script>
-	<script type="text/javascript" src="/static/JavaScript/calendar.js"></script>
-	<script type="text/javascript" src="/static/JavaScript/methods.js"></script>
-	<script type="text/javascript" src="/static/JavaScript/notifications.js"></script>
-	<script type="text/javascript" src="/static/JavaScript/profile.js"></script>
-	<script type="text/javascript" src="/static/JavaScript/home.js"></script>
-	<script type="text/javascript" src="/static/JavaScript/account-settings.js"></script>
-	<script type="text/javascript" src="/static/JavaScript/PrivateKeyGenerator/PrivateKeyGenerator.js"></script>
-	<script type="text/javascript" src="/static/JavaScript/context-menu/context-menu.js"></script>
-	<script type="text/javascript" src="/static/JavaScript/classroom/classroom.js"></script>
-	<script type="text/javascript">
-		ContextMenu.prototype.handleWindowContextMenuEvents();
-	</script>
+	{% block scripts_body %}{% endblock %}
+	{% block styles_body %}{% endblock %}
 
 </body>
 

@@ -23,6 +23,7 @@ globals.app = app
 
 
 # import varous blueprints
+from .blueprints.account import account
 from .blueprints.MainBlueprint import main
 from .blueprints.HandlerBlueprint import handler
 from .blueprints.HandlerQuestionBlueprint import handlerQuestion
@@ -36,6 +37,7 @@ from .blueprints.ClassroomBlueprint import classroom
 from .blueprints.DevelopmentBlueprint import development
 from .blueprints.school import school
 
+app.register_blueprint(account)
 app.register_blueprint(main)
 app.register_blueprint(handler, url_prefix = "/handler")
 app.register_blueprint(handlerQuestion, url_prefix = "/handler/question")

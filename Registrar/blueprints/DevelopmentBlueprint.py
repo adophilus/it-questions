@@ -48,19 +48,19 @@ def getAccountById (id):
 def checkClassroom (classroom_id):
 	classroom = globals.model.Classroom.getById(classroom_id)
 	if (not classroom):
-		return globals.General.sendFalse(config.getMessage("INEXISTENT_CLASS"))
+		return globals.General.sendFalse(config.getMessage("INEXISTENT_CLASSROOM"))
 	return globals.General.sendTrue({"id": classroom.id, "name": classroom.NAME})
 
 @development.route("/create-classroom/<classroom_name>")
 def createClassroom (classroom_name):
 	globals.methods.createClassroom(classroom_name)
-	return globals.General.sendTrue(config.getMessage("CLASS_CREATED"))
+	return globals.General.sendTrue(config.getMessage("CLASSROOM_CREATED"))
 
 @development.route("/delete-classroom/<classroom_id>")
 def deleteClassroom (classroom_id):
 	if (globals.methods.deleteClassroom(classroom_id, commit = True)):
-		return globals.General.sendTrue(config.getMessage("CLASS_DELETED"))
-	return globals.General.sendTrue(config.getMessage("INEXISTENT_CLASS"))
+		return globals.General.sendTrue(config.getMessage("CLASSROOM_DELETED"))
+	return globals.General.sendTrue(config.getMessage("INEXISTENT_CLASSROOM"))
 
 @development.route("/classroom/<classroom_id>/message")
 def getClassroomMessages (classroom_id):

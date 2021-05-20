@@ -12,8 +12,6 @@ from ..controllers import calendar
 from ..controllers.account import Account
 from ..controllers.methods import sendTrue
 
-from .MainBlueprint import mainLoginPage
-
 import os
 
 student = Blueprint("student", __name__)

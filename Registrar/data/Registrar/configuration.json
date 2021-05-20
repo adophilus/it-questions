@@ -222,6 +222,7 @@
 		"EXISTENT_USERNAME": "This username is already in use!",
 		"EXISTENT_ACCOUNT": "This account already exists!",
 		"INEXISTENT_CLASS": "Class in-existent!",
+		"INEXISTENT_CLASSROOM_MESSAGE": "In-existent classroom message!",
 		"INEXISTENT_ACCOUNT": "Account in-existent!",
 		"INEXISTENT_ACCOUNT_SEARCH": "The account you searched for is in-existent!",
 		"INVALID_ACCOUNT": "Invalid account!",
@@ -254,8 +255,10 @@
 		"INVALID_PARENT": "The ID specified does not belong to a parent!",
 		"WARD_ADD_SUCCESSFUL": "The ward has been added under the parent!",
 		"WARD_ALREADY_UNDER_PARENT": "The ward specified is already under the parent!",
-		"CLASS_CREATED": "Class has been created!",
-		"CLASS_DELETED": "Class has been deleted successfully!",
-		"CLASS_MESSAGE_SENT": "The message has been sent to the classroom"
+		"CLASSROOM_CREATED": "Class has been created!",
+		"CLASSROOM_DELETED": "Class has been deleted successfully!",
+		"CLASSROOM_MESSAGE_SENT": "The message has been sent to the classroom",
+		"CLASSROOM_MESSAGE_DELETED": "The message has been deleted from the classroom",
+		"CLASSROOM_MESSAGE_NOT_DELETED": "The message could not be deleted from the classroom"
 	}
 }

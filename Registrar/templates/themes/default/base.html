@@ -4,87 +4,32 @@
 <head>
     <meta charset="utf-8">
     <title>{% block title %}{% endblock %}</title>
-    <!-- <link rel="stylesheet" href="/static/CSS/bootstrap/bootstrap.css"> -->
-    <link rel="stylesheet" href="/static/CSS/freebie-interactive/freebie-interactive.css">
-    <link rel="stylesheet" href="/static/CSS/input.css">
-    <link rel="stylesheet" href="/static/CSS/account-settings.css">
-    <link rel="stylesheet" href="/static/CSS/notifications.css">
-    <link rel="stylesheet" href="/static/CSS/profile.css">
-    <link rel="stylesheet" href="/static/CSS/school-events.css">
-    <link rel="stylesheet" href="/static/CSS/context-menu/context-menu.css">
+    {% block scripts_head %}{% endblock %}
+    {% block styles_head %}{% endblock %}
 </head>
 
 <body>
     <div class="main-container">
         <!-- NAVIGATION BAR -->
-        <header class="block">
-            <ul class="header-menu horizontal-list">
-                <li>
-                    <a class="header-menu-tab active" href="{{ url_for(account.accountType + '.homeView') }}">
-                        <span class="icon fontawesome-home scnd-font-color"></span>
-                        Home
-                    </a>
-                </li>
-            </ul>
-            <div class="profile-menu">
-                <p>Me <a href="javascript:void(0)"><span class="entypo-down-open scnd-font-color"></span></a></p>
-                <div class="profile-picture small-profile-picture">
-                    <img draggable="false" width="40px" alt="Profile picture" src="/static/media/user-profile-unisesx-big-white.png">
-                </div>
-            </div>
-        </header>
+        {% block navbar %}{% endblock %}
         <!-- LEFT-CONTAINER -->
         <div class="left-container container">
-            {% include account.accountType + "/sidebar.html" %}
+            {% block left_container %}{% endblock %}
         </div>
         <!-- MIDDLE-CONTAINER -->
         <div class="middle-container container">
-            {% include "profile-container.html" %}
-            {% include "student/public-remarks.html" %}
-            {% include "school-events.html" %}
-            {% include "notifications.html" %}
-            {% include "account-settings.html" %}
-            <div style="visibility: hidden;" class="calendar-day block">
-
-            </div>
+            {% block middle_container %}{% endblock %}
         </div>
         <!-- RIGHT-CONTAINER -->
         <div class="right-container container">
-            {% include "account/calendar.html" %}
+            {% block right_container %}
+            {% include "themes/default/calendar.html" %}
+            {% endblock %}
         </div>
     </div>
 
-    <script type="text/javascript">
-        window.Account = {
-            "type": "{{ account.ACCOUNT_TYPE }}"
-        }
-        window.displaying = new Array();
-        window.displaying["account_settings"] = false;
-        window.displaying["calendar_day"] = true;
-        window.displaying["calendar_month"] = true;
-        window.displaying["notifications"] = false;
-        window.displaying["school_events"] = true;
-        window.displaying["public_remarks"] = false;
-        window.displaying["user_profile"] = true;
-        window.chat_messages = new Array();
-        window.customContextMenu = {}
-    </script>
-    <script type="text/javascript" src="/static/JavaScript/script-1.js"></script>
-    <script type="text/javascript" src="/static/JavaScript/events.js"></script>
-    <script type="text/javascript" src="/static/JavaScript/calendar.js"></script>
-    <script type="text/javascript" src="/static/JavaScript/jquery.js"></script>
-    <script type="text/javascript" src="/static/JavaScript/jquery-ui.js"></script>
-    <script type="text/javascript" src="/static/JavaScript/methods.js"></script>
-    <script type="text/javascript" src="/static/JavaScript/notifications.js"></script>
-    <script type="text/javascript" src="/static/JavaScript/profile.js"></script>
-    <script type="text/javascript" src="/static/JavaScript/school-events.js"></script>
-    <script type="text/javascript" src="/static/JavaScript/home.js"></script>
-    <script type="text/javascript" src="/static/JavaScript/account-settings.js"></script>
-    <script type="text/javascript" src="/static/JavaScript/PrivateKeyGenerator/PrivateKeyGenerator.js"></script>
-    <script type="text/javascript" src="/static/JavaScript/context-menu/context-menu.js"></script>
-    <script type="text/javascript">
-        ContextMenu.prototype.handleWindowContextMenuEvents();
-    </script>
+    {% block scripts_body %}{% endblock %}
+    {% block styles_body %}{% endblock %}
 
 </body>
 

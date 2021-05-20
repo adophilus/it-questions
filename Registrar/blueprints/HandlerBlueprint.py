@@ -17,7 +17,7 @@ handler = Blueprint("handler", __name__)
 
 # login manager
 globals.loginManager = LoginManager()
-globals.loginManager.login_view = "main.mainLoginPage"
+globals.loginManager.login_view = "account.loginView"
 globals.loginManager.init_app(app)
 
 @globals.loginManager.user_loader
