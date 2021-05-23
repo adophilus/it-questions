@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>{% block title %}{% endblock %}</title>
+    <title>{% block title %}Home | {{ account.accountType | capitalize }}{% endblock %}</title>
     {% block scripts_head %}{% endblock %}
     {% block styles_head %}{% endblock %}
 </head>

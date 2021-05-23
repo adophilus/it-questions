@@ -2,8 +2,9 @@ from flask import globals
 from flask_login import UserMixin
 
 from ..controllers.config import config
+from .account_mixin import AccountMixin
 
-class Administrator (UserMixin, globals.db.Model):
+class Administrator (UserMixin, globals.db.Model, AccountMixin):
     id = globals.db.Column(globals.db.Text, primary_key = True)
     FIRST_NAME = globals.db.Column(globals.db.Text)
     LAST_NAME = globals.db.Column(globals.db.Text)
@@ -16,18 +17,3 @@ class Administrator (UserMixin, globals.db.Model):
     ADMIN_RANK = globals.db.Column(globals.db.Text)
     ACCOUNT_TYPE = globals.db.Column(globals.db.Text, default = config.getAccountType("administrator")["name"])
     ACCOUNT_STATUS = globals.db.Column(globals.db.Text, default = config.getAccountStatus("ACTIVE"))
-
-    def __bool__ (self):
-        return True
-
-    @classmethod
-    def getByEmail (cls, email):
-        return cls.query.filter_by(EMAIL = email).first()
-
-    @classmethod
-    def getById (cls, id):
-        return cls.query.filter_by(id = id).first()
-
-    @classmethod
-    def getByUsername (cls, username):
-        return cls.query.filter_by(USERNAME = username).first()

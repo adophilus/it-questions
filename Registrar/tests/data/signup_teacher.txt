@@ -1,0 +1,6 @@
+from .tests.signup import signups
+
+# signups.signupAdministrator()
+# signups.signupParent()
+signups.signupTeacher()
+# signups.signupStudent()

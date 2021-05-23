@@ -25,10 +25,13 @@ class Account ():
 		if (_object):
 			self.__determineAccountType(_object = _object, account_type = account_type, check = check)
 		elif (email):
+			printDebug(f"Determining account with email {email}")
 			self.__determineAccountType(email = email, account_type = account_type, check = check)
 		elif (username):
+			printDebug(f"Determining account with username {username}")
 			self.__determineAccountType(username = username, account_type = account_type, check = check)
 		else:
+			printDebug(f"Determining account with id {id}")
 			self.__determineAccountType(id, account_type = account_type, check = check)
 
 	def __bool__ (self):
@@ -46,16 +49,19 @@ class Account ():
 		if (_object):
 			administrator = _object
 		elif (email):
+			printDebug(f"Checking accounts that have the email '{email}'")
 			administrator = Administrator.getByEmail(email)
 			parent = Parent.getByEmail(email)
 			teacher = Teacher.getByEmail(email)
 			student = Student.getByEmail(email)
 		elif (username):
+			printDebug(f"Checking accounts that have the username '{username}'")
 			administrator = Administrator.getByUsername(username)
 			parent = Parent.getByUsername(username)
 			teacher = Teacher.getByUsername(username)
 			student = Student.getByUsername(username)
 		else:
+			printDebug(f"Checking accounts that have the id '{id}'")
 			administrator = Administrator.getById(id)
 			parent = Parent.getById(id)
 			teacher = Teacher.getById(id)
@@ -79,6 +85,7 @@ class Account ():
 			self.__exists__ = True
 		else:
 			if (not check):
+				printDebug(f"Checking accounts (check = True)", "Account.__determineAccountType")
 				if (account_type == config.getAccountType("administrator")["name"]):
 					self.account = Administrator(id = self.__generateId__())
 				elif (account_type == config.getAccountType("parent")["name"]):
@@ -244,9 +251,13 @@ class AccountMixin ():
 	classrooms = []
 
 	def __init__ (self):
-		self.setAccountPath("data")
-		self.loadAccountDetails()
-		self.loadAccountSettings()
+		if (self):
+			self.setAccountPath("data")
+			self.loadAccountDetails()
+			self.loadAccountSettings()
+
+	def __bool__ (self):
+		return self.__exists__
 
 	def addClassroom (self, classroom, classroom_profile):
 		if (self.isStudent() or self.isTeacher()):
@@ -263,7 +274,7 @@ class AccountMixin ():
 	def populateClassrooms (self):
 		# VERY DANGEROUS!!! RAISES MAX RECURSION DEPTH EXCEPTION # print("current_user:",current_user)
 		# ALSO VERY DANGEROUS!!! CALLS 'current_user' MULTIPLE TIMES THEREBY ADDING MULTIPLE CLASSROOMS # print("dir(current_user):",dir(current_user))
-		if (self.is_active):
+		if (self):
 			for classroom_id in self.accountDetails["classroom"].keys():
 				created = False
 				for classroom in self.classrooms:
@@ -274,34 +285,34 @@ class AccountMixin ():
 					self.classrooms.append(Classroom(classroom_id))
 
 	def setAccountPath (self, path = "data"):
-		if (self.is_active):
+		if (self):
 			path = os.path.join(path, f'{self.ACCOUNT_TYPE}s', self.id)
 			self.accountDetailsPath = os.path.join(path, "details.json")
 			self.accountSettingsPath = os.path.join(path, "settings.json")
 
 	def loadAccountDetails (self, from_dict = False):
-		if (self.is_active):
+		if (self):
 			if (not from_dict):
 				self.accountDetails = loadJson(self.accountDetailsPath)
 			else:
 				self.accountDetails = from_dict
 
 	def saveAccountDetails (self, details = None):
-		if (self.is_active):
+		if (self):
 			if (not details):
 				details = self.accountDetails
 			saveJson(self.accountDetailsPath, details)
 			return True
 
 	def loadAccountSettings (self, from_dict = False):
-		if (self.is_active):
+		if (self):
 			if (not from_dict):
 				self.accountSettings = loadJson(self.accountSettingsPath)
 			else:
 				self.accountSettings = from_dict
 
 	def saveAccountSettings (self, settings = None):
-		if (self.is_active):
+		if (self):
 			if (not settings):
 				settings = self.accountSettings
 			saveJson(self.accountSettingsPath, settings)
@@ -309,13 +320,11 @@ class AccountMixin ():
 class Administrator (models.Administrator, AccountMixin, Account):
 	accountType = config.getAccountType("administrator")["name"]
 
-	def __init__ (self, **kwargs):
+	def __init__ (self, exists = False, **kwargs):
+		self.__exists__ = exists
 		kwargs["ACCOUNT_TYPE"] = config.getAccountType("administrator")["name"]
 		models.Administrator.__init__(self, **kwargs)
 		AccountMixin.__init__(self)
-
-	def __bool__ (self):
-		return self.is_active
 
 	def __str__ (self):
 		return self.id
@@ -432,13 +441,11 @@ class Administrator (models.Administrator, AccountMixin, Account):
 class Parent (models.Parent, AccountMixin, Account):
 	accountType = config.getAccountType("parent")["name"]
 
-	def __init__ (self, **kwargs):
+	def __init__ (self, exists = False, **kwargs):
+		self.__exists__ = exists
 		kwargs["ACCOUNT_TYPE"] = config.getAccountType("parent")["name"]
 		models.Parent.__init__(self, **kwargs)
 		AccountMixin.__init__(self)
-
-	def __bool__ (self):
-		return self.is_active
 
 	def __str__ (self):
 		return self.id
@@ -566,24 +573,27 @@ class Parent (models.Parent, AccountMixin, Account):
 
 class Teacher (models.Teacher, AccountMixin, Account):
 	classrooms = []
+	subjects_teaching = []
 	questions = []
 	accountType = config.getAccountType("teacher")["name"]
 	accountDetails = {
+		"subjects_teaching": [],
 		"classroom": {}
 	}
 
-	def __init__ (self, **kwargs):
+	def __init__ (self, exists = False, **kwargs):
+		self.__exists__ = exists
 		kwargs["ACCOUNT_TYPE"] = config.getAccountType("teacher")["name"]
 		models.Teacher.__init__(self, **kwargs)
 		AccountMixin.__init__(self)
 		self.populateClassrooms()
-
-	def __bool__ (self):
-		return self.is_active
+		self.populateSubjectsTeaching()
 
 	def __str__ (self):
 		return self.id
 
+	def populateSubjectsTeaching (self):
+		printDebug("Not implemented yet!", "Teacher.populateSubjectsTeaching")
 
 	def addClassroom (self, classroom, classroom_profile = None):
 		if (not classroom_profile):
@@ -633,7 +643,6 @@ class Teacher (models.Teacher, AccountMixin, Account):
 		self.set("phone_number", phone_number)
 		self.set("username", username)
 		self.set("password", password)
-		self.set("subjects_teaching", self.subjects_teaching)
 		self.set("ACCOUNT_STATUS", config.getAccountStatus("ACTIVE")["status"])
 
 		globals.db.session.add(self)
@@ -714,14 +723,13 @@ class Student (models.Student, AccountMixin, Account):
 		"classroom": {}
 	}
 
-	def __init__ (self, **kwargs):
+	def __init__ (self, exists = False, **kwargs):
+		self.__exists__ = exists
+		printDebug("Calling student __init__ method", "Student.__init__")
 		kwargs["ACCOUNT_TYPE"] = config.getAccountType("student")["name"]
 		models.Student.__init__(self, **kwargs)
 		AccountMixin.__init__(self)
 		self.populateClassrooms()
-
-	def __bool__ (self):
-		return self.is_active
 
 	def __str__ (self):
 		return self.id
@@ -731,63 +739,65 @@ class Student (models.Student, AccountMixin, Account):
 		return ((datetime.now() - birthday).days) + 1
 
 	def create (self, first_name, last_name, other_names, birthday, email, phone_number, username, password, account_type, classroom = None, department = None, subjects_offered = [], extracurricular_activities = [], **kwargs):
-		account_details = {
-			"unread_messages": 0,
-			"unread_notifications": 0,
-			"unread_public_remarks": 0,
-			"height": "unknown",
-			"weight": "unknown",
-			"complexion": "unknown",
-			"eye_color": "unknown",
-			"subjects_offerred": [],
-			"extracurricular_activities": extracurricular_activities,
-			"guardian": {},
-			"classroom": {}
-		}
+		if (not self.__exists__):
+			account_details = {
+				"unread_messages": 0,
+				"unread_notifications": 0,
+				"unread_public_remarks": 0,
+				"height": "unknown",
+				"weight": "unknown",
+				"complexion": "unknown",
+				"eye_color": "unknown",
+				"subjects_offerred": [],
+				"extracurricular_activities": extracurricular_activities,
+				"guardian": {},
+				"classroom": {}
+			}
 
-		account_settings = {
-			"theme": "default",# hard-coded (for lack of an alternative theme)
-			"last_login": "",# f"{globals.clock.date()} {globals.clock.time()}"
-			"login_history": {},# history of previous login attempts
-			"secret_question": "",# a secret question for logging into the account (in the case of "forgotten password")
-			"secret_question_answer": "",# the answer to the secret question
-			"enable_secret_question": ""# determines whether the secret question will be enaled or not
-		}
+			account_settings = {
+				"theme": "default",# hard-coded (for lack of an alternative theme)
+				"last_login": "",# f"{globals.clock.date()} {globals.clock.time()}"
+				"login_history": {},# history of previous login attempts
+				"secret_question": "",# a secret question for logging into the account (in the case of "forgotten password")
+				"secret_question_answer": "",# the answer to the secret question
+				"enable_secret_question": ""# determines whether the secret question will be enaled or not
+			}
 
-		account_details.update(self.accountDetails)
-		account_settings.update(self.accountSettings)
+			account_details.update(self.accountDetails)
+			account_settings.update(self.accountSettings)
 
-		classroom = Classroom(classroom)
+			classroom = Classroom(classroom)
 
-		self.set("first_name", first_name)
-		self.set("last_name", last_name)
-		self.set("last_name", last_name)
-		self.set("other_names", other_names)
-		self.set("birthday", birthday)
-		self.set("email", email)
-		self.set("phone_number", phone_number)
-		self.set("username", username)
-		self.set("password", password)
-		if (classroom):
-			classroom.addMember(self)
-		self.set("department", department)
-		self.set("ACCOUNT_STATUS", config.getAccountStatus("ACTIVE")["status"])
-		self.AGE = self.calculateAge(birthday)
+			self.set("first_name", first_name)
+			self.set("last_name", last_name)
+			self.set("last_name", last_name)
+			self.set("other_names", other_names)
+			self.set("birthday", birthday)
+			self.set("email", email)
+			self.set("phone_number", phone_number)
+			self.set("username", username)
+			self.set("password", password)
+			if (classroom):
+				classroom.addMember(self)
+			self.set("department", department)
+			self.set("ACCOUNT_STATUS", config.getAccountStatus("ACTIVE")["status"])
+			self.AGE = self.calculateAge(birthday)
 
-		globals.db.session.add(self)
-		globals.db.session.commit()
+			globals.db.session.add(self)
+			globals.db.session.commit()
 
-		return Account.create(self, account_details = account_details, account_settings = account_settings)
+			return Account.create(self, account_details = account_details, account_settings = account_settings)
 
 	def delete (self, first_call = True):
-		for classroom in self.classrooms:
-			self.accountDetails["classroom"].remove(classroom)
-			classroom.removeMember(self.id)
+		if (self.__exists__):
+			for classroom in self.classrooms:
+				self.accountDetails["classroom"].remove(classroom)
+				classroom.removeMember(self.id)
 
-		globals.db.session.delete(self)
-		globals.db.session.commit()
-		if (first_call):
-			return Account.delete(self, False)
+			globals.db.session.delete(self)
+			globals.db.session.commit()
+			if (first_call):
+				return Account.delete(self, False)
 
 	def setAccountStatus (self, account_status):
 		self.ACCOUNT_STATUS = account_status

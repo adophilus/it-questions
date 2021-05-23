@@ -3,8 +3,10 @@ from flask_login import UserMixin
 from pprint import pprint
 
 from ..controllers.config import config
+from ..controllers.methods import printDebug
+from .account_mixin import AccountMixin
 
-class Student (UserMixin, globals.db.Model):
+class Student (UserMixin, globals.db.Model, AccountMixin):
 	id = globals.db.Column(globals.db.Text, primary_key = True)
 	FIRST_NAME = globals.db.Column(globals.db.Text)
 	LAST_NAME = globals.db.Column(globals.db.Text)
@@ -18,21 +20,3 @@ class Student (UserMixin, globals.db.Model):
 	DEPARTMENT = globals.db.Column(globals.db.Text, nullable = False)
 	ACCOUNT_TYPE = globals.db.Column(globals.db.Text, default = config.getAccountType("student")["name"])
 	ACCOUNT_STATUS = globals.db.Column(globals.db.Text, default = config.getAccountStatus("ACTIVE"))
-
-	def __bool__ (self):
-		return True
-
-	@classmethod
-	def getByEmail (cls, email):
-		return cls.query.filter_by(EMAIL = email).first()
-
-	@classmethod
-	def getById (cls, id):
-		a = cls.query.filter_by(id = id).first()
-		if (a):
-			a.__init__()
-		return a
-
-	@classmethod
-	def getByUsername (cls, username):
-		return cls.query.filter_by(USERNAME = username).first()

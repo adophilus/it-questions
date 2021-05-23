@@ -26,8 +26,6 @@ function login () {
     });
 }
 
-$(document).ready(
-    function () {
-        $("#sign-in-form .sign-in").click(login);
-    }
-);
+$(document).ready(function () {
+    $("#sign-in-form .sign-in").click(login);
+});

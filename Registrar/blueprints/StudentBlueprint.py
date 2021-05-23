@@ -1,10 +1,8 @@
 from datetime import datetime
 from flask import Blueprint
 from flask import globals
-from flask import make_response
 from flask import redirect
 from flask import render_template
-from flask import session
 from flask import url_for
 from flask_login import login_required, current_user
 

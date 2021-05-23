@@ -30,6 +30,7 @@ from .blueprints.HandlerQuestionBlueprint import handlerQuestion
 from .blueprints.QuestionsPool import questionsPool
 from .blueprints.AdminBlueprint import admin
 from .blueprints.ParentBlueprint import parent
+from .blueprints.questions_manager import questionsManager
 from .blueprints.RegistrarBlueprint import registrar
 from .blueprints.TeacherBlueprint import teacher
 from .blueprints.StudentBlueprint import student
@@ -44,12 +45,14 @@ app.register_blueprint(handlerQuestion, url_prefix = "/handler/question")
 app.register_blueprint(questionsPool, url_prefix = "/questions-pool")
 app.register_blueprint(admin, url_prefix = "/administrator")
 app.register_blueprint(parent, url_prefix = "/parent")
+app.register_blueprint(questionsManager, url_prefix = "/questions-manager")
 app.register_blueprint(registrar, url_prefix = "/registrar")
 app.register_blueprint(teacher, url_prefix = "/teacher")
 app.register_blueprint(student, url_prefix = "/student")
 app.register_blueprint(classroom, url_prefix = "/classroom")
-app.register_blueprint(development, url_prefix = "/dev")
 app.register_blueprint(school, url_prefix = "/school")
+
+app.register_blueprint(development, url_prefix = "/dev")
 
 """
 globals.days = [

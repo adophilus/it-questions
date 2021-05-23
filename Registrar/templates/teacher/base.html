@@ -5,22 +5,21 @@
 {% endblock %}
 
 {% block styles_head %}
-    <link rel="stylesheet" href="/static/CSS/freebie-interactive/freebie-interactive.css">
-    <link rel="stylesheet" href="/static/CSS/input.css">
-    <link rel="stylesheet" href="/static/CSS/account-settings.css">
-    <link rel="stylesheet" href="/static/CSS/notifications.css">
-    <link rel="stylesheet" href="/static/CSS/profile.css">
-    <link rel="stylesheet" href="/static/CSS/school-events.css">
-    <link rel="stylesheet" href="/static/CSS/context-menu/context-menu.css">
+	<link rel="stylesheet" href="/static/CSS/freebie-interactive/freebie-interactive.css">
+	<link rel="stylesheet" href="/static/CSS/input.css">
+	<link rel="stylesheet" href="/static/CSS/account-settings.css">
+	<link rel="stylesheet" href="/static/CSS/notifications.css">
+	<link rel="stylesheet" href="/static/CSS/profile.css">
+	<link rel="stylesheet" href="/static/CSS/school-events.css">
+	<link rel="stylesheet" href="/static/CSS/context-menu/context-menu.css">
 {% endblock %}
 
 {% block left_container %}
-{% include "student/sidebar.html" %}
+{% include "teacher/sidebar.html" %}
 {% endblock %}
 
 {% block middle_container %}
 {% include "themes/default/profile-container.html" %}
-{% include "student/public-remarks.html" %}
 {% include "themes/default/school-events.html" %}
 {% include "themes/default/notifications.html" %}
 {% include "themes/default/account-settings.html" %}
@@ -31,19 +30,19 @@
 
 {% block scripts_body %}
 <script type="text/javascript">
-    window.Account = {
-        "type": "{{ account.ACCOUNT_TYPE }}"
-    }
-    window.displaying = new Array();
-    window.displaying["account_settings"] = false;
-    window.displaying["calendar_day"] = true;
-    window.displaying["calendar_month"] = true;
-    window.displaying["notifications"] = false;
-    window.displaying["school_events"] = true;
-    window.displaying["public_remarks"] = false;
-    window.displaying["user_profile"] = true;
-    window.chat_messages = new Array();
-    window.customContextMenu = {}
+	window.Account = {
+		"type": "{{ account.ACCOUNT_TYPE }}"
+	}
+	window.displaying = new Array();
+	window.displaying["account_settings"] = false;
+	window.displaying["calendar_day"] = true;
+	window.displaying["calendar_month"] = true;
+	window.displaying["notifications"] = false;
+	window.displaying["school_events"] = true;
+	window.displaying["public_remarks"] = false;
+	window.displaying["user_profile"] = true;
+	window.chat_messages = new Array();
+	window.customContextMenu = {}
 </script>
 <script type="text/javascript" src="/static/JavaScript/script-1.js"></script>
 <script type="text/javascript" src="/static/JavaScript/events.js"></script>
@@ -59,6 +58,6 @@
 <script type="text/javascript" src="/static/JavaScript/PrivateKeyGenerator/PrivateKeyGenerator.js"></script>
 <script type="text/javascript" src="/static/JavaScript/context-menu/context-menu.js"></script>
 <script type="text/javascript">
-    ContextMenu.prototype.handleWindowContextMenuEvents();
+	ContextMenu.prototype.handleWindowContextMenuEvents();
 </script>
 {% endblock %}

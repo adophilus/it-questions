@@ -2,7 +2,9 @@ from flask import globals
 from flask_login import UserMixin
 
 from ..controllers.config import config
-class Teacher (UserMixin, globals.db.Model):
+from .account_mixin import AccountMixin
+
+class Teacher (UserMixin, globals.db.Model, AccountMixin):
 	id = globals.db.Column(globals.db.Text, primary_key = True)
 	FIRST_NAME = globals.db.Column(globals.db.Text)
 	LAST_NAME = globals.db.Column(globals.db.Text)
@@ -14,18 +16,3 @@ class Teacher (UserMixin, globals.db.Model):
 	PHONE_NUMBER = globals.db.Column(globals.db.Text)
 	ACCOUNT_TYPE = globals.db.Column(globals.db.Text, default = config.getAccountType("teacher")["name"])
 	ACCOUNT_STATUS = globals.db.Column(globals.db.Text, default = config.getAccountStatus("ACTIVE"))
-
-	def __bool__ (self):
-		return True
-
-	@classmethod
-	def getByEmail (cls, email):
-		return cls.query.filter_by(EMAIL = email).first()
-
-	@classmethod
-	def getById (cls, id):
-		return cls.query.filter_by(id = id).first()
-
-	@classmethod
-	def getByUsername (cls, username):
-		return cls.query.filter_by(USERNAME = username).first()

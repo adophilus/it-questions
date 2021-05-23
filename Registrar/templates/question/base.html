@@ -1,0 +1,37 @@
+{% extends "themes/default/question.html" %}
+
+{% block left_container %}
+{% include "teacher/sidebar.html" %}
+{% endblock %}
+
+{% block question %}
+<div class="block questions-list">
+	<div class="arrow-btn-container">
+		<a class="arrow-btn left" id="display_classrooms_list_btn" href="javascript:void(0)">
+			<span class="icon fontawesome-angle-left"></span>
+		</a>
+		<h2 class="titular">CLASSROOMS</h2>
+	</div>
+	<div class="body"></div>
+	<div class="active-classroom">
+		<div class="messages"></div>
+		<div class="classroom-entry">
+			<span id="message_attachment_btn" class="entypo-attach message-attach-btn"></span>
+			<input type="text" id="classroom_message_entry" class="message-entry">
+			<span id="message_send_btn" class="message-send-btn">
+				<span class="flaticon-paper-plane"></span>
+			</span>
+		</div>
+	</div>
+</div>
+{% endblock %}
+
+{% block middle_container %}
+{% include "themes/default/profile-container.html" %}
+{% include "themes/default/school-events.html" %}
+{% include "themes/default/notifications.html" %}
+{% include "themes/default/account-settings.html" %}
+<div style="visibility: hidden;" class="calendar-day block">
+
+</div>
+{% endblock %}

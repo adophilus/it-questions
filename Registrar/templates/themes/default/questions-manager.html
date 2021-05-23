@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+	<meta charset="utf-8">
+	<title>{% block title %}Questions | {{ account.accountType | capitalize }}{% endblock %}</title>
+	{% block scripts_head %}{% endblock %}
+    {% block styles_head %}
+    <link rel="stylesheet" href="/static/CSS/freebie-interactive/freebie-interactive.css">
+	<link rel="stylesheet" href="/static/CSS/input.css">
+	<link rel="stylesheet" href="/static/CSS/modal-box/modal-box-select.css">
+	<link rel="stylesheet" href="/static/CSS/context-menu/context-menu.css">
+	<link rel="stylesheet" href="/static/CSS/questions.css">
+    {% endblock %}
+</head>
+
+<body>
+	<div class="main-container">
+		<!-- NAVIGATION BAR -->
+		{% block navbar %}{% endblock navbar %}
+		<!-- LEFT-CONTAINER -->
+		<div class="left-container container">
+			{% block sidebar %}{% endblock %}
+		</div>
+		<!-- MIDDLE-RIGHT-CONTAINER -->
+		<div class="middle-right-container">
+			{% block middle_content %}
+			{% block question %}
+			<div class="block questions-list">
+				<div class="arrow-btn-container">
+					<a class="arrow-btn left" id="display_questions_list_btn" href="javascript:void(0)">
+						<span class="icon fontawesome-angle-left"></span>
+					</a>
+					<h2 class="titular">QUESTIONS</h2>
+				</div>
+				<div class="body"></div>
+				<div class="active-qustion"></div>
+				</div>
+			</div>
+			{% endblock %}
+			{% endblock %}
+		</div>
+	</div>
+
+	{% block scripts_body %}
+	<script type="text/javascript">
+	window.Account = {
+		"type": "{{ account.ACCOUNT_TYPE }}"
+	}
+	window.displaying = new Array();
+	window.displaying["account_settings"] = false;
+	window.displaying["calendar_day"] = true;
+	window.displaying["calendar_month"] = true;
+	window.displaying["notifications"] = false;
+	window.displaying["school_events"] = true;
+	window.displaying["public_remarks"] = false;
+	window.displaying["user_profile"] = true;
+	window.chat_messages = new Array();
+	window.customContextMenu = {}
+	</script>
+	<script type="text/javascript" src="/static/JavaScript/script-1.js"></script>
+	<script type="text/javascript" src="/static/JavaScript/jquery.js"></script>
+	<script type="text/javascript" src="/static/JavaScript/jquery-ui.js"></script>
+	<script type="text/javascript" src="/static/JavaScript/modal-box/modal-box-select.js"></script>
+	<script type="text/javascript" src="/static/JavaScript/context-menu/context-menu.js"></script>
+	<script type="text/javascript" src="/static/JavaScript/questions.js"></script>
+	<script type="text/javascript">
+		ContextMenu.prototype.handleWindowContextMenuEvents();
+	</script>
+	{% endblock %}
+	{% block styles_body %}{% endblock %}
+
+</body>
+
+</html>

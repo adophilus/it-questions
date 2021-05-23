@@ -1,6 +1,6 @@
 from . import Account, validate
 from .config import config
-from .methods import sendFalse, sendTrue
+from .methods import printDebug, sendFalse, sendTrue
 
 def createQuestion (*args, **kwargs):
 	return sendFalse("not implemented yet!")

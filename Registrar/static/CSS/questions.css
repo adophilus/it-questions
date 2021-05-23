@@ -1,10 +1,11 @@
-.questions {
+#display_questions_list_btn {
 	display: none;
 }
-	.questions .titular,
-	.edit-question .titular,
-	.edit-question-details .titular,
-	.edit-question-option-settings .titular {
+
+.questions-list .titular,
+.edit-question .titular,
+.edit-question-details .titular,
+.edit-question-option-settings .titular {
 		background: #35aadc;
 	}
 
@@ -26,7 +27,7 @@
 	display: none;
 }
 
-.edit-question-details .details-item 
+.edit-question-details .details-item
 {
 
 }
