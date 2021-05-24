@@ -27,7 +27,7 @@ from .blueprints.account import account
 from .blueprints.MainBlueprint import main
 from .blueprints.HandlerBlueprint import handler
 from .blueprints.HandlerQuestionBlueprint import handlerQuestion
-from .blueprints.QuestionsPool import questionsPool
+from .blueprints.questions_pool import questionsPool
 from .blueprints.AdminBlueprint import admin
 from .blueprints.ParentBlueprint import parent
 from .blueprints.questions_manager import questionsManager

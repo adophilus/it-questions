@@ -55,7 +55,7 @@ class OptionRadioButton {
 	onclick (event, that) {
 		window.optionEntry.val(that.valueElement.innerHTML);
 		window.correctOptionSwitch.prop("checked", that.is_correct_option);
-		
+
 		window.selectedOption = that;
 		if (that.is_correct_option) {
 			window.correctRadioOption = that;
@@ -118,7 +118,7 @@ class OptionTextEntry {
 
 	assignAttributes () {
 		this.containerElement.setAttribute("class", "input-container edit-question-option");
-		
+
 		// this.valueElement.setAttribute("id", "text" + this.option_number);
 		this.valueElement.setAttribute("type", "text");
 		this.valueElement.setAttribute("autocomplete", "off");
@@ -197,7 +197,7 @@ class OptionCheckBox {
 
 	assignAttributes () {
 		this.containerElement.setAttribute("class", "input-container edit-question-option");
-		
+
 		this.checkBox.checked = this.is_correct_option;
 
 		this.checkBox.setAttribute("type", "checkbox");
@@ -222,7 +222,7 @@ class OptionCheckBox {
 	onclick (event, that) {
 		window.optionEntry.val(that.valueElement.innerHTML);
 		window.correctOptionSwitch.prop("checked", that.is_correct_option);
-		
+
 		window.selectedOption = that;
 		toggleEditQuestionOptionSettingsBlock(null, "show");
 	}
@@ -304,7 +304,7 @@ class OptionSwitchBox {
 		// this.switchBox.setAttribute("edit-question-option-number", this.option_number);
 
 		// this.switchBoxLabel.setAttribute("class", this.switchBoxLabel.getAttribute("class") + " option-value");
-		
+
 		this.switchBoxLabel.setAttribute("for", "switch" + this.option_number)
 		this.switchBox.setAttribute("id", "switch" + this.option_number);
 		this.switchBox.checked = false;
@@ -326,7 +326,7 @@ class OptionSwitchBox {
 		window.switchOptionMatchSelectOff.html(this.option_off_value);
 
 		window.correctOptionSwitch.prop("checked", that.is_correct_option);
-		
+
 		if (this.option_on_value == this.match) {
 			window.switchOptionMatchSelectOff.prop("selected", false);
 			window.switchOptionMatchSelectOn.prop("selected", "selected");
@@ -382,7 +382,7 @@ var options = {
 
 function updateOptionValue (event) {
 	var value = event.target.value;
-	
+
 	if (window.selectedOption.is_radio || window.selectedOption.is_check || window.selectedOption.is_switch) {
 		window.selectedOption.valueElement.innerHTML = value;
 	}
@@ -393,7 +393,7 @@ function updateOptionValue (event) {
 
 function updateOnOptionValue (event) {
 	var value = event.target.value;
-	
+
 	if (window.selectedOption.is_switch) {
 		window.selectedOption.setValue("on", value);
 	}
@@ -401,7 +401,7 @@ function updateOnOptionValue (event) {
 
 function updateOffOptionValue (event) {
 	var value = event.target.value;
-	
+
 	if (window.selectedOption.is_switch) {
 		window.selectedOption.setValue("off", value);
 	}
@@ -458,6 +458,41 @@ function updateOptionCorrect (event) {
 function updateOptionCaseSensitive (event) {
 	var is_case_sensitive = event.target.checked;
 	window.selectedOption.ignore_case = !(is_case_sensitive);
+}
+
+function getUserQuestionsList (callback = () => {}) {
+	$.ajax({
+		url: "/account/questions",
+		type: "POST",
+		success: function (data) {
+			data = JSON.parse(data);
+			if (data.status) {
+				console.log(data);
+				// callback(data.data);
+			}
+			else {
+				alert(data.error);
+			}
+		},
+		error: function (xhr) {
+			console.warn(xhr);
+		}
+	});
+}
+
+function displayQuestionsList (questions_list) {
+	for (let question_details in questions_list) {
+		var questionListContainer = document.createElement("div");
+		var questionDetailsContainer = document.createElement("p");
+		var questionTitleContainer = document.createElement("span");
+
+		questionDetailsContainer.classList.add("question-list-item");
+		questionTitleContainer.innerHTML = question_details.title;
+
+		questionDetailsContainer.appendChild(questionDetailsTitleContainer);
+		questionListContainer.appendChild(questionDetailsContainer);
+		window.questionsListContainer.append(questionListContainer);
+	}
 }
 
 function toggleQuestionsList (event, operation = "toggle") {
@@ -558,7 +593,7 @@ function toggleEditQuestionOptionSettingsBlock (event, operation = "toggle") {
 		else {
 			option_settings_container.css("display", "none");
 		}
-		
+
 		radio_option_settings.css("display", "none");
 		text_option_settings.css("display", "none");
 		check_option_settings.css("display", "none");
@@ -569,7 +604,7 @@ function toggleEditQuestionOptionSettingsBlock (event, operation = "toggle") {
 	else if (operation == "show") {
 		option_settings_container.fadeIn();
 		window.displaying["option_settings_block"] = true;
-		
+
 		if (window.selectedOption.is_radio) {
 			text_option_settings.css("display", "none");
 			check_option_settings.css("display", "none");
@@ -839,7 +874,7 @@ function saveCurrentQuestion (options, callback) {
 		}
 
 		option["value"] = optionData.valueElement.innerHTML;
-		
+
 		if (optionData.is_text) {
 			option["value"] = optionData.valueElement.placeholder;
 			option["ignore_case"] = optionData.ignore_case;
@@ -1033,7 +1068,7 @@ function addQuestionOption (data) {
 			loop_count++;
 		}
 	}
-	
+
 	var option_number = String(loop_count);
 	var option_value = "";
 	var option_mark = 0;
@@ -1055,7 +1090,8 @@ $(document).ready(function () {
 	window.caseSensitiveSwitch = $("#option_settings_is_case_sensitive");
 	window.keywordsEntry = $("#option_settings_keywords");
 	window.matchSelect = $("#switch_option_match");
-	
+	window.questionsListContainer = $(".question .questions-list");
+
 	window.switchOptionMatchSelectOn = $("#switch_option_on");
 	window.switchOptionMatchSelectOff = $("#switch_option_off");
 	window.switchOptionMatchSelectNone = $("#switch_option_match_none");
@@ -1077,20 +1113,22 @@ $(document).ready(function () {
 		"callback": addQuestionOption
 	});
 
+	getUserQuestions(displayUserQuestions);
+
 	for (var questionBlock of questionBlocks) {
 		$(questionBlock).click(showQuestionsDetails);
 
-		var editQuestionButton = $(questionBlock).find(".edit-question-button");
+		var editQuestionButton = $(questionBlock).find("#edit_question_button");
 		editQuestionButton.click(function (event) {
 			displayEditQuestionBlock(event);
 			fillQuestionDetailsBlock();
 		});
 	}
 
-	$("#questions_list_toggler").click(toggleQuestionsList);
+	$(".questions-list #questions_list_toggler").click(toggleQuestionsList);
 
 	// Bind the "previous_question" and the "next_question" buttons to functions
-	$("#next_question").click(function (e) {
+	$(".question-editor #next_question").click(function (e) {
 		saveCurrentQuestion(window.availableOptions, function (data) {
 			toggleEditQuestionOptionSettingsBlock(null, "hide");
 			displayNextQuestion();
@@ -1098,7 +1136,7 @@ $(document).ready(function () {
 		});
 	});
 
-	$("#previous_question").click(window.availableOptions, function (e) {
+	$(".question-editor #previous_question").click(window.availableOptions, function (e) {
 		saveCurrentQuestion(window.availableOptions, function (data) {
 			toggleEditQuestionOptionSettingsBlock(null, "hide");
 			displayPreviousQuestion();

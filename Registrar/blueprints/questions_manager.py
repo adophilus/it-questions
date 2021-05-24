@@ -18,3 +18,7 @@ def homeView ():
 		return redirect(url_for(f"{account.accountType}.homeView"))
 
 	return render_template(f"{account.accountType}/questions-manager.html", account = account, url_for = url_for)
+
+@questionsManager.route("/questions", methods = [ "POST" ])
+def getQuestionsView ():
+	return sendFalse([ question.as_dict() for question in current_user.questions ])

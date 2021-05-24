@@ -10,7 +10,7 @@
 	<link rel="stylesheet" href="/static/CSS/input.css">
 	<link rel="stylesheet" href="/static/CSS/modal-box/modal-box-select.css">
 	<link rel="stylesheet" href="/static/CSS/context-menu/context-menu.css">
-	<link rel="stylesheet" href="/static/CSS/questions.css">
+	<link rel="stylesheet" href="/static/CSS/question/questions-manager.css">
     {% endblock %}
 </head>
 
@@ -26,15 +26,23 @@
 		<div class="middle-right-container">
 			{% block middle_content %}
 			{% block question %}
-			<div class="block questions-list">
+			<div class="block question">
 				<div class="arrow-btn-container">
 					<a class="arrow-btn left" id="display_questions_list_btn" href="javascript:void(0)">
 						<span class="icon fontawesome-angle-left"></span>
 					</a>
 					<h2 class="titular">QUESTIONS</h2>
 				</div>
-				<div class="body"></div>
-				<div class="active-qustion"></div>
+				<div class="questions-list">
+					<!-- <div class="list">
+						<p class="question-list-item">
+							<span class="question-name">
+								Question 1
+							</span>
+						</p>
+					</div> -->
+				</div>
+				<div class="question-editor"></div>
 				</div>
 			</div>
 			{% endblock %}
@@ -63,7 +71,8 @@
 	<script type="text/javascript" src="/static/JavaScript/jquery-ui.js"></script>
 	<script type="text/javascript" src="/static/JavaScript/modal-box/modal-box-select.js"></script>
 	<script type="text/javascript" src="/static/JavaScript/context-menu/context-menu.js"></script>
-	<script type="text/javascript" src="/static/JavaScript/questions.js"></script>
+	<script type="text/javascript" src="/static/JavaScript/question/question-options.js"></script>
+	<script type="text/javascript" src="/static/JavaScript/question/questions-manager.js"></script>
 	<script type="text/javascript">
 		ContextMenu.prototype.handleWindowContextMenuEvents();
 	</script>

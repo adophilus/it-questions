@@ -7,50 +7,66 @@ from .methods import loadJson, saveJson
 
 import os
 
-class Question ():
+class Question (models.Question):
 	__exists__ = False
 	generator = PrivateKeyGenerator()
 	questionDetailsPath = None
 	questionPublicDetailsPath = None
+	questionDetails = {}
+	questionPublicDetails = {}
 
-	def __init__ (self, question_id = None, _object = None, *args, **kwargs):
-		question = _object
-
-		if (not object):
-			question = models.Question.getById(question_id)
-
-		if (question):
-			self.question = question
-			self.__exists__ = True
-		else:
-			self.question = models.Question(id = question_id, *args, **kwargs)
+	def __init__ (self, id, exists = False, *args, **kwargs):
+		kwargs["id"] = id
+		self.__exists__ = exists
+		models.Question(*args, **kwargs)
+		self.setQuestionPath()
+		if (self):
+			self.loadQuestionDetails()
 
 	def __bool__ (self):
 		return self.__exists__
 
 	def __str__ (self):
-		return self.get("id")
+		return self.id
+
+	def __iter__ (self):
+		return [
+			[ "id", self.id ],
+			[ "title", self.TITLE ],
+			[ "is_public", self.IS_PUBLIC ],
+			[ "number_of_questions", self.NUMBER_OF_QUESTIONS ],
+			[ "creator", self.CREATOR ],
+			[ "owner", self.OWNER ],
+			[ "image", self.IMAGE_PATH ]
+		].__iter()
+
+	def __repr__ (self):
+		return f"<Question id='{self.id}' owner='{self.OWNER}' creator='{self.CREATOR}'>"
+
+	def as_dict (self):
+		return dict(self.__iter__())
 
 	def setQuestionPath (self, path = None):
-		if (self.__exists__):
+		if (self):
 			if (not path):
-				path = os.path.join("data", "questions", self.question.id)
+				path = os.path.join("data", "questions", self.id)
 			self.questionDetailsPath = path.join("details.json")
 			self.questionPublicDetailsPath = path.join("details-public.json")
 
-	def __loadQuestionDetails (self, from_dict = False):
-		if (self.__exists__):
-			if (not from_dict):
+	def loadQuestionDetails (self, from_dict = False):
+		if (self):
+			if (from_dict):
+				if (self.IS_PUBLIC):
+					self.questionPublicDetails = loadJson(self.questionPublicDetailsPath)
 				self.questionDetails = loadJson(self.questionDetailsPath)
-				if (self.get("IS_PUBLIC")):
-					self.questionPublicDetails = loadJson(self.questionPublicDetailsPath)
-			else:
-				self.questionDetails = from_dict
-				if (self.get("IS_PUBLIC")):
-					self.questionPublicDetails = loadJson(self.questionPublicDetailsPath)
+				return True
+
+			if (self.IS_PUBLIC):
+				self.questionPublicDetails = loadJson(self.questionPublicDetails)
+			self.questionDetails = loadJson(self.questionDetails)
 
 	def saveQuestionDetails (self, details = None, public_details = None):
-		if (self.__exists__):
+		if (self):
 			if (self.get("IS_PUBLIC")):
 				if (not public_details):
 					public_details = self.questionPublicDetails
@@ -62,12 +78,13 @@ class Question ():
 			return True
 
 	def updatePublicDetails (self):
-		if (self.get("IS_PUBLIC")):
-			self.questionPublicDetails = self.questionDetails
+		if (self.IS_PUBLIC):
+			self.questionPublicDetails = self.questionPublicDetails
 			return self.saveQuestionDetails()
 
 	def makePublic (self):
-		return self.set("IS_PUBLIC", 1)
+		self.IS_PUBLIC = 1
+		return self.save()
 
 	@classmethod
 	def __generateId__  (cls, unique = True, question_type = "private"):
@@ -80,46 +97,34 @@ class Question ():
 				if not (question):
 					return id
 
-	@classmethod
-	def getAll (cls):
-		return [Question(_object = question) for question in models.Question.getAll()]
-
-	@classmethod
-	def getAllPublic (cls):
-		return [ Question(_object = question) for question in models.Question.getAllPublic() ]
-
 	def assignOwner (self, owner):
-		self.set("OWNER", owner.get("id"))
-		globals.db.session.commit()
+		self.OWNER = owner.get("id")
+		return self.save()
 
 	def setCreator (self, creator):
-		return self.set("CREATOR", creator.get("id"))
+		self.CREATOR = creator.get("id")
+		return self.save()
 
 	def setNumberOfQuestions (self, number_of_questions):
 		return self.set("NUMBER_OF_QUESTIONS", number_of_questions)
 
 	def create (self):
-		if (not self.__exists__):
-			self.setQuestionPath()
+		if (not self):
 			os.mkdir(os.dirname(self.questionDetailsPath))
 
-			question_details = {}
-			self.saveQuestionDetails(from_dict = question_details)
-			self.__loadQuestionDetails(from_dict = question_details)
+			self.questionDetails = {}
+			self.questionPublicDetails = {}
+			self.saveQuestionDetails()
 
-			globals.db.session.add(self.question)
+			globals.db.session.add(self)
 			globals.db.session.commit()
 			self.__exists__ = True
 
 	def delete (self):
-		if (self.__exists__):
-			globals.db.session.delete(self.question)
+		if (self):
+			globals.db.session.delete(self)
 			globals.db.session.commit()
 			self.__exists__ = False
 
-	def get (self, field):
-		return self.question[field]
-
-	def set (self, field, value):
-		self.question[field] = value
-		globals.db.session.commit()
+	def save (self):
+		return globals.db.session.commit()

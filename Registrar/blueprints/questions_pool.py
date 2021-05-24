@@ -9,7 +9,6 @@ questionsPool = Blueprint("questions_pool", __name__)
 
 @questionsPool.route("/")
 def questionsPoolIndexPage ():
-	# return globals.methods.renderQuestionsPoolPage()
 	return sendFalse("needs revision!")
 
 @questionsPool.route("/list/<question_id>")

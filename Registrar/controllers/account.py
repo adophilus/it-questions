@@ -249,6 +249,7 @@ class Account ():
 
 class AccountMixin ():
 	classrooms = []
+	questions = []
 
 	def __init__ (self):
 		if (self):

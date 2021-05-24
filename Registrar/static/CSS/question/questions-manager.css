@@ -1,0 +1,69 @@
+#display_questions_list_btn {
+	display: none;
+}
+
+.questions-list {
+	user-select: none;
+}
+
+.questions-list .titular,
+.edit-question .titular,
+.edit-question-details .titular,
+.edit-question-option-settings .titular {
+		background: #35aadc;
+	}
+
+#questions_list_holder .question {
+	overflow: auto;
+	cursor: pointer;
+}
+
+#questions_list_holder .question .title {
+	font-size: 20px;
+	font-weight: bolder;
+}
+
+#questions_list_holder .question .details,
+.edit-question,
+.edit-question-details,
+.edit-question-option-settings
+{
+	display: none;
+}
+
+.edit-question-details .details-item
+{
+
+}
+	.details-value {
+		float: right;
+	}
+
+.edit-question-option-settings .text-option-settings {
+	display: none;
+}
+
+.edit-question-option-settings .switch-option-settings {
+	display: none;
+}
+
+.edit-question-option-settings .switch-option-settings .switch-option-entry {
+	width: 40%;
+	display: inline-block;
+}
+
+.edit-question-button.button {
+	background: #35aadc;
+	margin: 10px auto;
+}
+	.edit-question.button:hover {
+		background: #0080b7;
+	}
+
+textarea[edit-question-text] {
+	max-width: fixed;
+}
+
+.option-value {
+	overflow-wrap: break-word;
+}
