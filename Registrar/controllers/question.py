@@ -4,6 +4,7 @@ from .private_key_generator import PrivateKeyGenerator
 from .. import models
 from .config import config
 from .methods import loadJson, saveJson
+from .methods import printDebug
 
 import os
 
@@ -15,19 +16,17 @@ class Question (models.Question):
 	questionDetails = {}
 	questionPublicDetails = {}
 
-	def __init__ (self, id, exists = False, *args, **kwargs):
-		kwargs["id"] = id
+	def __init__ (self, exists = False, *args, **kwargs):
+		if (kwargs.get("id") == None):
+			kwargs["id"] = self.__generateId__()
 		self.__exists__ = exists
-		models.Question(*args, **kwargs)
+		models.Question.__init__(self, *args, **kwargs)
 		self.setQuestionPath()
 		if (self):
 			self.loadQuestionDetails()
 
 	def __bool__ (self):
 		return self.__exists__
-
-	def __str__ (self):
-		return self.id
 
 	def __iter__ (self):
 		return [
@@ -92,17 +91,22 @@ class Question (models.Question):
 			id = cls.generator.generate(level = config["id_length"]["question"])
 
 			if (unique):
-				question = Question(id)
+				question = cls.getById(id)
 
 				if not (question):
 					return id
 
 	def assignOwner (self, owner):
 		self.OWNER = owner.get("id")
+		owner.addQuestion(self)
+		if (not self.CREATOR):
+			self.setCreator(owner)
 		return self.save()
 
 	def setCreator (self, creator):
 		self.CREATOR = creator.get("id")
+		if (not self.OWNER):
+			self.assignOwner(creator)
 		return self.save()
 
 	def setNumberOfQuestions (self, number_of_questions):
@@ -125,6 +129,12 @@ class Question (models.Question):
 			globals.db.session.delete(self)
 			globals.db.session.commit()
 			self.__exists__ = False
+
+	def get (self, field):
+		return self[field]
+	
+	def set (self, field, value):
+		self[field] = value
 
 	def save (self):
 		return globals.db.session.commit()

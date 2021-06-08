@@ -5,7 +5,7 @@ from flask import url_for
 
 from ..controllers.methods import sendFalse
 
-questionsPool = Blueprint("questions_pool", __name__)
+questionsPool = Blueprint("questionsPool", __name__)
 
 @questionsPool.route("/")
 def questionsPoolIndexPage ():

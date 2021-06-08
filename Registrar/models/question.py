@@ -13,12 +13,21 @@ class Question (globals.db.Model):
 
     @classmethod
     def getAll (cls):
-        return [ question for question in cls.query.all() ]
+        qs = [ question for question in cls.query.all() ]
+        for q in qs:
+            q.__init__(exists = True)
+        return qs
 
     @classmethod
     def getAllPublic (cls):
-        return [ question for question in cls.query.filter_by(IS_PUBLIC = 1) ]
+        qs = [ question for question in cls.query.filter_by(IS_PUBLIC = 1) ]
+        for q in qs:
+            q.__init__(exists = True)
+        return qs
 
     @classmethod
     def getById (cls, id):
-        return cls.query.filter_by(id = id).first()
+        q = cls.query.filter_by(id = id).first()
+        if (q != None):
+            q.__init__(exists = True)
+        return q

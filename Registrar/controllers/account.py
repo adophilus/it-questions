@@ -5,7 +5,8 @@ from flask_login import current_user
 from . import validate
 from .config import config
 from .classroom import Classroom
-from .methods import fernetEncrypt, fernetDecrypt, loadJson, printDebug, saveJson, sendFalse
+from .methods import fernetEncrypt, fernetDecrypt, loadJson, saveJson, sendFalse
+from .methods import printDebug
 from .private_key_generator import PrivateKeyGenerator
 from .. import models
 
@@ -252,7 +253,9 @@ class AccountMixin ():
 	questions = []
 
 	def __init__ (self):
+		printDebug("calling __init__ method", f"{self.__class__.__name__}.__init__")
 		if (self):
+			printDebug("setting account path", f"{self.__class__.__name__}.__init__")
 			self.setAccountPath("data")
 			self.loadAccountDetails()
 			self.loadAccountSettings()
@@ -261,12 +264,37 @@ class AccountMixin ():
 		return self.__exists__
 
 	def addClassroom (self, classroom, classroom_profile):
-		if (self.isStudent() or self.isTeacher()):
+		if (isinstance(question, Question)):
 			printDebug("adding classroom to account details", "AccountMixin.addClassroom")
 			self.accountDetails["classroom"][classroom.get("id")] = classroom_profile
 			self.classrooms.append(classroom)
 			self.saveAccountDetails()
 			return True
+
+	def removeClassroom (self, classroom):
+		if (isinstance(classroom, Classroom)):
+			for i in range(len(self.classrooms)):
+				if (self.classrooms[i].get("id") == classroom.get("id")):
+					del self.accountDetails["classroom"][classroom.get("id")]
+					self.classrooms.pop(i)
+					self.saveAccountDetails()
+					return True
+					
+	def addQuestion (self, question):
+		if (isinstance(question, Question)):
+			self.accountDetails["questions"].append(question.get("id"))
+			self.questions.append(question)
+			self.saveAccountDetails()
+			return True
+
+	def removeQuestion (self, question):
+		if (isinstance(question, Question)):
+			for i in range(len(self.questions)):
+				if (self.questions[i].get("id") == question.get("id")):
+					self.accountDetails["questions"].pop(i)
+					self.questions.pop(i)
+					self.saveAccountDetails()
+					return True
 
 	def getClassrooms (self):
 		printDebug(type(self), "AccountMixin.getClassrooms")
@@ -283,14 +311,15 @@ class AccountMixin ():
 						created = True
 						break
 				if (not created):
-					self.classrooms.append(Classroom(classroom_id))
 
+					self.classrooms.append(Classroom(classroom_id))
+	
 	def setAccountPath (self, path = "data"):
 		if (self):
 			path = os.path.join(path, f'{self.ACCOUNT_TYPE}s', self.id)
 			self.accountDetailsPath = os.path.join(path, "details.json")
 			self.accountSettingsPath = os.path.join(path, "settings.json")
-
+			
 	def loadAccountDetails (self, from_dict = False):
 		if (self):
 			if (not from_dict):
@@ -386,7 +415,7 @@ class Administrator (models.Administrator, AccountMixin, Account):
 	def get (self, field):
 		if (str(field).lower() == "id"):
 		    return self.id
-		if (str(field).upper() == "FIRST_NAME"):
+		elif (str(field).upper() == "FIRST_NAME"):
 			return self.FIRST_NAME
 		elif (str(field).upper() == "LAST_NAME"):
 			return self.LAST_NAME
@@ -517,7 +546,7 @@ class Parent (models.Parent, AccountMixin, Account):
 	def get (self, field):
 		if (str(field).lower() == "id"):
 		    return self.id
-		if (str(field).upper() == "FIRST_NAME"):
+		elif (str(field).upper() == "FIRST_NAME"):
 			return self.FIRST_NAME
 		elif (str(field).upper() == "LAST_NAME"):
 			return self.LAST_NAME
@@ -582,10 +611,10 @@ class Teacher (models.Teacher, AccountMixin, Account):
 		"classroom": {}
 	}
 
-	def __init__ (self, exists = False, **kwargs):
+	def __init__ (self, exists = False, *args, **kwargs):
 		self.__exists__ = exists
 		kwargs["ACCOUNT_TYPE"] = config.getAccountType("teacher")["name"]
-		models.Teacher.__init__(self, **kwargs)
+		models.Teacher.__init__(self, *args, **kwargs)
 		AccountMixin.__init__(self)
 		self.populateClassrooms()
 		self.populateSubjectsTeaching()
@@ -595,19 +624,6 @@ class Teacher (models.Teacher, AccountMixin, Account):
 
 	def populateSubjectsTeaching (self):
 		printDebug("Not implemented yet!", "Teacher.populateSubjectsTeaching")
-
-	def addClassroom (self, classroom, classroom_profile = None):
-		if (not classroom_profile):
-			return False
-
-		self.accountDetails["classroom"][classroom.get("id")] = classroom_profile
-		self.classrooms.append(classroom)
-		self.saveAccountDetails()
-		return True
-
-	def addQuestion (self, question):
-		if (isinstance(question, Question)):
-			self.questions.append(question)
 
 	def addSubjectsTeaching (self, subject):
 		if (isinstance(subject, models.Subject)):
@@ -663,7 +679,7 @@ class Teacher (models.Teacher, AccountMixin, Account):
 	def get (self, field):
 		if (str(field).lower() == "id"):
 		    return self.id
-		if (str(field).upper() == "FIRST_NAME"):
+		elif (str(field).upper() == "FIRST_NAME"):
 			return self.FIRST_NAME
 		elif (str(field).upper() == "LAST_NAME"):
 			return self.LAST_NAME
@@ -724,11 +740,10 @@ class Student (models.Student, AccountMixin, Account):
 		"classroom": {}
 	}
 
-	def __init__ (self, exists = False, **kwargs):
+	def __init__ (self, exists = False, *args, **kwargs):
 		self.__exists__ = exists
-		printDebug("Calling student __init__ method", "Student.__init__")
 		kwargs["ACCOUNT_TYPE"] = config.getAccountType("student")["name"]
-		models.Student.__init__(self, **kwargs)
+		models.Student.__init__(self, *args, **kwargs)
 		AccountMixin.__init__(self)
 		self.populateClassrooms()
 

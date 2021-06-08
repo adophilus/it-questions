@@ -1,0 +1,5 @@
+from .controllers.account import Account
+from .tests.questions import create_question
+
+account = Account(username = "teacher")
+create_question.createQuestionFor(account)
